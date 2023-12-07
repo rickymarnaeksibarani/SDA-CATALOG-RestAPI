@@ -37,12 +37,6 @@ Go to into file application.properties and then :
 - change password :
 >spring.datasource.password=password
 
--------
-
-### Contact
-Hubungi Kantor Polisi Terdekat
-
-911 Emergency Call
 
 -------
 
@@ -61,3 +55,10 @@ For further reference, please consider the following sections:
 
 ### Rest API Documentation
 [**Click here**](ApiDoc.md "**Click here**")
+
+-------
+
+### Contact
+Hubungi Kantor Polisi Terdekat
+
+911 Emergency Call
