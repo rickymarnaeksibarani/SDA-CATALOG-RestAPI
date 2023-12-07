@@ -1,4 +1,6 @@
-# SDA Catalogue Rest Api
+# **SDA Catalogue Rest Api**
+
+-------
 ### Application Specification
 - Spring Boot v3.2.0
 - JDK v17.0.3
