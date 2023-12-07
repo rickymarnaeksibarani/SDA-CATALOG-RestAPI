@@ -1,7 +1,7 @@
 # **SDA Catalogue Rest Api**
 
 -------
-### Application Specification
+### 1. Application Specification
 - Spring Boot v3.2.0
 - JDK v17.0.3
 - PostgreSQL Driver v42.2.27
@@ -11,13 +11,13 @@
 
 -------
 
-### Database
+### 2. Database
 - PostgreSQL v14
 
 [*More Information*](https://www.postgresql.org/ "*More Information*")
 
 ------
-### Installation
+### 3. Installation
 Install dependency
 > mvn install
 
@@ -26,7 +26,7 @@ run spring boot
 
 ------
 
-### Database Configuration
+### 4. Database Configuration
 Go to into file application.properties and then :
 - change url, port, and database name :
 >spring.datasource.url=jdbc:postgresql://localhost:5432/db_sda_catalogue
@@ -40,7 +40,7 @@ Go to into file application.properties and then :
 
 -------
 
-### Reference Documentation
+### 5. Reference Documentation
 For further reference, please consider the following sections:
 
 * [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
@@ -53,12 +53,12 @@ For further reference, please consider the following sections:
 
 -------
 
-### Rest API Documentation
+### 6. Rest API Documentation
 [**Click here**](ApiDoc.md "**Click here**")
 
 -------
 
-### Contact
+### 7. Contact
 Hubungi Kantor Polisi Terdekat
 
 911 Emergency Call
