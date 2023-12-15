@@ -1,35 +1,42 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
+import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangAnnotation.*;
 
 @Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WebAppPostDTO {
 
-    @NotBlank(message = "application name is required!")
+//    @TGRNotEmpty
+//    @TGRString
     private String applicationName;
 
-    @NotBlank(message = "description is required!")
+//    @TGRNotEmpty
     private String description;
 
-    @NotBlank(message = "function application is required!")
+//    @TGRString
     private String functionApplication;
 
-    @NotBlank(message = "address is required!")
+//    @TGRNotEmpty
     private String address;
 
-    @NotBlank(message = "dinas is required!")
+//    @TGRNotEmpty
     private String dinas;
 
-    @NotBlank(message = "mapping function is required!")
+//    @TGRNotEmpty
     private String mappingFunction;
 
-    @NotBlank(message = "business impact priority is required!")
+//    @TGRNotEmpty
     private String businessImpactPriority;
 
-    @NotBlank(message = "status is required!")
+//    @TGRNotEmpty
+//    @TGREmail
     private String status;
 
-    @NotBlank(message = "sda cloud is required!")
+//    @TGRNotEmpty
     private String sdaCloud;
 }

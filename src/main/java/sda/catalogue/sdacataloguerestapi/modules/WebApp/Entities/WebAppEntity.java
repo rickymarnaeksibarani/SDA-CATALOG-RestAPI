@@ -2,26 +2,29 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
 @Immutable
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Table(name = "tb_webapp")
 public class WebAppEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_webapp")
@@ -31,49 +34,47 @@ public class WebAppEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @NotBlank(message = "application name is required!")
-    @Column(name = "application_name", nullable = false)
+    @Column(name = "application_name")
     private String applicationName;
 
-    @NotBlank(message = "description is required!")
-    @Column(name = "description", nullable = false)
+
+    @Column(name = "description")
     private String description;
 
-    @NotBlank(message = "function application is required!")
-    @Column(name = "function_application", nullable = false)
+    @Column(name = "function_application")
     private String functionApplication;
 
-    @NotBlank(message = "address is required!")
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
-    @NotBlank(message = "mapping function is required!")
-    @NotBlank(message = "dinas is required!")
-    @Column(name = "dinas", nullable = false)
+    @Column(name = "dinas")
     private String dinas;
 
-    @NotBlank(message = "business impact priority is required!")
-    @Column(name = "mapping_function", nullable = false)
+    @Column(name = "mapping_function")
     private String mappingFunction;
 
-
-    @NotBlank(message = "business impact priority is required!")
-    @Column(name = "business_impact_priority", nullable = false)
+    @Column(name = "business_impact_priority")
     private String businessImpactPriority;
 
-    @NotBlank(message = "status is required!")
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private String status;
 
-    @NotBlank(message = "sda cloud is required!")
-    @Column(name = "sda_cloud", nullable = false)
+    @Column(name = "sda_cloud")
     private String sdaCloud;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+            name = "webapp_picdeveloper",
+            joinColumns = @JoinColumn(name = "id_webapp"),
+            inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
+    )
+    private List<PICDeveloperEntity> picDeveloperList;
 }
