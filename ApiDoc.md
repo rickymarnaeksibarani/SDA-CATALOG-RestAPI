@@ -590,5 +590,3 @@ URL: {{url_local}}:{{port}}/api/v1/type-database/6c04e304-ede5-4f8f-8b62-4d257e6
 
 ---
 [Back to top](#sda-catalogue)
-
->Generated at 2023-12-16 03:09:03 by [docgen](https://github.com/thedevsaddam/docgen)
