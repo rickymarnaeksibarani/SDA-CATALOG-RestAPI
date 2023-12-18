@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseDTO;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Services.TypeDatabaseService;
 
@@ -41,6 +43,44 @@ public class TypeDatabaseController {
         try {
             TypeDatabaseEntity result = typeDatabaseService.getTypeDatabaseByUuid(uuid);
             ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data type database!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (TangerangRequestException error) {
+            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    @PostMapping()
+    public ResponseEntity<?> createTypeDatabase(TypeDatabaseDTO request) {
+        try {
+            TypeDatabaseEntity result = typeDatabaseService.createTypeDatabase(request);
+            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success create data type database!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (TangerangRequestException error) {
+            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    @PutMapping("/{uuid}")
+    public ResponseEntity<?> updateTypeDatabase(
+            @PathVariable("uuid") UUID uuid,
+            @RequestBody @Valid TypeDatabaseDTO request
+    ) {
+        try {
+            TypeDatabaseEntity result = typeDatabaseService.updateTypeDatabase(uuid, request);
+            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success update data type database!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (TangerangRequestException error) {
+            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<?> deleteTypeDatabase(
+            @PathVariable("uuid") UUID uuid
+    ) {
+        try {
+            TypeDatabaseEntity result = typeDatabaseService.deleteTypeDatabase(uuid);
+            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data type database!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
