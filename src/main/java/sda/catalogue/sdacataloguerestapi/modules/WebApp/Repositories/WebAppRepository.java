@@ -25,7 +25,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "   OR LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "ORDER BY w.updatedAt DESC")
     List<WebAppEntity> findBySearchTerm(String searchTerm, Pageable pageable);
 

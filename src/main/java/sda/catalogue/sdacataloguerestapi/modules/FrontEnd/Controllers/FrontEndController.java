@@ -1,6 +1,5 @@
-package sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Controllers;
+package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Controllers;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,53 +7,54 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseDTO;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Services.TypeDatabaseService;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Servces.FrontEndService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/type-database")
-public class TypeDatabaseController {
+@RequestMapping("/api/v1/front-end")
+public class FrontEndController {
     @Autowired
-    private TypeDatabaseService typeDatabaseService;
+    private FrontEndService frontEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchTypeDatabase(
+    public ResponseEntity<?> searchFrontEnd(
             @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
             @RequestParam(name = "page", defaultValue = "1") long page,
             @RequestParam(name = "size", defaultValue = "10") long size
     ) {
         try {
-            PaginateResponse<List<TypeDatabaseEntity>> result = typeDatabaseService.searchAndPaginate(searchTerm, page, size);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data type database!", result), HttpStatus.OK);
+            PaginateResponse<List<FrontEndEntity>> result = frontEndService.searchFrontEnd(searchTerm, page, size);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result), HttpStatus.OK);
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
         }
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<?> getTypeDatabaseByUuid(
+    public ResponseEntity<?> getFrontEndByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            TypeDatabaseEntity result = typeDatabaseService.getTypeDatabaseByUuid(uuid);
-            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data type database!", result);
+            FrontEndEntity result = frontEndService.getFrontEndByUuid(uuid);
+            ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
         }
     }
 
+
     @PostMapping()
-    public ResponseEntity<?> createTypeDatabase(
-            @RequestBody TypeDatabaseDTO request
+    public ResponseEntity<?> createFrontEnd(
+            @RequestBody FrontEndDTO request
     ) {
         try {
-            TypeDatabaseEntity result = typeDatabaseService.createTypeDatabase(request);
-            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Success create data type database!", result);
+            FrontEndEntity result = frontEndService.createFrontEnd(request);
+            ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Success create data front end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
@@ -62,26 +62,27 @@ public class TypeDatabaseController {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<?> updateTypeDatabase(
+    public ResponseEntity<?> updateFrontEnd(
             @PathVariable("uuid") UUID uuid,
-            @RequestBody @Valid TypeDatabaseDTO request
+            @RequestBody FrontEndDTO request
     ) {
         try {
-            TypeDatabaseEntity result = typeDatabaseService.updateTypeDatabase(uuid, request);
-            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Success update data type database!", result);
+            FrontEndEntity result = frontEndService.updateFrontEnd(uuid, request);
+            ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Success update data front end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
         }
     }
 
+
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<?> deleteTypeDatabase(
+    public ResponseEntity<?> deleteFrontEnd(
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            TypeDatabaseEntity result = typeDatabaseService.deleteTypeDatabase(uuid);
-            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data type database!", result);
+            FrontEndEntity result = frontEndService.deleteFrontEnd(uuid);
+            ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data front end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());

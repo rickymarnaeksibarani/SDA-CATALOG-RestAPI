@@ -57,7 +57,7 @@ public class PICDeveloperController {
     ) {
         try {
             PICDeveloperEntity result = picDeveloperService.createPICDeveloper(request);
-            ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success created data pic developer!", result);
+            ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Success created data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (TangerangRequestException error) {
             return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());

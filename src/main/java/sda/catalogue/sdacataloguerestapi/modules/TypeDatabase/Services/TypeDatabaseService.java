@@ -20,7 +20,6 @@ public class TypeDatabaseService {
     @Autowired
     private TypeDatabaseRepository typeDatabaseRepository;
 
-    @Transactional
     public PaginateResponse<List<TypeDatabaseEntity>> searchAndPaginate(String searchTerm, long page, long size) {
         Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
         List<TypeDatabaseEntity> result = typeDatabaseRepository.findBySearchTerm(searchTerm, pageable);
