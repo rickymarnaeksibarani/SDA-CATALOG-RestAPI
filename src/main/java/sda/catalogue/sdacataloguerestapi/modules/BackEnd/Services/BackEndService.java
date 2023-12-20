@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -45,7 +45,7 @@ public class BackEndService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -56,7 +56,7 @@ public class BackEndService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 }

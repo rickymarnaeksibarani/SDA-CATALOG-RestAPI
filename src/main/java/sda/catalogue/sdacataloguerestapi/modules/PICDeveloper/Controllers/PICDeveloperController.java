@@ -1,13 +1,13 @@
 package sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.ApiResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Services.PICDeveloperService;
@@ -31,8 +31,8 @@ public class PICDeveloperController {
         try {
             PaginateResponse<List<PICDeveloperEntity>> result = picDeveloperService.searchAndPaginate(searchTerm, page, size);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data pic developers!", result), HttpStatus.OK);
-        } catch (TangerangRequestException error) {
-            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
 
@@ -45,22 +45,22 @@ public class PICDeveloperController {
             PICDeveloperEntity result = picDeveloperService.getPICDeveloperByUUID(uuid);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
-        } catch (TangerangRequestException error) {
-            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
 
     //Creating data PIC Developer
     @PostMapping()
     public ResponseEntity<?> createPICDeveloper(
-            @RequestBody PICDeveloperDTO request
+           @Valid @RequestBody PICDeveloperDTO request
     ) {
         try {
             PICDeveloperEntity result = picDeveloperService.createPICDeveloper(request);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Success created data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
-        } catch (TangerangRequestException error) {
-            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
 
@@ -68,14 +68,14 @@ public class PICDeveloperController {
     @PutMapping("/{uuid}")
     public ResponseEntity<?> updatePICDeveloper(
             @PathVariable("uuid") UUID uuid,
-            @RequestBody PICDeveloperDTO request
+            @Valid @RequestBody PICDeveloperDTO request
     ) {
         try {
             PICDeveloperEntity result = picDeveloperService.updatePICDeveloper(uuid, request);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Success updated data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
-        } catch (TangerangRequestException error) {
-            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
 
@@ -88,8 +88,8 @@ public class PICDeveloperController {
             PICDeveloperEntity result = picDeveloperService.deletePICDeveloperByUuid(uuid);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success deleted data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
-        } catch (TangerangRequestException error) {
-            return error.GlobalTangerangRequestException(error.getMessage(), error.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
 }

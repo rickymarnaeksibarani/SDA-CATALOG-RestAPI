@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
@@ -35,7 +35,7 @@ public class PICDeveloperService {
     public PICDeveloperEntity getPICDeveloperByUUID(UUID uuid) {
         PICDeveloperEntity result = pICDeveloperRepository.findByUuid(uuid);
         if (result == null) {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
@@ -59,7 +59,7 @@ public class PICDeveloperService {
         if (result > 0) {
             return pICDeveloperRepository.findByUuid(uuid);
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -72,7 +72,7 @@ public class PICDeveloperService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 

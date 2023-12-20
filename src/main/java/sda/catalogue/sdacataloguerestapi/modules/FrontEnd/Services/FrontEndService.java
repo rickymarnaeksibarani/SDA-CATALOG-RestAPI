@@ -1,4 +1,4 @@
-package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Servces;
+package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
@@ -31,7 +31,7 @@ public class FrontEndService {
     public FrontEndEntity getFrontEndByUuid(UUID uuid) {
         FrontEndEntity result = frontEndRepository.findByUuid(uuid);
         if (result == null) {
-            throw new TangerangRequestException("UUID" + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID" + uuid + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
@@ -50,7 +50,7 @@ public class FrontEndService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -61,7 +61,7 @@ public class FrontEndService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 }

@@ -1,4 +1,4 @@
-package sda.catalogue.sdacataloguerestapi.core.TangerangResponse;
+package sda.catalogue.sdacataloguerestapi.core.CustomResponse;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;

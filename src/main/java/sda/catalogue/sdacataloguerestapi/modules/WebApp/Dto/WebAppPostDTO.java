@@ -1,7 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
 import lombok.*;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangAnnotation.*;
 
 @Data
 @Getter

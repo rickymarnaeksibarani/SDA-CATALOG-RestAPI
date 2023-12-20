@@ -1,13 +1,12 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppPostDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
@@ -35,7 +34,7 @@ public class WebAppService {
     public WebAppEntity getWebAppByUuid(UUID uuid) {
         WebAppEntity result = webAppRepository.findByUuid(uuid);
         if (result == null) {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
