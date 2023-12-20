@@ -1,11 +1,11 @@
 package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 @Data
 @Setter
 @Getter

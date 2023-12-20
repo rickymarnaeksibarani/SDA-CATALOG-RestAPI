@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class ValidatorExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ValidatorException> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ValidatorExceptionDTO> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, List<String>> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
             errors.computeIfAbsent(fieldName, key -> new ArrayList<>()).add(errorMessage);
         });
 
-        ValidatorException response = new ValidatorException(HttpStatus.BAD_REQUEST, "Validation failed", errors);
+        ValidatorExceptionDTO response = new ValidatorExceptionDTO(HttpStatus.BAD_REQUEST, "Validation failed", errors);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

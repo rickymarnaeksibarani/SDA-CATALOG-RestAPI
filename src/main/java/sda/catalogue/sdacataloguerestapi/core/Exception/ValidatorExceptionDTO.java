@@ -9,12 +9,12 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class ValidatorException {
+public class ValidatorExceptionDTO {
     private HttpStatus status;
     private String message;
     private Map<String, List<String>> errors;
 
-    public ValidatorException(HttpStatus status, String message, Map<String, List<String>> errors) {
+    public ValidatorExceptionDTO(HttpStatus status, String message, Map<String, List<String>> errors) {
         this.status = status;
         this.message = message;
         this.errors = errors;

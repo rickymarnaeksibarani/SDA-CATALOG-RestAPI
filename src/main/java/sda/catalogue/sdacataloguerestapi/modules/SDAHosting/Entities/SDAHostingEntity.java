@@ -23,7 +23,7 @@ import java.util.UUID;
 public class SDAHostingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_pic_developer")
+    @Column(name = "id_sda_hosting")
     private long idPicDeveloper;
 
     @UuidGenerator
