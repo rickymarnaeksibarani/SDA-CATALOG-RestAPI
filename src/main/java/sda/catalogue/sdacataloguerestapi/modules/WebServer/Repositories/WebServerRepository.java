@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public interface WebServerRepository extends JpaRepository<WebServerEntity, Long
             "WHERE LOWER(w.webServer) LIKE LOWER(CONCAT('%', :searchTerm,'%'))")
     long countBySearchTerm(String searchTerm);
 
-    BackEndEntity findByUuid(UUID uuid);
+    WebServerEntity findByUuid(UUID uuid);
 
     @Modifying
     @Transactional

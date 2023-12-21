@@ -8,17 +8,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.MappingFunctionDTO;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.DinasRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class MappingFunctionService {
     @Autowired
     private MappingFunctionRepository mappingFunctionRepository;
+
+    @Autowired
+    private DinasRepository dinasRepository;
 
     @Transactional
     public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
@@ -37,13 +45,53 @@ public class MappingFunctionService {
         return result;
     }
 
+    @Transactional
     public MappingFunctionEntity createMappingFunction(MappingFunctionDTO request) {
         MappingFunctionEntity data = new MappingFunctionEntity();
         data.setMappingFunction(request.getMappingFunction());
-        return mappingFunctionRepository.save(data);
+        MappingFunctionEntity mappingFunctionProcess = mappingFunctionRepository.save(data);
+
+        List<DinasEntity> dinasList = new ArrayList<>();
+        for (DinasDTO dataDinas : request.getDinasList()) {
+            DinasEntity dinasItem = new DinasEntity();
+            dinasItem.setMappingFunctionEntity(mappingFunctionProcess);
+            dinasItem.setDinas(dataDinas.getDinas());
+            dinasList.add(dinasItem);
+        }
+        dinasRepository.saveAll(dinasList);
+        data.setDinasEntityList(dinasList);
+
+        return mappingFunctionProcess;
     }
 
-//    public MappingFunctionEntity updateMappingFunctionByUuid(UUID uuid, MappingFunctionDTO request) {
-//        return mappingFunctionRepository.findByUuidAndUpdate(uuid, request.getMappingFunction())
-//    }
+    @Transactional
+    public MappingFunctionEntity updateMappingFunctionByUuid(UUID uuid, MappingFunctionDTO request) {
+        int mappingFunctionProcess = mappingFunctionRepository.findByUuidAndUpdate(uuid, request.getMappingFunction());
+        MappingFunctionEntity findData = mappingFunctionRepository.findByUuid(uuid);
+        dinasRepository.deleteAllByMappingFunctionEntity(findData);
+        List<DinasEntity> dinasList = new ArrayList<>();
+        for (DinasDTO dataDinas : request.getDinasList()) {
+            DinasEntity dinasItem = new DinasEntity();
+            dinasItem.setMappingFunctionEntity(findData);
+            dinasItem.setDinas(dataDinas.getDinas());
+            dinasList.add(dinasItem);
+        }
+        dinasRepository.saveAll(dinasList);
+        if (mappingFunctionProcess > 0) {
+            return mappingFunctionRepository.findByUuid(uuid);
+        } else {
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Transactional
+    public MappingFunctionEntity deleteMappingFunctionByUuid(UUID uuid) {
+        MappingFunctionEntity findData = mappingFunctionRepository.findByUuid(uuid);
+        int result = mappingFunctionRepository.deleteByUuid(uuid);
+        if (result > 0) {
+            return findData;
+        } else {
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+        }
+    }
 }

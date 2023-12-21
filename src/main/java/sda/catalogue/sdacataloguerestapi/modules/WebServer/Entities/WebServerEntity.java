@@ -24,7 +24,7 @@ public class WebServerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_web_server")
-    private long idWebapp;
+    private long idWebServer;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)

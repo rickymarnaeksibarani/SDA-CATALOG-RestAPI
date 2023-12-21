@@ -41,9 +41,8 @@ public class BackEndService {
     @Transactional
     public BackEndEntity updateBackend(UUID uuid, BackEndDTO request) {
         int result = backendRepository.findByUuidAndUpdate(uuid, request.getBackEnd());
-        BackEndEntity findData = backendRepository.findByUuid(uuid);
         if (result > 0) {
-            return findData;
+            return backendRepository.findByUuid(uuid);
         } else {
             throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }

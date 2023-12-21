@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class MappingFunctionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_mapping_function")
-    private long idFrontEnd;
+    private long idMappingFunction;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,6 +43,6 @@ public class MappingFunctionEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "mappingFunctionEntity")
+    @OneToMany(mappedBy = "mappingFunctionEntity", cascade = CascadeType.ALL)
     private List<DinasEntity> dinasEntityList;
 }

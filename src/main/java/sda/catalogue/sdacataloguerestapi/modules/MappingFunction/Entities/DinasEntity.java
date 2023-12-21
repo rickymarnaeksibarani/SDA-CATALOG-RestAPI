@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,14 +25,14 @@ public class DinasEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_dinas")
-    private long idFrontEnd;
+    private long idDinas;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
     @Column(name = "dinas")
-    private long mappingFunction;
+    private String dinas;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -41,6 +42,8 @@ public class DinasEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(targetEntity = MappingFunctionEntity.class)
+    @ManyToOne
+    @JoinColumn(name = "id_mapping_function", nullable = false)
+    @JsonIgnore
     private MappingFunctionEntity mappingFunctionEntity;
 }

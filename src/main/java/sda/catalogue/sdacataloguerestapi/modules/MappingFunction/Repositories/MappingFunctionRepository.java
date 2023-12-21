@@ -33,8 +33,6 @@ public interface MappingFunctionRepository extends JpaRepository<MappingFunction
     int findByUuidAndUpdate(UUID uuid, String mappingFunction);
 
 
-    @Modifying
     @Transactional
-    @Query("DELETE FROM MappingFunctionEntity w WHERE w.uuid = :uuid")
-    int findUuidAndDelete(UUID uuid);
+    int deleteByUuid(UUID uuid);
 }

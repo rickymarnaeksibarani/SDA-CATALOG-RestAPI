@@ -1,4 +1,4 @@
-package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities;
+package sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,19 +19,19 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_sda_hosting")
-public class SDAHostingEntity {
+@Table(name = "tb_document_upload")
+public class DocumentUploadEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_sda_hosting")
-    private long idSDAHosting;
+    @Column(name = "id_document_upload")
+    private long idDocumentUpload;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "sda_hosting")
-    private String sdaHosting;
+    @Column(name = "path")
+    private String path;
 
     @CreationTimestamp
     @Column(name = "created_at")

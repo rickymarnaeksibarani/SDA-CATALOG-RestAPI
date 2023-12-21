@@ -21,7 +21,7 @@ public class BackEndEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_backend")
-    private long idFrontEnd;
+    private long idBackEnd;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
