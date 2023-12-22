@@ -42,15 +42,7 @@ public class WebAppService {
     //Creating data WebApp
     public WebAppEntity createWebApp(WebAppPostDTO request) {
         WebAppEntity data = new WebAppEntity();
-        data.setApplicationName(request.getApplicationName());
-        data.setDescription(request.getDescription());
-        data.setFunctionApplication(request.getFunctionApplication());
-        data.setAddress(request.getAddress());
-        data.setDinas(request.getDinas());
-        data.setMappingFunction(request.getMappingFunction());
-        data.setBusinessImpactPriority(request.getBusinessImpactPriority());
-        data.setStatus(request.getStatus());
-        data.setSdaCloud(request.getSdaCloud());
+        System.out.println(request);
         return webAppRepository.save(data);
     }
 
@@ -63,11 +55,8 @@ public class WebAppService {
                 request.getDescription(),
                 request.getFunctionApplication(),
                 request.getAddress(),
-                request.getDinas(),
-                request.getMappingFunction(),
                 request.getBusinessImpactPriority(),
-                request.getStatus(),
-                request.getSdaCloud());
+                request.getStatus());
     }
 
     //Deleting data WebApp by UUID

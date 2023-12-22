@@ -21,11 +21,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.dinas) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "ORDER BY w.updatedAt DESC")
     List<WebAppEntity> findBySearchTerm(String searchTerm, Pageable pageable);
 
@@ -35,11 +32,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.dinas) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+            "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) ")
     long countBySearchTerm(String searchTerm);
 
     //Getting data WebApp by UUID
@@ -53,11 +47,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "w.description = :description, " +
             "w.functionApplication = :functionApplication, " +
             "w.address = :address, " +
-            "w.dinas = :dinas, " +
-            "w.mappingFunction = :mappingFunction, " +
             "w.businessImpactPriority = :businessImpactPriority, " +
-            "w.status = :status, " +
-            "w.sdaCloud = :sdaCloud " +
+            "w.status = :status " +
             "WHERE w.uuid = :uuid")
     WebAppEntity updateByUuid(
             UUID uuid,
@@ -65,11 +56,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             String description,
             String functionApplication,
             String address,
-            String dinas,
-            String mappingFunction,
             String businessImpactPriority,
-            String status,
-            String sdaCloud);
+            String status);
 
     //Deleting data WebApp by UUID
     @Modifying

@@ -45,7 +45,4 @@ public class PICDeveloperEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @ManyToMany(mappedBy = "picDeveloperList")
-    private List<WebAppEntity> webAppEntityList;
 }

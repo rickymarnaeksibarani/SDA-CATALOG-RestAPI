@@ -53,17 +53,13 @@ public class WebAppController {
 
 
     //Create Data Web App
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<?> createWebApp(
-            @RequestBody WebAppPostDTO request
+            @ModelAttribute WebAppPostDTO request
     ) {
         try {
-//            ResponseEntity<?> validationResponse = TangerangValidator.TangerangValidator(webappData);
-//            if (validationResponse != null) {
-//                return validationResponse;
-//            }
-            WebAppEntity result = webAppService.createWebApp(request);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
+            System.out.println(request);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", null);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

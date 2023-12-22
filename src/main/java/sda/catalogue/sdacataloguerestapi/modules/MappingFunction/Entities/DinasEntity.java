@@ -43,7 +43,7 @@ public class DinasEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "id_mapping_function", nullable = false)
+    @JoinColumn(name = "id_mapping_function")
     @JsonIgnore
     private MappingFunctionEntity mappingFunctionEntity;
 }

@@ -1,4 +1,4 @@
-package sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities;
+package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,9 +10,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -21,19 +21,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_document_upload")
-public class DocumentUploadEntity {
+@Table(name = "tb_versioning_application")
+public class VersioningApplicationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_document_upload")
-    private long idDocumentUpload;
+    @Column(name = "id_versioning_application")
+    private long idVersioningApplication;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "path")
-    private String path;
+    @Column(name = "version")
+    private String version;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "release_date")
+    private Date releaseDate;
 
     @CreationTimestamp
     @Column(name = "created_at")

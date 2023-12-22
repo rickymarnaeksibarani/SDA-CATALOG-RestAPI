@@ -9,8 +9,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -40,4 +42,7 @@ public class SDAHostingEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "sdaHostingEntity", cascade = CascadeType.ALL)
+    private List<WebAppEntity> webAppList;
 }
