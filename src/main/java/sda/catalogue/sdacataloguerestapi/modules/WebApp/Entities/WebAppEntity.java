@@ -2,6 +2,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,6 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 import java.time.LocalDateTime;
@@ -147,6 +147,6 @@ public class WebAppEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_sda_hosting")
-    @JsonIgnore
+    @JsonIgnoreProperties("sdaHostingEntities")
     private SDAHostingEntity sdaHostingEntity;
 }

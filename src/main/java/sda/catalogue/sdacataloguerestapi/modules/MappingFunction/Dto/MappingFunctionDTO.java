@@ -18,6 +18,6 @@ public class MappingFunctionDTO {
     private String mappingFunction;
 
     @NotNull
-    @NotBlank
+    @NotEmpty
     private List<DinasDTO> dinasList;
 }

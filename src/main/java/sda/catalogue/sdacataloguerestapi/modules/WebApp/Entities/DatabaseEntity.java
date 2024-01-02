@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class DatabaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_database")
-    private long idWebapp;
+    private long idDatabase;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,6 +46,6 @@ public class DatabaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_type_database")
-    @JsonIgnore
+    @JsonIgnoreProperties("databaseEntities")
     private TypeDatabaseEntity typeDatabaseEntity;
 }

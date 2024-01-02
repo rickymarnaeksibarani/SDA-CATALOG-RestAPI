@@ -9,10 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -45,4 +43,11 @@ public class PICDeveloperEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public PICDeveloperEntity(Long id) {
+        // Assuming you want to set the idPicDeveloper field with the provided id
+        this.idPicDeveloper = id;
+        // You might need to initialize other fields based on the id or provide additional logic
+    }
+
 }

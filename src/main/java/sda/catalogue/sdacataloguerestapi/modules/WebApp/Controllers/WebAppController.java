@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.DatabaseDTO;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.VersioningApplicationDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppPostDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
 
 import jakarta.validation.Valid;
+
 import java.util.*;
 
 @RestController
@@ -55,11 +58,18 @@ public class WebAppController {
     //Create Data Web App
     @PostMapping
     public ResponseEntity<?> createWebApp(
-            @ModelAttribute WebAppPostDTO request
+            @Valid @ModelAttribute WebAppPostDTO request,
+            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
+            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
+            @RequestPart("frontEndList") List<Long> frontEndList,
+            @RequestPart("backEndList") List<Long> backEndList,
+            @RequestPart("webServerList") List<Long> webServerList,
+            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList
     ) {
         try {
-            System.out.println(request);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", null);
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
@@ -70,10 +80,17 @@ public class WebAppController {
     @PutMapping("/{uuid}")
     public ResponseEntity<?> updateWebApp(
             @PathVariable("uuid") UUID uuid,
-            @RequestBody @Valid WebAppEntity request
+            @Valid @ModelAttribute WebAppPostDTO request,
+            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
+            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
+            @RequestPart("frontEndList") List<Long> frontEndList,
+            @RequestPart("backEndList") List<Long> backEndList,
+            @RequestPart("webServerList") List<Long> webServerList,
+            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList
     ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

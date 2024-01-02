@@ -20,10 +20,11 @@ public class DocumentUploadController {
 
     @PostMapping
     public ResponseEntity<?> createDocumentUpload(
-            @RequestParam() List<MultipartFile> documents
+            @RequestParam() List<MultipartFile> documents,
+            @RequestParam() Integer webAppId
     ) {
         try {
-            List<DocumentUploadEntity> result = documentUploadService.createDocumentUpload(documents);
+            List<DocumentUploadEntity> result = documentUploadService.createDocumentUpload(documents, webAppId);
             ApiResponse<List<DocumentUploadEntity>> response = new ApiResponse<>(HttpStatus.OK, "Success upload documents!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

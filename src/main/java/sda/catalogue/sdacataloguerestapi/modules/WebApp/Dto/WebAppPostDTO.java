@@ -1,17 +1,9 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
-import jakarta.persistence.ElementCollection;
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
-import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
-import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
-import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 import java.util.List;
 
@@ -20,24 +12,31 @@ import java.util.List;
 @AllArgsConstructor
 public class WebAppPostDTO {
 
+    @NotNull
     @NotEmpty
     private String applicationName;
 
+    @NotNull
     @NotEmpty
     private String categoryApp;
 
+    @NotNull
     @NotEmpty
     private String description;
 
+    @NotNull
     @NotEmpty
     private String functionApplication;
 
+    @NotNull
     @NotEmpty
     private String address;
 
+    @NotNull
     @NotEmpty
     private String businessImpactPriority;
 
+    @NotNull
     @NotEmpty
     private String status;
 
@@ -51,39 +50,21 @@ public class WebAppPostDTO {
 
     private MultipartFile fileAndroid;
 
+    @NotNull
     @NotEmpty
     private String applicationSourceFe;
 
+    @NotNull
     @NotEmpty
     private String applicationSourceBe;
 
+    @NotNull
     @NotEmpty
     private String ipDatabase;
 
-    @NotEmpty
-    private List<Integer> picDeveloperList;
+    @NotNull
+    private Long sdaHostingEntity;
 
-    @NotEmpty
-    private List<Integer> mappingFunctionList;
-
-    @NotEmpty
-    private List<Integer> frontEndList;
-
-    @NotEmpty
-    private List<Integer> backEndList;
-
-    @NotEmpty
-    private List<Integer> webServerList;
-
-    @NotEmpty
-    private List<VersioningApplicationEntity> versioningApplicationList;
-
-    @NotEmpty
-    private List<DatabaseEntity> databaseList;
-
-    @NotEmpty
-    private SDAHostingEntity sdaHostingEntity;
-
-    @NotEmpty
+    @NotNull
     private List<MultipartFile> documentUploadList;
 }

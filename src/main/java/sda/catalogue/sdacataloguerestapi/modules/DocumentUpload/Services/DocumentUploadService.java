@@ -9,6 +9,7 @@ import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Repositories.DocumentUploadRepository;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +27,7 @@ public class DocumentUploadService extends BaseController {
     private static final String UPLOAD_DIR = "src/main/resources/uploads/document";
 
     @Transactional
-    public List<DocumentUploadEntity> createDocumentUpload(List<MultipartFile> documents) {
+    public List<DocumentUploadEntity> createDocumentUpload(List<MultipartFile> documents, long webAppId) {
 
         List<DocumentUploadEntity> documentList = new ArrayList<>();
         try {
@@ -39,10 +40,14 @@ public class DocumentUploadService extends BaseController {
                 Files.copy(dataDocument.getInputStream(), filePath);
 
                 DocumentUploadEntity documentItem = new DocumentUploadEntity();
-                documentItem.setPath(uploadPath + "\\" + newFilename);
+                documentItem.setPath(String.valueOf(filePath));
+                WebAppEntity webAppEntity = new WebAppEntity();
+                webAppEntity.setIdWebapp(webAppId);
+                documentItem.setWebAppEntity(webAppEntity);
 
                 documentList.add(documentItem);
             }
+            documentUploadRepository.saveAll(documentList);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }

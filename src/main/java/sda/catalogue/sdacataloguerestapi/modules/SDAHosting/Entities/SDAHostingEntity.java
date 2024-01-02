@@ -43,6 +43,6 @@ public class SDAHostingEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "sdaHostingEntity", cascade = CascadeType.ALL)
-    private List<WebAppEntity> webAppList;
+    @OneToMany(mappedBy = "sdaHostingEntity")
+    private List<WebAppEntity> sdaHostingEntities;
 }
