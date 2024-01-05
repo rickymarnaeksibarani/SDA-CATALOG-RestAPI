@@ -24,7 +24,7 @@ public class DocumentUploadService extends BaseController {
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
 
-    private static final String UPLOAD_DIR = "src/main/resources/uploads/document";
+    public static final String UPLOAD_DIR = "src/main/resources/uploads/document";
 
     @Transactional
     public List<DocumentUploadEntity> createDocumentUpload(List<MultipartFile> documents, long webAppId) {

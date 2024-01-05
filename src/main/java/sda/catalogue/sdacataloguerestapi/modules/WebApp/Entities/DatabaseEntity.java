@@ -39,7 +39,7 @@ public class DatabaseEntity {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_webapp")
     @JsonIgnore
     private WebAppEntity webAppEntity;

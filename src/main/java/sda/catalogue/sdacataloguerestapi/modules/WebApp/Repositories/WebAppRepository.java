@@ -5,12 +5,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
+import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 @Repository
 public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
@@ -42,22 +51,30 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
 
     //Updating data WebApp by UUID
     @Modifying
-    @Query("UPDATE WebAppEntity w SET " +
-            "w.applicationName = :applicationName, " +
-            "w.description = :description, " +
-            "w.functionApplication = :functionApplication, " +
-            "w.address = :address, " +
-            "w.businessImpactPriority = :businessImpactPriority, " +
-            "w.status = :status " +
+    @Transactional
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.categoryApp = :categoryApp, " +
+            "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
+            "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
+            "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
+            "w.fileAndroid = :fileAndroid, w.applicationSourceFe = :applicationSourceFe, " +
+            "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
             "WHERE w.uuid = :uuid")
-    WebAppEntity updateByUuid(
-            UUID uuid,
-            String applicationName,
-            String description,
-            String functionApplication,
-            String address,
-            String businessImpactPriority,
-            String status);
+    int updateByUuid(UUID uuid,
+                           String applicationName,
+                           String categoryApp,
+                           String description,
+                           String functionApplication,
+                           String address,
+                           String businessImpactPriority,
+                           String status,
+                           String linkIOS,
+                           String linkAndroid,
+                           String fileManifest,
+                           String fileIpa,
+                           String fileAndroid,
+                           String applicationSourceFe,
+                           String applicationSourceBe,
+                           String ipDatabase);
 
     //Deleting data WebApp by UUID
     @Modifying

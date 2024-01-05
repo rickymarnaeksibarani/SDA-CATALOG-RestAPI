@@ -13,6 +13,7 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
@@ -43,6 +44,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService.UPLOAD_DIR;
 
 @Service
 public class WebAppService extends BaseController {
@@ -205,112 +208,49 @@ public class WebAppService extends BaseController {
     public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
-            if (findData != null) {
-                super.isValidApkType(request.getFileAndroid());
-                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-                Files.createDirectories(newApkPath);
-                Path apkPath = newApkPath.resolve(apkFileName);
-                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
-
-                //Ipa Process
-                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-                Files.createDirectories(newIpaPath);
-                Path ipaPath = newIpaPath.resolve(ipaFileName);
-                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
-
-                //Manifest Process
-                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-                Files.createDirectories(newManifestPath);
-                Path manifestPath = newManifestPath.resolve(manifestFileName);
-                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
-
-                //Upload Apk, Ipa, and Manifests Process
-                uploadApkIpaManifest(request.getFileAndroid(), request.getFileIpa(), request.getFileManifest());
-
-                //PIC Developer Process
-                List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
-
-                //Mapping Function Process
-                List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunctionList, mappingFunctionRepository, Function.identity(), "Mapping Function");
-
-                //Front End Process
-                List<FrontEndEntity> frontEndData = processLongList(frontEndList, frontEndRepository, Function.identity(), "Front End");
-
-                //Back End Process
-                List<BackEndEntity> backEndData = processLongList(backEndList, backEndRepository, Function.identity(), "Back End");
-
-                //Web Server Process
-                List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
-
-                //WebApp Process
-                WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
-
-                data.setPicDeveloperList(picDeveloperData);
-                data.setMappingFunctionList(mappingFunctionData);
-                data.setFrontEndList(frontEndData);
-                data.setBackEndList(backEndData);
-                data.setWebServerList(webServerData);
-
-                //Path File
-                data.setFileAndroid(String.valueOf(apkPath));
-                data.setFileIpa(String.valueOf(ipaPath));
-                data.setFileManifest(String.valueOf(manifestPath));
-
-                // Modify SDA Hosting
-                Optional<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findById(request.getSdaHostingEntity());
-                if (findSdaHosting.isPresent()) {
-                    data.setSdaHostingEntity(findSdaHosting.get());
-                } else {
-                    throw new CustomRequestException("SDA Hosting with ID :" + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
-                }
-
-                //Saving Data
-                WebAppEntity result = webAppRepository.save(data);
-
-                //Document Process
-                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
-
-                //Versioning Application Process
-                List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
-                for (VersioningApplicationDTO versioningApplicationId : versioningApplicationList) {
-                    VersioningApplicationEntity versioningApplicationItem = new VersioningApplicationEntity();
-                    versioningApplicationItem.setVersion(versioningApplicationId.getVersion());
-                    versioningApplicationItem.setDescription(versioningApplicationId.getDescription());
-                    versioningApplicationItem.setReleaseDate(versioningApplicationId.getReleaseDate());
-                    versioningApplicationItem.setWebAppEntity(result);
-                    versioningApplicationListData.add(versioningApplicationItem);
-                }
-
-                //Database Process
-                List<DatabaseEntity> databaseListData = new ArrayList<>();
-                for (DatabaseDTO databaseId : databaseList) {
-                    DatabaseEntity databaseItem = new DatabaseEntity();
-                    databaseItem.setWebAppEntity(result);
-                    databaseItem.setApiAddress(databaseId.getApiAddress());
-                    databaseItem.setPassword(databaseId.getPassword());
-                    databaseItem.setApiName(databaseId.getApiName());
-                    Optional<TypeDatabaseEntity> typeDatabaseEntityOptional = typeDatabaseRepository.findById(databaseId.getIdTypeDatabase());
-                    if (typeDatabaseEntityOptional.isPresent()) {
-                        TypeDatabaseEntity typeDatabaseEntity = typeDatabaseEntityOptional.get();
-                        databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
-                        databaseListData.add(databaseItem);
-                    } else {
-                        throw new CustomRequestException("Database with ID :" + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
-                    }
-                }
-
-                databaseRepository.saveAll(databaseListData);
-                versioningApplicationRepository.saveAll(versioningApplicationListData);
-
-                //Delete File Apk, Ipa, Manifest
-                deleteApkIpaManifest(Path.of(findData.getFileAndroid()), Path.of(findData.getFileIpa()), Path.of(findData.getFileManifest()));
-                return result;
-            } else {
+            if (findData == null) {
                 throw new CustomRequestException("WebApp with UUID :" + uuid + " not found", HttpStatus.NOT_FOUND);
             }
+            super.isValidApkType(request.getFileAndroid());
+            String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
+            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
+            Files.createDirectories(newApkPath);
+            Path apkPath = newApkPath.resolve(apkFileName);
+            Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+
+            //Ipa Process
+            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
+            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
+            Files.createDirectories(newIpaPath);
+            Path ipaPath = newIpaPath.resolve(ipaFileName);
+            Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+
+            //Manifest Process
+            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
+            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
+            Files.createDirectories(newManifestPath);
+            Path manifestPath = newManifestPath.resolve(manifestFileName);
+            Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+
+            webAppRepository.updateByUuid(
+                    uuid,
+                    request.getApplicationName(),
+                    request.getCategoryApp(),
+                    request.getDescription(),
+                    request.getFunctionApplication(),
+                    request.getAddress(),
+                    request.getBusinessImpactPriority(),
+                    request.getStatus(),
+                    request.getLinkIOS(),
+                    request.getLinkAndroid(),
+                    manifestPath.toString(),
+                    ipaPath.toString(),
+                    apkPath.toString(),
+                    request.getApplicationSourceFe(),
+                    request.getApplicationSourceBe(),
+                    request.getIpDatabase()
+            );
+            return webAppRepository.findByUuid(uuid);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }
@@ -321,45 +261,17 @@ public class WebAppService extends BaseController {
         return webAppRepository.findByUuidAndDelete(uuid);
     }
 
-    //Upload Apk, Ipa, and Manifests Process
-    private void uploadApkIpaManifest(MultipartFile fileApk, MultipartFile fileIpa, MultipartFile fileManifest) {
-        try {
-            //APK Process
-            super.isValidApkType(fileApk);
-            String apkFileName = super.generateNewFilename(Objects.requireNonNull(fileApk.getOriginalFilename()));
-            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-            Files.createDirectories(newApkPath);
-            Path apkPath = newApkPath.resolve(apkFileName);
-            Files.copy(fileApk.getInputStream(), apkPath);
-
-            //Ipa Process
-            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(fileIpa.getOriginalFilename()));
-            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-            Files.createDirectories(newIpaPath);
-            Path ipaPath = newIpaPath.resolve(ipaFileName);
-            Files.copy(fileApk.getInputStream(), ipaPath);
-
-            //Manifest Process
-            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(fileManifest.getOriginalFilename()));
-            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-            Files.createDirectories(newManifestPath);
-            Path manifestPath = newManifestPath.resolve(manifestFileName);
-            Files.copy(fileApk.getInputStream(), manifestPath);
-        } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
-        }
-    }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {
             //APK Process
-            Files.deleteIfExists(apkPath);
+            Files.delete(apkPath);
 
             //Ipa Process
-            Files.deleteIfExists(ipaPath);
+            Files.delete(ipaPath);
 
             //Manifest Process
-            Files.deleteIfExists(manifestPath);
+            Files.delete(manifestPath);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }

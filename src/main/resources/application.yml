@@ -15,7 +15,7 @@ spring:
     jpa:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         hibernate:
-            ddl-auto: update
+            ddl-auto: create-drop
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,7 +30,7 @@ spring:
         validation: true
     servlet:
         multipart:
-            max-file-size: 1000MB
-            max-request-size: 1000MB
+            max-file-size: 500MB
+            max-request-size: 500MB
     springdoc:
 
