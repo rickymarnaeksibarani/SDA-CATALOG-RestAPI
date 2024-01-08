@@ -14,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
@@ -136,6 +137,11 @@ public class WebAppEntity {
     )
     private List<WebServerEntity> webServerList;
 
+    @ManyToOne
+    @JoinColumn(name = "id_sda_hosting")
+    @JsonIgnoreProperties("sdaHostingEntities")
+    private SDAHostingEntity sdaHostingEntity;
+
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
     private List<DocumentUploadEntity> documentUploadList;
 
@@ -145,8 +151,7 @@ public class WebAppEntity {
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
     private List<DatabaseEntity> databaseList;
 
-    @ManyToOne
-    @JoinColumn(name = "id_sda_hosting")
-    @JsonIgnoreProperties("sdaHostingEntities")
-    private SDAHostingEntity sdaHostingEntity;
+//    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+//    private List<FeedbackEntity> feedbackList;
+
 }

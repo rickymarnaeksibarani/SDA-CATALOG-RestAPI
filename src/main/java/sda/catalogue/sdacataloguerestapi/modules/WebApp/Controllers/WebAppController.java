@@ -14,7 +14,7 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppPostDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.*;
 
