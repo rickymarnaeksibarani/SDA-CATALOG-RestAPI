@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -20,4 +21,8 @@ public class CommentDTO {
     @NotEmpty
     @NotNull
     private String comment;
+
+    @NotEmpty
+    @NotNull
+    private Long feedBackEntity;
 }

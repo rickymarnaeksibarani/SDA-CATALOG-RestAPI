@@ -40,6 +40,22 @@ public class FeedbackController {
         }
     }
 
+    @GetMapping("/user/{personalNumber}")
+    public ResponseEntity<?> getByPersonalNumberAndFilterByYearAndRating(
+            @PathVariable("personalNumber") String personalNumber,
+            @RequestParam(name = "year", defaultValue = "") int year,
+            @RequestParam(name = "rate", defaultValue = "") Long rate,
+            @RequestParam(name = "page", defaultValue = "1") long page,
+            @RequestParam(name = "size", defaultValue = "10") long size
+    ) {
+        try {
+            PaginateResponse<List<FeedbackEntity>> result = feedbackService.getByPersonalNumberAndFilterByYearAndRating(personalNumber, year, rate, page, size);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data feedback!", result), HttpStatus.OK);
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
     @GetMapping("/{uuid}")
     public ResponseEntity<?> getFeedbackByUuid(
             @PathVariable("uuid") UUID uuid

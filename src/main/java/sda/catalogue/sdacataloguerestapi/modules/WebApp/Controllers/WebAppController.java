@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.DatabaseDTO;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.VersioningApplicationDTO;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppPostDTO;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
 
@@ -29,11 +27,13 @@ public class WebAppController {
     @GetMapping()
     public ResponseEntity<?> searchWebApps(
             @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+            @RequestParam(name = "order", defaultValue = "createdAt") String order,
+            @RequestParam(name = "by", defaultValue = "desc") String by,
             @RequestParam(name = "page", defaultValue = "1") long page,
             @RequestParam(name = "size", defaultValue = "10") long size
     ) {
         try {
-            PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, page, size);
+            PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, order, by, page, size);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
@@ -49,6 +49,38 @@ public class WebAppController {
             WebAppEntity result = webAppService.getWebAppByUuid(uuid);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+
+    @GetMapping("/stats-status")
+    public ResponseEntity<?> getStatsStatus() {
+        try {
+            SDAStatusStatsDTO result = webAppService.statsWebByStatus();
+            ApiResponse<SDAStatusStatsDTO> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by status!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+
+    @GetMapping("/stats-sda-hosting")
+    public ResponseEntity<?> getStatsSdaHosting(
+            @RequestParam(name = "dataType", defaultValue = "array") String dataType
+    ) {
+        try {
+            if (Objects.equals(dataType, "object")) {
+                Map<String, Long> result = webAppService.statsSdaHostingObject();
+                ApiResponse<Map<String, Long>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
+                return new ResponseEntity<>(response, response.getStatus());
+            } else {
+                List<SDAHostingStatsDTO> result = webAppService.statsSdaHostingArray();
+                ApiResponse<List<SDAHostingStatsDTO>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
+                return new ResponseEntity<>(response, response.getStatus());
+            }
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }

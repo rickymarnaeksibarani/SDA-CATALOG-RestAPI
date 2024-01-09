@@ -32,8 +32,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "ORDER BY w.updatedAt DESC")
-    List<WebAppEntity> findBySearchTerm(String searchTerm, Pageable pageable);
+            "ORDER BY CASE WHEN :order = 'asc' THEN :by END ASC, CASE WHEN :order = 'desc' THEN :by END DESC")
+    List<WebAppEntity> findBySearchTerm(String searchTerm, String order, String by, Pageable pageable);
 
     //Counting data WebApp with search
     @Query("SELECT COUNT(w) FROM WebAppEntity w " +
@@ -60,24 +60,31 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
             "WHERE w.uuid = :uuid")
     int updateByUuid(UUID uuid,
-                           String applicationName,
-                           String categoryApp,
-                           String description,
-                           String functionApplication,
-                           String address,
-                           String businessImpactPriority,
-                           String status,
-                           String linkIOS,
-                           String linkAndroid,
-                           String fileManifest,
-                           String fileIpa,
-                           String fileAndroid,
-                           String applicationSourceFe,
-                           String applicationSourceBe,
-                           String ipDatabase);
+                     String applicationName,
+                     String categoryApp,
+                     String description,
+                     String functionApplication,
+                     String address,
+                     String businessImpactPriority,
+                     String status,
+                     String linkIOS,
+                     String linkAndroid,
+                     String fileManifest,
+                     String fileIpa,
+                     String fileAndroid,
+                     String applicationSourceFe,
+                     String applicationSourceBe,
+                     String ipDatabase);
 
     //Deleting data WebApp by UUID
     @Modifying
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")
     WebAppEntity findByUuidAndDelete(UUID uuid);
+
+    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
+    int countByStatus(String status);
+
+    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
+    Long countBySdaHosting(String sdaHosting);
+
 }

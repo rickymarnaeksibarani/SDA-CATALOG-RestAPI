@@ -53,7 +53,7 @@ public class PICDeveloperController {
     //Creating data PIC Developer
     @PostMapping()
     public ResponseEntity<?> createPICDeveloper(
-           @Valid @RequestBody PICDeveloperDTO request
+           @RequestBody @Valid PICDeveloperDTO request
     ) {
         try {
             PICDeveloperEntity result = picDeveloperService.createPICDeveloper(request);

@@ -7,8 +7,11 @@ import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.CommentDTO;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.CommentEntity;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Repositories.CommentRepository;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Repositories.FeedbackRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -16,9 +19,18 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
     public CommentEntity createComment(CommentDTO request) {
-        CommentEntity data = ObjectMapperUtil.map(request, CommentEntity.class);
-        return commentRepository.save(data);
+        Optional<FeedbackEntity> findData = feedbackRepository.findById(request.getFeedBackEntity());
+        if (findData.isPresent()) {
+            CommentEntity data = ObjectMapperUtil.map(request, CommentEntity.class);
+            data.setFeedBackEntity(findData.get());
+            return commentRepository.save(data);
+        } else {
+            throw new CustomRequestException("ID Feedback" + request.getFeedBackEntity() + " not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     public CommentEntity updateComment(UUID uuid, CommentDTO request) {

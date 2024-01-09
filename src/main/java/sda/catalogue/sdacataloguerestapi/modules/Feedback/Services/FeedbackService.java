@@ -59,4 +59,12 @@ public class FeedbackService {
             throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
+
+    public PaginateResponse<List<FeedbackEntity>> getByPersonalNumberAndFilterByYearAndRating(String personalNumber, int year, Long rate, long page, long size) {
+        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
+        List<FeedbackEntity> result = feedbackRepository.findByPersonalNumber(personalNumber, year, rate, pageable);
+        long total = 5;
+        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
+        return new PaginateResponse<>(result, pageInfo);
+    }
 }

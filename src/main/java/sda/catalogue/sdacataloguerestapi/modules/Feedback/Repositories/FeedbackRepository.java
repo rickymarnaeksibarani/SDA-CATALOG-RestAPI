@@ -42,4 +42,15 @@ public interface FeedbackRepository extends JpaRepository<FeedbackEntity, Long> 
     @Transactional
     @Query("DELETE FROM FeedbackEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+
+
+    @Query("SELECT w FROM FeedbackEntity w " +
+            "WHERE (:year IS NULL OR YEAR(w.createdAt) = :year) " +
+            "AND (:rate IS NULL OR w.rate = :rate) " +
+            "AND (:personalNumber IS NULL OR w.personalNumber = :personalNumber) " +
+            "ORDER BY w.updatedAt DESC")
+    List<FeedbackEntity> findByPersonalNumber(String personalNumber, int year, Long rate, Pageable pageable);
+
+
 }

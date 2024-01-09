@@ -25,9 +25,7 @@ import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingE
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Repositories.TypeDatabaseRepository;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.DatabaseDTO;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.VersioningApplicationDTO;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppPostDTO;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
@@ -80,9 +78,9 @@ public class WebAppService extends BaseController {
 
 
     //Getting data Web App with search and pagination
-    public PaginateResponse<List<WebAppEntity>> searchAndPaginate(String searchTerm, long page, long size) {
+    public PaginateResponse<List<WebAppEntity>> searchAndPaginate(String searchTerm, String order, String by, long page, long size) {
         Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<WebAppEntity> result = webAppRepository.findBySearchTerm(searchTerm, pageable);
+        List<WebAppEntity> result = webAppRepository.findBySearchTerm(searchTerm, order, by, pageable);
         long total = webAppRepository.countBySearchTerm(searchTerm);
         PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
         return new PaginateResponse<>(result, pageInfo);
@@ -277,5 +275,39 @@ public class WebAppService extends BaseController {
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public SDAStatusStatsDTO statsWebByStatus() {
+        int active = webAppRepository.countByStatus("active");
+        int underConstruction = webAppRepository.countByStatus("Under Construction");
+        int underReview = webAppRepository.countByStatus("Under Review");
+        int inactive = webAppRepository.countByStatus("Inactive");
+        SDAStatusStatsDTO stats = new SDAStatusStatsDTO();
+        stats.setActive(active);
+        stats.setUnderConstruction(underConstruction);
+        stats.setUnderReview(underReview);
+        stats.setInactive(inactive);
+        return stats;
+    }
+
+    public List<SDAHostingStatsDTO> statsSdaHostingArray() {
+        List<SDAHostingStatsDTO> statsList = new ArrayList<>();
+        for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
+            SDAHostingStatsDTO dataModified = new SDAHostingStatsDTO();
+            dataModified.setName(sdaHosting.getSdaHosting());
+            dataModified.setTotal(webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting()));
+            statsList.add(dataModified);
+        }
+        return statsList;
+    }
+
+    public Map<String, Long> statsSdaHostingObject() {
+        Map<String, Long> statsMap = new HashMap<>();
+        for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
+            String hostingName = sdaHosting.getSdaHosting().replace(" ", ""); // Remove spaces
+            long total = webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting());
+            statsMap.put(hostingName, total);
+        }
+        return statsMap;
     }
 }

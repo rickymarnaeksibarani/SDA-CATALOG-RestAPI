@@ -151,7 +151,7 @@ public class WebAppEntity {
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
     private List<DatabaseEntity> databaseList;
 
-//    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
-//    private List<FeedbackEntity> feedbackList;
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    private List<FeedbackEntity> feedbackList;
 
 }
