@@ -1,36 +1,44 @@
 logging:
-    level:
-        org:
-            hibernate: INFO
-            springframework:
-                web: INFO
+  level:
+    org:
+      hibernate: INFO
+      springframework:
+        web: INFO
 spring:
-    datasource:
-        driver-class-name: org.postgresql.Driver
-        password: 464606
-        url: jdbc:postgresql://localhost:5432/db_sda_catalogue
-        username: postgres
-    devtools:
-        add-properties: true
-    jpa:
-        database-platform: org.hibernate.dialect.PostgreSQLDialect
-        hibernate:
-            ddl-auto: create-drop
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.PostgreSQLDialect
-                format_sql: true
-                id:
-                    uuid:
-                        generator: org.hibernate.id.UUIDGenerator
-                jdbc:
-                    lob:
-                        non_contextual_creation: true
-    mvc:
-        validation: true
-    servlet:
-        multipart:
-            max-file-size: 500MB
-            max-request-size: 500MB
-    springdoc:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: 464606
+    url: jdbc:postgresql://localhost:5432/db_sda_catalogue
+    username: postgres
+  devtools:
+    add-properties: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        id:
+          uuid:
+            generator: org.hibernate.id.UUIDGenerator
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  mvc:
+    validation: true
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+keycloak:
+  realm: sda-catalogue
+  resource: sda-catalogue
+  auth-server-url: http://localhost:8180/auth
+  use-resource-role-mappings: true
+  ssl-required: none
+  bearer-only: true
+  credentials:
+    secret: uPcTmgTZe5QWiE7odAG22S2L2bzhpGAy
 
