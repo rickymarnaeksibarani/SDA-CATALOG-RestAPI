@@ -32,13 +32,13 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
-keycloak:
-  realm: sda-catalogue
-  resource: sda-catalogue
-  auth-server-url: http://localhost:8180/auth
-  use-resource-role-mappings: true
-  ssl-required: none
-  bearer-only: true
-  credentials:
-    secret: uPcTmgTZe5QWiE7odAG22S2L2bzhpGAy
+#keycloak:
+#  realm: sda-catalogue
+#  resource: sda-catalogue
+#  auth-server-url: http://localhost:8180/auth
+#  use-resource-role-mappings: true
+#  ssl-required: none
+#  bearer-only: true
+#  credentials:
+#    secret: uPcTmgTZe5QWiE7odAG22S2L2bzhpGAy
 
