@@ -17,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/type-database")
+@CrossOrigin(origins = "${spring.frontend}")
 public class TypeDatabaseController {
     @Autowired
     private TypeDatabaseService typeDatabaseService;

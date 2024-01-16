@@ -17,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/back-end")
+@CrossOrigin(origins = "${spring.frontend}")
 public class BackEndController {
     @Autowired
     private BackEndService backEndService;

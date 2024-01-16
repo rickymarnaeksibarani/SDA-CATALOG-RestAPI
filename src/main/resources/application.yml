@@ -4,12 +4,17 @@ logging:
       hibernate: INFO
       springframework:
         web: INFO
+        security: DEBUG
 spring:
+  frontend: "http://localhost:4200"
   datasource:
     driver-class-name: org.postgresql.Driver
     password: sd4_c4t4l0g
     url: jdbc:postgresql://172.16.41.107:5151/sda_catalog
     username: sda_catalog
+  #    password: 464606
+  #    url: jdbc:postgresql://localhost:5432/db_sda_catalogue
+  #    username: postgres
   devtools:
     add-properties: true
   jpa:
@@ -32,13 +37,16 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
-#keycloak:
-#  realm: sda-catalogue
-#  resource: sda-catalogue
-#  auth-server-url: http://localhost:8180/auth
-#  use-resource-role-mappings: true
-#  ssl-required: none
-#  bearer-only: true
-#  credentials:
-#    secret: uPcTmgTZe5QWiE7odAG22S2L2bzhpGAy
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/userman
+        registration:
+          keycloak:
+            client-id: userman-web
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/userman/protocol/openid-connect/certs
 

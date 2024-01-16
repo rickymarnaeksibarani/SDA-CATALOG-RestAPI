@@ -17,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/pic-developer")
+@CrossOrigin(origins = "${spring.frontend}")
 public class PICDeveloperController {
     @Autowired
     private PICDeveloperService picDeveloperService;

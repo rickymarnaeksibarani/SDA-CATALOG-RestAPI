@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/document-upload")
+@CrossOrigin(origins = "${spring.frontend}")
 public class DocumentUploadController {
     @Autowired
     DocumentUploadService documentUploadService;

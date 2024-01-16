@@ -1,8 +1,10 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Controllers;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
@@ -11,6 +13,7 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
+import org.springframework.security.core.Authentication;
 
 import javax.validation.Valid;
 
@@ -19,18 +22,21 @@ import java.util.*;
 @RestController
 @Validated
 @RequestMapping("/api/v1/web-app")
+@CrossOrigin(origins = "${spring.frontend}")
 public class WebAppController {
     @Autowired
     WebAppService webAppService;
 
     //Getting Data Web App with search and pagination parameters
     @GetMapping()
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> searchWebApps(
             @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
             @RequestParam(name = "order", defaultValue = "createdAt") String order,
             @RequestParam(name = "by", defaultValue = "desc") String by,
             @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
+            @RequestParam(name = "size", defaultValue = "10") long size,
+            Authentication authentication // Inject Authentication
     ) {
         try {
             PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, order, by, page, size);
@@ -42,6 +48,7 @@ public class WebAppController {
 
     //Getting Data Web App By UUID
     @GetMapping("/{uuid}")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getWebAppByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -56,6 +63,7 @@ public class WebAppController {
 
 
     @GetMapping("/stats-status")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getStatsStatus() {
         try {
             SDAStatusStatsDTO result = webAppService.statsWebByStatus();
@@ -68,6 +76,7 @@ public class WebAppController {
 
 
     @GetMapping("/stats-sda-hosting")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getStatsSdaHosting(
             @RequestParam(name = "dataType", defaultValue = "array") String dataType
     ) {
@@ -89,6 +98,7 @@ public class WebAppController {
 
     //Create Data Web App
     @PostMapping
+//    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
@@ -110,6 +120,7 @@ public class WebAppController {
 
     //Update Data Web App By UUID
     @PutMapping("/{uuid}")
+//    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> updateWebApp(
             @PathVariable("uuid") UUID uuid,
             @Valid @ModelAttribute WebAppPostDTO request,
@@ -132,6 +143,7 @@ public class WebAppController {
 
     //Delete Data Web App by UUID
     @DeleteMapping("/{uuid}")
+//    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> deleteWebAppByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -143,5 +155,4 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
 }

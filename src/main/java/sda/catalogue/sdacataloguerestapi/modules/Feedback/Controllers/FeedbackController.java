@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/feedback")
+@CrossOrigin(origins = "${spring.frontend}")
 @Validated
 public class FeedbackController {
     @Autowired
