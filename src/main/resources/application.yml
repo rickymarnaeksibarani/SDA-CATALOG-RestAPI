@@ -6,7 +6,7 @@ logging:
         web: INFO
         security: DEBUG
 spring:
-  frontend: "http://localhost:4200"
+  frontend: "*"
   datasource:
     driver-class-name: org.postgresql.Driver
     password: sd4_c4t4l0g
@@ -42,11 +42,11 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/userman
+            issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog
         registration:
           keycloak:
-            client-id: userman-web
+            client-id: sda-catalog-web
       resourceserver:
         jwt:
-          jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/userman/protocol/openid-connect/certs
+          jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog/protocol/openid-connect/certs
 
