@@ -1,16 +1,6 @@
 version: '3.8'
 
 services:
-  db-sda-catalogue:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB_ADMIN: sda_catalog # Set the name of the admin database
-      POSTGRES_USER_ADMIN: sda_catalog # Set the admin user
-      POSTGRES_PASSWORD_ADMIN: sd4_c4t4l0g # Set the admin user password
-    ports:
-      - "5151:5432"
-    networks:
-      - sda-network
   sda-catalog-rest-api:
     image: sda-catalogue:1.0
     ports:
