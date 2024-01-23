@@ -1,8 +1,14 @@
-# FROM maven:3.8.2-jdk-8 # for Java 8
-FROM maven:3.8.5-openjdk-17
+# Use AdoptOpenJDK's OpenJDK 11 with Alpine Linux as the base image
+FROM adoptopenjdk:17-jre-hotspot-alpine
 
-WORKDIR .
-COPY . .
-RUN mvn clean install
+# Set the working directory inside the container
+WORKDIR /app
 
-CMD mvn spring-boot:run
+# Copy the JAR file into the container at /app
+COPY target/sda-catalogue-rest-api.jar /app/sda-catalogue-rest-api.jar
+
+# Expose the port that your Spring Boot application will run on
+EXPOSE 8080
+
+# Command to run your application
+CMD ["java", "-jar", "your-spring-boot-app.jar"]
