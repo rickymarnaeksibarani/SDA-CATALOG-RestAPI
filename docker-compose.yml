@@ -8,7 +8,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sda_catalog
       SPRING_DATASOURCE_USERNAME: saynotodream
-      SPRING_DATASOURCE_PASSWORD: 464606
+      SPRING_DATASOURCE_PASSWORD: 0p3nw0rld
       SPRING_PROFILES_ACTIVE: "docker"
     networks:
       - sda-catalogue-network

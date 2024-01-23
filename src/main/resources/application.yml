@@ -11,7 +11,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://postgres:5432/sda_catalog
     username: saynotodream
-    password: 464606
+    password: 0p3nw0lrd
   devtools:
     add-properties: true
   jpa:
