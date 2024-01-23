@@ -10,8 +10,6 @@ services:
       SPRING_DATASOURCE_USERNAME: sda_catalog
       SPRING_DATASOURCE_PASSWORD: sd4_c4t4l0g
       SPRING_PROFILES_ACTIVE: "docker"
-    depends_on:
-      - db-sda-catalogue
     networks:
       - sda-network
 
