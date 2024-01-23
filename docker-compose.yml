@@ -11,7 +11,7 @@ services:
       - "5151:5432"
     networks:
       - sda-network
-  app:
+  sda-catalog:
     image: sda-catalogue:1.0
     ports:
       - "8016:8080"
