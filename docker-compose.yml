@@ -11,7 +11,7 @@ services:
       - "5151:5432"
     networks:
       - sda-network
-  sda-catalog:
+  sda-catalog-rest-api:
     image: sda-catalogue:1.0
     ports:
       - "8016:8080"
@@ -21,7 +21,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: sd4_c4t4l0g
       SPRING_PROFILES_ACTIVE: "docker"
     depends_on:
-      - postgres
+      - db-sda-catalogue
     networks:
       - sda-network
 
