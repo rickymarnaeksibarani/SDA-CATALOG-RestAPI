@@ -10,7 +10,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     password: sd4_c4t4l0g
-    url: jdbc:postgresql://172.16.41.107:5151/sda_catalog
+    url: jdbc:postgresql://db-sda-catalogue:5151/sda_catalog
     username: sda_catalog
   #    password: 464606
   #    url: jdbc:postgresql://localhost:5432/db_sda_catalogue
