@@ -6,7 +6,7 @@ services:
     ports:
       - "8016:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db-sda-catalogue:5432/sda_catalog
+      SPRING_DATASOURCE_URL: jdbc:postgresql://172.18.0.2:5432/sda_catalog
       SPRING_DATASOURCE_USERNAME: sda_catalog
       SPRING_DATASOURCE_PASSWORD: sd4_c4t4l0g
       SPRING_PROFILES_ACTIVE: "docker"
