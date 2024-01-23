@@ -4,9 +4,9 @@ services:
   db-sda-catalogue:
     image: postgres:latest
     environment:
-      POSTGRES_DB: sda_catalog
-      POSTGRES_USER: sda_catalog
-      POSTGRES_PASSWORD: sd4_c4t4l0g
+      POSTGRES_DB_ADMIN: sda_catalog # Set the name of the admin database
+      POSTGRES_USER_ADMIN: sda_catalog # Set the admin user
+      POSTGRES_PASSWORD_ADMIN: sd4_c4t4l0g # Set the admin user password
     ports:
       - "5151:5432"
     networks:
