@@ -6,10 +6,23 @@ services:
     ports:
       - "8016:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://172.16.121.110:5432/sda_catalog
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-sda-catalog:2354/sda_catalog
       SPRING_DATASOURCE_USERNAME: saynotodream
       SPRING_DATASOURCE_PASSWORD: 464606
       SPRING_PROFILES_ACTIVE: "docker"
+    networks:
+      - sda-network
+
+  db-sda-catalog:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: sda_catalog
+      POSTGRES_USER: saynotodream
+      POSTGRES_PASSWORD: 464606
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "2354:5432"
     networks:
       - sda-network
 
