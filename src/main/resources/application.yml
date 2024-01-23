@@ -9,9 +9,11 @@ spring:
   frontend: "*"
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/sda_catalog
-    username: sda_catalog
-    password: sd4_c4t4l0g
+    url: jdbc:postgresql://172.18.0.2:5432/sda_catalog
+    username: saynotodream
+    password: 464606
+#    username: sda_catalog
+#    password: sd4_c4t4l0g
   devtools:
     add-properties: true
   jpa:
