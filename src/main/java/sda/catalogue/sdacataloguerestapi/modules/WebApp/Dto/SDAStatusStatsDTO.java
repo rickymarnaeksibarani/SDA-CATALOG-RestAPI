@@ -8,5 +8,8 @@ import lombok.Setter;
 @Getter
 @Data
 public class SDAStatusStatsDTO {
-
+    private int active;
+    private int underConstruction;
+    private int underReview;
+    private int inactive;
 }

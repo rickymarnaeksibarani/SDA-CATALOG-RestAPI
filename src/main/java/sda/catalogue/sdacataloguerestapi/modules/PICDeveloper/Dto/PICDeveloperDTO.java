@@ -10,12 +10,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Setter
 public class PICDeveloperDTO {
 
-    @NotEmpty
-    @NotNull
-    private String personalNumber;
 
-    @NotEmpty
-    @NotNull
-    private String personalName;
 }
  

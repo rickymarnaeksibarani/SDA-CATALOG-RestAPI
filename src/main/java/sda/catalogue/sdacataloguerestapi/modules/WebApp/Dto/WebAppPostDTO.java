@@ -11,6 +11,59 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebAppPostDTO {
+    @NotNull
+    @NotEmpty
+    private String applicationName;
 
+    @NotNull
+    @NotEmpty
+    private String categoryApp;
 
+    @NotNull
+    @NotEmpty
+    private String description;
+
+    @NotNull
+    @NotEmpty
+    private String functionApplication;
+
+    @NotNull
+    @NotEmpty
+    private String address;
+
+    @NotNull
+    @NotEmpty
+    private String businessImpactPriority;
+
+    @NotNull
+    @NotEmpty
+    private String status;
+
+    private String linkIOS;
+
+    private String linkAndroid;
+
+    private MultipartFile fileManifest;
+
+    private MultipartFile fileIpa;
+
+    private MultipartFile fileAndroid;
+
+    @NotNull
+    @NotEmpty
+    private String applicationSourceFe;
+
+    @NotNull
+    @NotEmpty
+    private String applicationSourceBe;
+
+    @NotNull
+    @NotEmpty
+    private String ipDatabase;
+
+    @NotNull
+    private Long sdaHostingEntity;
+
+    @NotNull
+    private List<MultipartFile> documentUploadList;
 }

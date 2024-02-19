@@ -6,5 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class SDAHostingStatsDTO {
-
+    private String name;
+    private Long total;
 }
