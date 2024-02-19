@@ -10,6 +10,5 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Setter
 public class PICDeveloperDTO {
 
-
 }
  
