@@ -13,19 +13,5 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VersioningApplicationDTO {
-    @NotNull
-    @NotEmpty
-    private String version;
 
-    @NotNull
-    @NotEmpty
-    private String description;
-
-    @NotNull
-    @NotEmpty
-    private Date releaseDate;
-
-    @NotNull
-    @NotEmpty
-    private WebAppEntity webAppEntity;
 }

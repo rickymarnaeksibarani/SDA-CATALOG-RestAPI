@@ -11,23 +11,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 @AllArgsConstructor
 public class DatabaseDTO {
 
-    @NotNull
-    @NotEmpty
-    private String apiName;
 
-    @NotNull
-    @NotEmpty
-    private String apiAddress;
-
-    @NotNull
-    @NotEmpty String userName;
-
-    @NotNull
-    @NotEmpty
-    private String password;
-
-    @NotNull
-    @NotEmpty
-    private Long idTypeDatabase;
 
 }
