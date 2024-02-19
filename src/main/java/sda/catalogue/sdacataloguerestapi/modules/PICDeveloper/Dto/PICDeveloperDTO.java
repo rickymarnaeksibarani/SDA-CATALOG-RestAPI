@@ -18,3 +18,4 @@ public class PICDeveloperDTO {
     @NotNull
     private String personalName;
 }
+ 

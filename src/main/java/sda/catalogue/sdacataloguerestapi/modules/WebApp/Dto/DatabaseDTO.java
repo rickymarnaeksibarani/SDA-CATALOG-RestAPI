@@ -20,6 +20,9 @@ public class DatabaseDTO {
     private String apiAddress;
 
     @NotNull
+    @NotEmpty String userName;
+
+    @NotNull
     @NotEmpty
     private String password;
 

@@ -36,6 +36,9 @@ public class DatabaseEntity {
     @Column(name = "ip_address")
     private String apiAddress;
 
+    @Column(name = "username")
+    private String userName;
+
     @Column(name = "password")
     private String password;
 

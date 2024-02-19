@@ -10,7 +10,7 @@ services:
     networks:
       - sda-catalogue-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://172.16.41.107:5151/sda_catalog
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/sda_catalog
       SPRING_DATASOURCE_USERNAME: sda_catalog
       SPRING_DATASOURCE_PASSWORD: sd4_c4t4l0g
       SPRING_PROFILES_ACTIVE: "docker"
