@@ -23,34 +23,5 @@ import java.util.UUID;
 @Setter
 @Table(name = "tb_versioning_application")
 public class VersioningApplicationEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_versioning_application")
-    private long idVersioningApplication;
 
-    @UuidGenerator
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
-
-    @Column(name = "version")
-    private String version;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "release_date")
-    private Date releaseDate;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "id_webapp")
-    @JsonIgnore
-    private WebAppEntity webAppEntity;
 }
