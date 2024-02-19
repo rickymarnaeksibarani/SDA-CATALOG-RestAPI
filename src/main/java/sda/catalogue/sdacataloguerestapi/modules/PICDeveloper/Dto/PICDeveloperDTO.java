@@ -9,6 +9,12 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Getter
 @Setter
 public class PICDeveloperDTO {
+    @NotEmpty
+    @NotNull
+    private String personalNumber;
 
+    @NotEmpty
+    @NotNull
+    private String personalName;
 }
  
