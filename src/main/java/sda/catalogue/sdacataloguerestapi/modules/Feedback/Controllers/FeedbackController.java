@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.FeedbackDTO;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Services.FeedbackService;
@@ -26,16 +29,10 @@ public class FeedbackController {
     private FeedbackService feedbackService;
 
     @GetMapping()
-    public ResponseEntity<?> searchFilterFeedback(
-            @RequestParam(name = "year", defaultValue = "") int year,
-            @RequestParam(name = "webAppEntityId", defaultValue = "") Long webAppEntityId,
-            @RequestParam(name = "rate", defaultValue = "") Long rate,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchFilterFeedback(@ModelAttribute FeedbackDTO searchDTO) {
         try {
-            PaginateResponse<List<FeedbackEntity>> result = feedbackService.searchFilterFeedback(year, webAppEntityId, rate, page, size);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data feedback!", result), HttpStatus.OK);
+            PaginationUtil<FeedbackEntity, FeedbackDTO> result = feedbackService.getAllFeedbackByPagination();
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
