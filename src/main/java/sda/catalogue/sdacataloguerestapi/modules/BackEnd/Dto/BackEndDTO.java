@@ -6,8 +6,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 
 @Data
-@Getter
-@Setter
 public class BackEndDTO {
 
     @NotEmpty

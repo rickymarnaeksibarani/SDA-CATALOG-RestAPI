@@ -9,8 +9,7 @@ import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntit
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
+
 @Data
 public class CommentDTO {
 

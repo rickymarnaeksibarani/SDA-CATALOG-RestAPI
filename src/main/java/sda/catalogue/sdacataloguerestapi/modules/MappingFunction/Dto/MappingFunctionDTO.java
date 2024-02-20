@@ -9,8 +9,6 @@ import java.util.List;
 
 
 @Data
-@Getter
-@Setter
 public class MappingFunctionDTO {
 
     @NotEmpty

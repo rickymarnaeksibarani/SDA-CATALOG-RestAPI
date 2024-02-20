@@ -1,7 +1,9 @@
 package sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,10 +18,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class BackEndService {
     @Autowired
     private BackEndRepository backendRepository;
 
+//    public Object test() {
+//        Pageable page = Pageable.ofSize(1);
+//        Page<BackEndEntity> paginationBackendEntity = this.backendRepository.findAll(page);
+//
+//        log.info(paginationBackendEntity);
+//    }
     public PaginateResponse<List<BackEndEntity>> searchBackEnd(String searchTerm, long page, long size) {
         Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
         List<BackEndEntity> result = backendRepository.findBySearchTerm(searchTerm, pageable);
