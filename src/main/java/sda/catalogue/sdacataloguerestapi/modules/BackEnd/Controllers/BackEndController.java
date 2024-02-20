@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services.BackEndService;
@@ -26,7 +27,7 @@ public class BackEndController {
     @GetMapping()
     public ResponseEntity<?> searchBackEnd(@ModelAttribute BackEndDTO searchDTO) {
         try {
-            PaginateResponse<List<BackEndEntity>> result = backEndService.searchBackEnd(searchDTO);
+            PaginationUtil<BackEndEntity, BackEndDTO> result = backEndService.getAllBackendByPagination();
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

@@ -1,25 +1,35 @@
 package sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Data
 public class BackEndDTO {
+    @JsonProperty("id")
+    private long idBackEnd;
 
-    @NotEmpty
-    @NotNull
+    @JsonProperty("uuid")
+    private UUID uuid;
+
+    @JsonProperty("backend")
     private String backEnd;
 
-    @NotNull
-    @NotEmpty
-    private String searchTerm;
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
 
-    @NotNull
-    private long page;
-
-    @NotEmpty
-    @NotNull
-    private long size;
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 }

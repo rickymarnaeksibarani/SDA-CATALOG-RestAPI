@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -23,17 +25,14 @@ public class BackEndService {
     @Autowired
     private BackEndRepository backendRepository;
 
-    public PaginateResponse<List<BackEndEntity>> searchBackEnd(BackEndDTO searchDTO) {
-        Pageable pageable = PageRequest.of((int) (searchDTO.getPage()-1), (int) searchDTO.getSize());
-        Page<BackEndEntity> resultPage = backendRepository.findBySearchTerm(searchDTO.getSearchTerm(), pageable);
+    public PaginationUtil<BackEndEntity, BackEndDTO> getAllBackendByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
 
-        List<BackEndEntity> result = resultPage.getContent();
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(
-                resultPage.getSize(),
-                resultPage.getTotalElements(),
-                resultPage.getNumber() +1
-        );
-        return new PaginateResponse<>(result, pageInfo);
+        Specification<BackEndEntity> specs = Specification.where(null);
+
+        Page<BackEndEntity> pagedResult = backendRepository.findAll(specs, paging);
+
+        return new PaginationUtil<>(pagedResult, BackEndDTO.class);
     }
 
     public BackEndEntity getBackEndByUuid(UUID uuid) {
