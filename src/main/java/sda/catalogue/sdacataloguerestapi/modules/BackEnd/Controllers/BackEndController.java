@@ -24,14 +24,9 @@ public class BackEndController {
     private BackEndService backEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchBackEnd(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-
-    ) {
+    public ResponseEntity<?> searchBackEnd(@ModelAttribute BackEndDTO searchDTO) {
         try {
-            PaginateResponse<List<BackEndEntity>> result = backEndService.searchBackEnd(searchTerm, page, size);
+            PaginateResponse<List<BackEndEntity>> result = backEndService.searchBackEnd(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

@@ -23,17 +23,16 @@ public class BackEndService {
     @Autowired
     private BackEndRepository backendRepository;
 
-//    public Object test() {
-//        Pageable page = Pageable.ofSize(1);
-//        Page<BackEndEntity> paginationBackendEntity = this.backendRepository.findAll(page);
-//
-//        log.info(paginationBackendEntity);
-//    }
-    public PaginateResponse<List<BackEndEntity>> searchBackEnd(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<BackEndEntity> result = backendRepository.findBySearchTerm(searchTerm, pageable);
-        long total = backendRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
+    public PaginateResponse<List<BackEndEntity>> searchBackEnd(BackEndDTO searchDTO) {
+        Pageable pageable = PageRequest.of((int) (searchDTO.getPage()-1), (int) searchDTO.getSize());
+        Page<BackEndEntity> resultPage = backendRepository.findBySearchTerm(searchDTO.getSearchTerm(), pageable);
+
+        List<BackEndEntity> result = resultPage.getContent();
+        PaginateResponse.Page pageInfo = new PaginateResponse.Page(
+                resultPage.getSize(),
+                resultPage.getTotalElements(),
+                resultPage.getNumber() +1
+        );
         return new PaginateResponse<>(result, pageInfo);
     }
 

@@ -11,4 +11,15 @@ public class BackEndDTO {
     @NotEmpty
     @NotNull
     private String backEnd;
+
+    @NotNull
+    @NotEmpty
+    private String searchTerm;
+
+    @NotNull
+    private long page;
+
+    @NotEmpty
+    @NotNull
+    private long size;
 }

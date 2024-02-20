@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 
-@Setter
+@Data
 public class WebServerDTO {
     @NotEmpty
     @NotNull
