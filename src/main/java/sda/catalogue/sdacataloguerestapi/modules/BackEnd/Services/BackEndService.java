@@ -15,6 +15,8 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
@@ -40,26 +42,16 @@ public class BackEndService {
         return backendRepository.findByUuid(uuid);
     }
 
+    //Creating data Back end
     public BackEndEntity createBackend(BackEndDTO request) {
         BackEndEntity data = new BackEndEntity();
         data.setBackEnd(request.getBackEnd());
         return backendRepository.save(data);
     }
 
-    //Creating data Back end
-    @Transactional
-    public BackEndEntity updateBackend(UUID uuid, BackEndDTO request) {
-        int result = backendRepository.findByUuidAndUpdate(uuid, request.getBackEnd());
-        if (result > 0) {
-            return backendRepository.findByUuid(uuid);
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
     //Updating data Back end by UUID
     @Transactional
-    public BackEndEntity updateBackEnd(UUID uuid, BackEndDTO request) {
+    public BackEndEntity updateBackend(UUID uuid, BackEndDTO request) {
         int result = backendRepository.findByUuidAndUpdate(
                 uuid,
                 request.getBackEnd()
