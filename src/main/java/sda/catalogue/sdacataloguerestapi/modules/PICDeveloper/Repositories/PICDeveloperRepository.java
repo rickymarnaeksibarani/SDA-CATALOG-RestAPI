@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity, Long> {
+public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity, Long>, JpaSpecificationExecutor<PICDeveloperEntity> {
 
     //Getting data PIC Developer with search and pagination
     @Query("SELECT w FROM PICDeveloperEntity w " +
