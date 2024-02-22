@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseDTO;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Services.TypeDatabaseService;
@@ -22,15 +25,12 @@ public class TypeDatabaseController {
     @Autowired
     private TypeDatabaseService typeDatabaseService;
 
+    //Getting data PIC Developer with pagination
     @GetMapping()
-    public ResponseEntity<?> searchTypeDatabase(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchTypeDatabase(@ModelAttribute TypeDatabaseDTO searchDTO) {
         try {
-            PaginateResponse<List<TypeDatabaseEntity>> result = typeDatabaseService.searchAndPaginate(searchTerm, page, size);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data type database!", result), HttpStatus.OK);
+            PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> result = typeDatabaseService.getAllTypeDatabaseByPagination();
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data type database!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
