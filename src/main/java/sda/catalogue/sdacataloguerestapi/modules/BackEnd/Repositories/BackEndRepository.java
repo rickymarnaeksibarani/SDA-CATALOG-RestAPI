@@ -14,21 +14,21 @@ import java.util.UUID;
 
 @Repository
 public interface BackEndRepository extends JpaRepository<BackEndEntity, Long>, JpaSpecificationExecutor<BackEndEntity> {
-    //Getting data Front End with search and pagination
+    //Getting data Back End with search and pagination
     @Query("SELECT w FROM BackEndEntity w " +
             "WHERE LOWER(w.backEnd) LIKE LOWER(CONCAT('%', :searchTerm,'%')) " +
             "ORDER BY w.updatedAt DESC")
     Page<BackEndEntity> findBySearchTerm(String searchTerm, Pageable pageable);
 
-    //Counting data Front End with search
+    //Counting data Back End with search
     @Query("SELECT COUNT(w) FROM BackEndEntity w " +
             "WHERE LOWER(w.backEnd) LIKE LOWER(CONCAT('%', :searchTerm,'%'))")
     long countBySearchTerm(String searchTerm);
 
-    //Getting data Front End by UUID
+    //Getting data Back End by UUID
     BackEndEntity findByUuid(UUID uuid);
 
-    //Updating data Front End by UUID
+    //Updating data Back End by UUID
     @Modifying
     @Transactional
     @Query("UPDATE BackEndEntity w SET " +
@@ -39,7 +39,7 @@ public interface BackEndRepository extends JpaRepository<BackEndEntity, Long>, J
             String backEnd
     );
 
-    //Deleting data Front End by UUID
+    //Deleting data Back End by UUID
     @Modifying
     @Transactional
     @Query("DELETE FROM BackEndEntity w WHERE w.uuid = :uuid")
