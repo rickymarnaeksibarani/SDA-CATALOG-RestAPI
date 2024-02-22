@@ -32,7 +32,7 @@ public class FeedbackController {
     public ResponseEntity<?> searchFilterFeedback(@ModelAttribute FeedbackDTO searchDTO) {
         try {
             PaginationUtil<FeedbackEntity, FeedbackDTO> result = feedbackService.getAllFeedbackByPagination();
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data feedback!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }

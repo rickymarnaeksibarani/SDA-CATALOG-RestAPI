@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,8 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long> {
-
+public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long>, JpaSpecificationExecutor<FrontEndEntity> {
     //Getting data Front End with search and pagination
     @Query("SELECT w FROM FrontEndEntity w " +
             "WHERE LOWER(w.frontEnd) LIKE LOWER(CONCAT('%', :searchTerm,'%')) " +

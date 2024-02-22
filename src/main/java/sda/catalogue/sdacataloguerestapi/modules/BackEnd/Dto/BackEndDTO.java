@@ -18,18 +18,18 @@ import java.util.UUID;
 
 @Data
 public class BackEndDTO {
-    @JsonProperty("id")
+    @JsonProperty("idBackEnd")
     private long idBackEnd;
 
     @JsonProperty("uuid")
     private UUID uuid;
 
-    @JsonProperty("backend")
+    @JsonProperty("backEnd")
     private String backEnd;
 
-    @JsonProperty("created_at")
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
-    @JsonProperty("updated_at")
+    @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
 }

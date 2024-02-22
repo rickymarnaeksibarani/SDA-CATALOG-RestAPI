@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services.FrontEndService;
@@ -23,13 +26,9 @@ public class FrontEndController {
     private FrontEndService frontEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchFrontEnd(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchFrontEnd(@ModelAttribute FrontEndDTO searchDTO) {
         try {
-            PaginateResponse<List<FrontEndEntity>> result = frontEndService.searchFrontEnd(searchTerm, page, size);
+            PaginationUtil<FrontEndEntity, FrontEndDTO> result = frontEndService.getAllFrontendByPagination();
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
