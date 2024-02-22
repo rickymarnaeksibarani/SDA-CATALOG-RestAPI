@@ -2,12 +2,15 @@ package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
@@ -22,13 +25,12 @@ public class SDAHostingService {
     private SDAHostingRepository sdaHostingRepository;
 
 
-    @Transactional
-    public PaginateResponse<List<SDAHostingEntity>> searchAndPaginate(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<SDAHostingEntity> result = sdaHostingRepository.findBySearchTerm(searchTerm, pageable);
-        long total = sdaHostingRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    //Getting data PIC Developer with search and pagination
+    public PaginationUtil<SDAHostingEntity, SDAHostingDTO> getAllSDAHostingByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<SDAHostingEntity> specs = Specification.where(null);
+        Page<SDAHostingEntity> pagedResult = sdaHostingRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, SDAHostingDTO.class);
     }
 
 

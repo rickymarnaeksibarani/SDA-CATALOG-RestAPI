@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Services.SDAHostingService;
@@ -22,14 +25,11 @@ public class SDAHostingController {
     @Autowired
     private SDAHostingService sdaHostingService;
 
+    //Getting data SDA Hosting with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchSDAHosting(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchSDAHosting(@ModelAttribute SDAHostingDTO searchDTO) {
         try {
-            PaginateResponse<List<SDAHostingEntity>> result = sdaHostingService.searchAndPaginate(searchTerm, page, size);
+            PaginationUtil<SDAHostingEntity, SDAHostingDTO> result = sdaHostingService.getAllSDAHostingByPagination();
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data sda hosting!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
