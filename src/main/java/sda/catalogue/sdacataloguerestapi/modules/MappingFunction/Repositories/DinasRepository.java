@@ -2,6 +2,7 @@ package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.Mappin
 import java.util.UUID;
 
 @Repository
-public interface DinasRepository extends JpaRepository<DinasEntity, Long> {
+public interface DinasRepository extends JpaRepository<DinasEntity, Long>, JpaSpecificationExecutor<DinasEntity> {
     @Modifying
     @Transactional
     @Query("UPDATE DinasEntity w SET " +

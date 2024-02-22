@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface MappingFunctionRepository extends JpaRepository<MappingFunctionEntity, Long> {
+public interface MappingFunctionRepository extends JpaRepository<MappingFunctionEntity, Long>, JpaSpecificationExecutor<MappingFunctionEntity> {
     @Query("SELECT w FROM MappingFunctionEntity w " +
             "WHERE LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "ORDER BY w.updatedAt DESC")
