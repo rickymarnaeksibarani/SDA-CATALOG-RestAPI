@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface VersioningApplicationRepository extends JpaRepository<VersioningApplicationEntity, Long> {
+public interface VersioningApplicationRepository extends JpaRepository<VersioningApplicationEntity, Long>, JpaSpecificationExecutor<VersioningApplicationEntity> {
     //Getting data VersionApplication with search and pagination
     @Query("SELECT w FROM VersioningApplicationEntity w"+
             " WHERE LOWER (CAST(w.releaseDate AS string)) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +

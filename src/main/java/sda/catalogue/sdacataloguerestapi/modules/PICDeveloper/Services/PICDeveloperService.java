@@ -62,7 +62,7 @@ public class PICDeveloperService {
         if (result > 0) {
             return pICDeveloperRepository.findByUuid(uuid);
         } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("uuid " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 

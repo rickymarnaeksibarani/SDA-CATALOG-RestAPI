@@ -2,8 +2,10 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +13,7 @@ import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
@@ -19,6 +22,7 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -78,12 +82,11 @@ public class WebAppService extends BaseController {
 
 
     //Getting data Web App with search and pagination
-    public PaginateResponse<List<WebAppEntity>> searchAndPaginate(String searchTerm, String order, String by, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<WebAppEntity> result = webAppRepository.findBySearchTerm(searchTerm, order, by, pageable);
-        long total = webAppRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    public PaginationUtil<WebAppEntity, WebAppPostDTO> getAllWebAppByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<WebAppEntity> specs = Specification.where(null);
+        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, WebAppPostDTO.class);
     }
 
     //Getting data by UUID

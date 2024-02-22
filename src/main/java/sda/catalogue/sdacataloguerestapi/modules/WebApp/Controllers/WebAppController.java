@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
@@ -24,23 +27,32 @@ public class WebAppController {
     @Autowired
     WebAppService webAppService;
 
-    //Getting Data Web App with search and pagination parameters
-    @GetMapping()
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
-    public ResponseEntity<?> searchWebApps(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "order", defaultValue = "createdAt") String order,
-            @RequestParam(name = "by", defaultValue = "desc") String by,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
-        try {
-            PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, order, by, page, size);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result), HttpStatus.OK);
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
+//    //Getting Data Web App with search and pagination parameters
+//    @GetMapping()
+////    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
+//    public ResponseEntity<?> searchWebApps(
+//            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+//            @RequestParam(name = "order", defaultValue = "createdAt") String order,
+//            @RequestParam(name = "by", defaultValue = "desc") String by,
+//            @RequestParam(name = "page", defaultValue = "1") long page,
+//            @RequestParam(name = "size", defaultValue = "10") long size
+//    ) {
+//        try {
+//            PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, order, by, page, size);
+//            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result), HttpStatus.OK);
+//        } catch (CustomRequestException error) {
+//            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+//        }
+//    }
+@GetMapping()
+public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO) {
+    try {
+        PaginationUtil<WebAppEntity, WebAppPostDTO> result = webAppService.getAllWebAppByPagination();
+        return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
+    } catch (CustomRequestException error) {
+        return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
     }
+}
 
     //Getting Data Web App By UUID
     @GetMapping("/{uuid}")

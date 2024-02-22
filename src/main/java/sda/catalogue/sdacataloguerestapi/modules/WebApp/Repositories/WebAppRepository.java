@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
@@ -22,7 +23,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 @Repository
-public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
+public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, JpaSpecificationExecutor<WebAppEntity> {
     //Getting data WebApp with search and pagination
     @Query("SELECT w FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
