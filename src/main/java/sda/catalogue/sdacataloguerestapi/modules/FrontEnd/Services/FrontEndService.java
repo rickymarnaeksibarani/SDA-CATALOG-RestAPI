@@ -27,11 +27,8 @@ public class FrontEndService {
 
     public PaginationUtil<FrontEndEntity, FrontEndDTO> getAllFrontendByPagination() {
         Pageable paging = PageRequest.of(0, 20);
-
         Specification<FrontEndEntity> specs = Specification.where(null);
-
         Page<FrontEndEntity> pagedResult = frontEndRepository.findAll(specs, paging);
-
         return new PaginationUtil<>(pagedResult, FrontEndDTO.class);
     }
 
