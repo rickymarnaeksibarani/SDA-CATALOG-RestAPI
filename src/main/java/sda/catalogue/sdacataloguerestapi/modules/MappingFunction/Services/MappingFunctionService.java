@@ -2,18 +2,23 @@ package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.MappingFunctionDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.DinasRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +33,12 @@ public class MappingFunctionService {
     @Autowired
     private DinasRepository dinasRepository;
 
-    @Transactional
-    public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<MappingFunctionEntity> result = mappingFunctionRepository.findBySearchTerm(searchTerm, pageable);
-        long total = mappingFunctionRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    //Getting data PIC Developer with search and pagination
+    public PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> getAllMappingFunctionByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<MappingFunctionEntity> specs = Specification.where(null);
+        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, MappingFunctionDTO.class);
     }
 
     public MappingFunctionEntity getMappingFunctionByUuid(UUID uuid) {

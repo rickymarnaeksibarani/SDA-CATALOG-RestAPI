@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.MappingFunctionDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Services.MappingFunctionService;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,15 +27,12 @@ public class MappingFunctionController {
     @Autowired
     private MappingFunctionService mappingFunctionService;
 
+    //Getting data Mapping Function with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchMappingFunction(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO) {
         try {
-            PaginateResponse<List<MappingFunctionEntity>> result = mappingFunctionService.searchAndPaginate(searchTerm, page, size);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data mapping function!", result), HttpStatus.OK);
+            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionByPagination();
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data mapping function!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
