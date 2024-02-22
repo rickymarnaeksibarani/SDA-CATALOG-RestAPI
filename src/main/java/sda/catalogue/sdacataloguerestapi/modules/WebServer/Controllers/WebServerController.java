@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Services.WebServerService;
@@ -23,14 +26,11 @@ public class WebServerController {
     @Autowired
     private WebServerService webServerService;
 
+    //Getting data Web Server with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchBackEnd(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchWebServer(@ModelAttribute WebServerDTO searchDTO) {
         try {
-            PaginateResponse<List<WebServerEntity>> result = webServerService.searchWebServer(searchTerm, page, size);
+            PaginationUtil<WebServerEntity, WebServerDTO> result = webServerService.getAllWebServerByPagination();
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data web server!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

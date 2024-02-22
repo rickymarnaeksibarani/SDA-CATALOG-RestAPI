@@ -2,12 +2,17 @@ package sda.catalogue.sdacataloguerestapi.modules.WebServer.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
@@ -20,12 +25,12 @@ public class WebServerService {
     @Autowired
     private WebServerRepository webServerRepository;
 
-    public PaginateResponse<List<WebServerEntity>> searchWebServer(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<WebServerEntity> result = webServerRepository.findBySearchTerm(searchTerm, pageable);
-        long total = webServerRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    //Getting data Web Server with search and pagination
+    public PaginationUtil<WebServerEntity, WebServerDTO> getAllWebServerByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<WebServerEntity> specs = Specification.where(null);
+        Page<WebServerEntity> pagedResult = webServerRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, WebServerDTO.class);
     }
 
     public WebServerEntity getWebServerByUuid(UUID uuid) {
