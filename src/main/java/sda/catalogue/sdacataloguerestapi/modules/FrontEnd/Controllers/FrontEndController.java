@@ -1,16 +1,15 @@
 package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services.FrontEndService;
@@ -18,6 +17,7 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services.FrontEndServi
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/front-end")
 @CrossOrigin(origins = "${spring.frontend}")
@@ -26,9 +26,14 @@ public class FrontEndController {
     private FrontEndService frontEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchFrontEnd(@ModelAttribute FrontEndDTO searchDTO) {
+    public ResponseEntity<?> searchFrontEnd(@ModelAttribute FrontEndDTO searchDTO,
+                @RequestParam("page") String page,
+                @RequestParam("size") String size
+    ) {
+        log.info("size: " + size);
+        log.info("page: " + page);
         try {
-            PaginationUtil<FrontEndEntity, FrontEndDTO> result = frontEndService.getAllFrontendByPagination();
+            PaginationUtil<FrontEndEntity, FrontEndDTO> result = frontEndService.getAllFrontendByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
