@@ -27,8 +27,8 @@ public class PICDeveloperService {
 
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> getAllPICDeveloperByPagination() {
-        Pageable paging = PageRequest.of(0, 20);
+    public PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> getAllPICDeveloperByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size );
         Specification<PICDeveloperEntity> specs = Specification.where(null);
         Page<PICDeveloperEntity> pagedResult = pICDeveloperRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, PICDeveloperDTO.class);

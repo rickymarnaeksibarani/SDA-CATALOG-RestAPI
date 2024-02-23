@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Services.PICDevelo
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/pic-developer")
 @CrossOrigin(origins = "${spring.frontend}")
@@ -27,9 +30,15 @@ public class PICDeveloperController {
 
     //Getting data PIC Developer with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchPICDeveloper(@ModelAttribute PICDeveloperDTO searchDTO) {
+    public ResponseEntity<?> searchPICDeveloper(@ModelAttribute PICDeveloperDTO searchDTO,
+                                                @RequestParam("page")String page,
+                                                @RequestParam("size")String size
+
+    ) {
+        log.info("page: " + size);
+        log.info(("size: " + page));
         try {
-            PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> result = picDeveloperService.getAllPICDeveloperByPagination();
+            PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> result = picDeveloperService.getAllPICDeveloperByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
