@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Data
 public class MappingFunctionDTO {
 
-    @JsonProperty("idMappingFunction")
+    @JsonProperty( "idMappingFunction")
     private long idMappingFunction;
 
     @JsonProperty("uuid")
@@ -34,18 +35,7 @@ public class MappingFunctionDTO {
     @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
 
-    @JsonProperty( "dinasEntityList")
-    private List<DinasEntity> dinasEntityList;
+    @JsonProperty("dinasList")
+    private List<DinasDTO> dinasList = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "MappingFunctionDTO{" +
-                "idMappingFunction=" + idMappingFunction +
-                ", uuid=" + uuid +
-                ", mappingFunction='" + mappingFunction + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", dinasEntityList=" + dinasEntityList +
-                '}';
-    }
 }

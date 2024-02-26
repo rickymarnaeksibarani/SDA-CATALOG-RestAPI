@@ -1,8 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Controllers;
 
 import javax.validation.Valid;
-
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 
 import java.util.List;
 import java.util.UUID;
-@Slf4j
+
 @RestController
 @RequestMapping("/api/v1/mapping-function")
 @CrossOrigin(origins = "${spring.frontend}")
@@ -31,19 +29,18 @@ public class MappingFunctionController {
 
     //Getting data Mapping Function with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO,
-                                                   @RequestParam("page") String page,
-                                                   @RequestParam("size") String size
+    public ResponseEntity<?> searchMappingFunction(
+            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+            @RequestParam(name = "page", defaultValue = "1") long page,
+            @RequestParam(name = "size", defaultValue = "10") long size
     ) {
-
         try {
-            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionByPagination(Integer.parseInt(page), Integer.parseInt(size));
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data mapping function!", result), HttpStatus.OK);
+            PaginateResponse<List<MappingFunctionEntity>> result = mappingFunctionService.searchAndPaginate(searchTerm, page, size);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data mapping function!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
     @GetMapping("/{uuid}")
     public ResponseEntity<?> getMappingFunctionByUuid(
             @PathVariable("uuid") UUID uuid

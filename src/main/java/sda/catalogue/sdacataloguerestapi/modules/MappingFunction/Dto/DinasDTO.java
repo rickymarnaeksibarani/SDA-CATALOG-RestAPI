@@ -33,8 +33,6 @@ public class DinasDTO {
     @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
 
-    @JsonProperty("mappingFunctionEntity")
+    @JsonProperty("id_mapping_function")
     private MappingFunctionEntity mappingFunctionEntity;
-
-
 }

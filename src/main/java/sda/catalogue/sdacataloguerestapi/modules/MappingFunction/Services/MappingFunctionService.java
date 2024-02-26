@@ -34,11 +34,13 @@ public class MappingFunctionService {
     private DinasRepository dinasRepository;
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> getAllMappingFunctionByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
-        Specification<MappingFunctionEntity> specs = Specification.where(null);
-        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, MappingFunctionDTO.class);
+    @Transactional
+    public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
+        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
+        List<MappingFunctionEntity> result = mappingFunctionRepository.findBySearchTerm(searchTerm, pageable);
+        long total = mappingFunctionRepository.countBySearchTerm(searchTerm);
+        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
+        return new PaginateResponse<>(result, pageInfo);
     }
 
     public MappingFunctionEntity getMappingFunctionByUuid(UUID uuid) {
@@ -55,16 +57,21 @@ public class MappingFunctionService {
         data.setMappingFunction(request.getMappingFunction());
         MappingFunctionEntity mappingFunctionProcess = mappingFunctionRepository.save(data);
 
-        List<DinasEntity> dinasList = new ArrayList<>();
-        for (DinasEntity dataDinas : request.getDinasEntityList()) {
-            DinasEntity dinasEntity = new DinasEntity();
-            dinasEntity.setMappingFunctionEntity(mappingFunctionProcess);
-            dinasEntity.setDinas(dataDinas.getDinas());
-            dinasList.add(dinasEntity);
+        if (request.getDinasList() != null) {
+            List<DinasEntity> dinasList = new ArrayList<>();
+            for (DinasDTO dataDinas : request.getDinasList()) {
+                if (dataDinas.getDinas() != null) {
+                    DinasEntity dinasItem = new DinasEntity();
+                    dinasItem.setMappingFunctionEntity(mappingFunctionProcess);
+                    dinasItem.setDinas(dataDinas.getDinas());
+                    dinasList.add(dinasItem);
+                }
+            }
+            dinasRepository.saveAll(dinasList);
+            data.setDinasEntityList(dinasList);
+        } else {
+            data.setDinasEntityList(null);
         }
-        dinasRepository.saveAll(dinasList);
-        data.setDinasEntityList(dinasList);
-
         return mappingFunctionProcess;
     }
 
@@ -73,12 +80,13 @@ public class MappingFunctionService {
         int mappingFunctionProcess = mappingFunctionRepository.findByUuidAndUpdate(uuid, request.getMappingFunction());
         MappingFunctionEntity findData = mappingFunctionRepository.findByUuid(uuid);
         dinasRepository.deleteAllByMappingFunctionEntity(findData);
+
         List<DinasEntity> dinasList = new ArrayList<>();
-        for (DinasEntity dataDinas : request.getDinasEntityList()) {
-            DinasEntity dinasEntity = new DinasEntity();
-            dinasEntity.setMappingFunctionEntity(findData);
-            dinasEntity.setDinas(dataDinas.getDinas());
-            dinasList.add(dinasEntity);
+        for (DinasDTO dataDinas : request.getDinasList()) {
+            DinasEntity dinasItem = new DinasEntity();
+            dinasItem.setMappingFunctionEntity(findData);
+            dinasItem.setDinas(dataDinas.getDinas());
+            dinasList.add(dinasItem);
         }
         dinasRepository.saveAll(dinasList);
         if (mappingFunctionProcess > 0) {
