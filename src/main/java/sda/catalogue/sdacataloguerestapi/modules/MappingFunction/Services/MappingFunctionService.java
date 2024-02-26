@@ -56,11 +56,11 @@ public class MappingFunctionService {
         MappingFunctionEntity mappingFunctionProcess = mappingFunctionRepository.save(data);
 
         List<DinasEntity> dinasList = new ArrayList<>();
-        for (DinasDTO dataDinas : request.getDinasList()) {
-            DinasEntity dinasItem = new DinasEntity();
-            dinasItem.setMappingFunctionEntity(mappingFunctionProcess);
-            dinasItem.setDinas(dataDinas.getDinas());
-            dinasList.add(dinasItem);
+        for (DinasEntity dataDinas : request.getDinasEntityList()) {
+            DinasEntity dinasEntity = new DinasEntity();
+            dinasEntity.setMappingFunctionEntity(mappingFunctionProcess);
+            dinasEntity.setDinas(dataDinas.getDinas());
+            dinasList.add(dinasEntity);
         }
         dinasRepository.saveAll(dinasList);
         data.setDinasEntityList(dinasList);
@@ -74,11 +74,11 @@ public class MappingFunctionService {
         MappingFunctionEntity findData = mappingFunctionRepository.findByUuid(uuid);
         dinasRepository.deleteAllByMappingFunctionEntity(findData);
         List<DinasEntity> dinasList = new ArrayList<>();
-        for (DinasDTO dataDinas : request.getDinasList()) {
-            DinasEntity dinasItem = new DinasEntity();
-            dinasItem.setMappingFunctionEntity(findData);
-            dinasItem.setDinas(dataDinas.getDinas());
-            dinasList.add(dinasItem);
+        for (DinasEntity dataDinas : request.getDinasEntityList()) {
+            DinasEntity dinasEntity = new DinasEntity();
+            dinasEntity.setMappingFunctionEntity(findData);
+            dinasEntity.setDinas(dataDinas.getDinas());
+            dinasList.add(dinasEntity);
         }
         dinasRepository.saveAll(dinasList);
         if (mappingFunctionProcess > 0) {
