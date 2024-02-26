@@ -26,8 +26,8 @@ public class SDAHostingService {
 
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<SDAHostingEntity, SDAHostingDTO> getAllSDAHostingByPagination() {
-        Pageable paging = PageRequest.of(0, 20);
+    public PaginationUtil<SDAHostingEntity, SDAHostingDTO> getAllSDAHostingByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size);
         Specification<SDAHostingEntity> specs = Specification.where(null);
         Page<SDAHostingEntity> pagedResult = sdaHostingRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, SDAHostingDTO.class);

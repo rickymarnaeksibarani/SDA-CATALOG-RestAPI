@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/sda-hosting")
 @CrossOrigin(origins = "${spring.frontend}")
 public class SDAHostingController {
@@ -27,9 +30,14 @@ public class SDAHostingController {
 
     //Getting data SDA Hosting with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchSDAHosting(@ModelAttribute SDAHostingDTO searchDTO) {
+    public ResponseEntity<?> searchSDAHosting(@ModelAttribute SDAHostingDTO searchDTO,
+                                              @RequestParam("page")String page,
+                                              @RequestParam("size")String size
+    ) {
+        log.info("page: "+ page);
+        log.info("size: "+ size);
         try {
-            PaginationUtil<SDAHostingEntity, SDAHostingDTO> result = sdaHostingService.getAllSDAHostingByPagination();
+            PaginationUtil<SDAHostingEntity, SDAHostingDTO> result = sdaHostingService.getAllSDAHostingByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data sda hosting!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
