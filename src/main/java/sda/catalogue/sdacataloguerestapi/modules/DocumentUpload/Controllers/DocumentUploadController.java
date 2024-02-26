@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.Documen
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/document-upload")
 @CrossOrigin(origins = "${spring.frontend}")

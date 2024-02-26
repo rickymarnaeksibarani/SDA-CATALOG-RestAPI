@@ -18,7 +18,6 @@ import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services.BackEndService
 
 import java.util.List;
 import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/back-end")
