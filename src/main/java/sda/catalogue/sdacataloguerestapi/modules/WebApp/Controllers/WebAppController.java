@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 
 import java.util.*;
 
+@Slf4j
 @RestController
 @Validated
 @RequestMapping("/api/v1/web-app")
@@ -27,27 +29,15 @@ public class WebAppController {
     @Autowired
     WebAppService webAppService;
 
-//    //Getting Data Web App with search and pagination parameters
-//    @GetMapping()
-////    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
-//    public ResponseEntity<?> searchWebApps(
-//            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-//            @RequestParam(name = "order", defaultValue = "createdAt") String order,
-//            @RequestParam(name = "by", defaultValue = "desc") String by,
-//            @RequestParam(name = "page", defaultValue = "1") long page,
-//            @RequestParam(name = "size", defaultValue = "10") long size
-//    ) {
-//        try {
-//            PaginateResponse<List<WebAppEntity>> result = webAppService.searchAndPaginate(searchTerm, order, by, page, size);
-//            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result), HttpStatus.OK);
-//        } catch (CustomRequestException error) {
-//            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-//        }
-//    }
+
 @GetMapping()
-public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO) {
+public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO,
+                                      @RequestParam("page") String page,
+                                      @RequestPart("size") String size
+) {
+
     try {
-        PaginationUtil<WebAppEntity, WebAppPostDTO> result = webAppService.getAllWebAppByPagination();
+        PaginationUtil<WebAppEntity, WebAppPostDTO> result = webAppService.getAllWebAppByPagination(Integer.parseInt(page), Integer.parseInt(size));
         return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
     } catch (CustomRequestException error) {
         return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

@@ -36,7 +36,7 @@ public class MappingFunctionController {
                                                    @RequestParam("size") String size
     ) {
         log.info("page" +page);
-        log.info("size"+ size);
+        log.info("size"+size);
 
         try {
             PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionByPagination(Integer.parseInt(page), Integer.parseInt(size));
