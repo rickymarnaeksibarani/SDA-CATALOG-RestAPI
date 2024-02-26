@@ -30,8 +30,8 @@ public class BackEndService {
     private BackEndRepository backendRepository;
 
     //Getting data Backend with pagination
-    public PaginationUtil<BackEndEntity, BackEndDTO> getAllBackendByPagination() {
-        Pageable paging = PageRequest.of(0, 20);
+    public PaginationUtil<BackEndEntity, BackEndDTO> getAllBackendByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size);
         Specification<BackEndEntity> specs = Specification.where(null);
         Page<BackEndEntity> pagedResult = backendRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, BackEndDTO.class);

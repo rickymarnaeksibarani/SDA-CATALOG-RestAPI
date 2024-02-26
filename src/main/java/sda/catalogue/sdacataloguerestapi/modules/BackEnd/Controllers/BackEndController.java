@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.BackEnd.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services.BackEndService
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/back-end")
 @CrossOrigin(origins = "${spring.frontend}")
@@ -25,9 +28,11 @@ public class BackEndController {
     private BackEndService backEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchBackEnd(@ModelAttribute BackEndDTO searchDTO) {
+    public ResponseEntity<?> searchBackEnd(@ModelAttribute BackEndDTO searchDTO,
+                                           @RequestParam("page") String page,
+                                           @RequestParam("size") String size) {
         try {
-            PaginationUtil<BackEndEntity, BackEndDTO> result = backEndService.getAllBackendByPagination();
+            PaginationUtil<BackEndEntity, BackEndDTO> result = backEndService.getAllBackendByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
