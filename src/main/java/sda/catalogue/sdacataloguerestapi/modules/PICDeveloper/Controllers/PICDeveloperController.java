@@ -35,8 +35,8 @@ public class PICDeveloperController {
                                                 @RequestParam("size")String size
 
     ) {
-        log.info("page: " + size);
-        log.info(("size: " + page));
+        log.info("page: " + page);
+        log.info(("size: " + size));
         try {
             PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> result = picDeveloperService.getAllPICDeveloperByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
