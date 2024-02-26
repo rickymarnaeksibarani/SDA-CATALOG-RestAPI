@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Services;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class MappingFunctionService {
     @Autowired
     private MappingFunctionRepository mappingFunctionRepository;

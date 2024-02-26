@@ -9,7 +9,7 @@
     frontend: "*"
     datasource:
       driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://localhost:5432/db_sda_catalog
+      url: jdbc:postgresql://172.16.41.107:5151/sda_catalog
       username: sda_catalog
       password: sd4_c4t4l0g
     devtools:
@@ -17,7 +17,7 @@
     jpa:
       database-platform: org.hibernate.dialect.PostgreSQLDialect
       hibernate:
-        ddl-auto: create-drop
+        ddl-auto: update
       properties:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQLDialect
