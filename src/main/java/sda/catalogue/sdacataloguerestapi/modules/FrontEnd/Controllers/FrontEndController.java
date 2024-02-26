@@ -30,8 +30,6 @@ public class FrontEndController {
                 @RequestParam("page") String page,
                 @RequestParam("size") String size
     ) {
-        log.info("size: " + size);
-        log.info("page: " + page);
         try {
             PaginationUtil<FrontEndEntity, FrontEndDTO> result = frontEndService.getAllFrontendByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result), HttpStatus.OK);
