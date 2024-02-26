@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/mapping-function")
 @CrossOrigin(origins = "${spring.frontend}")
@@ -29,9 +31,15 @@ public class MappingFunctionController {
 
     //Getting data Mapping Function with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO) {
+    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO,
+                                                   @RequestParam("page") String page,
+                                                   @RequestParam("size") String size
+    ) {
+        log.info("page" +page);
+        log.info("size"+ size);
+
         try {
-            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionByPagination();
+            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data mapping function!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
