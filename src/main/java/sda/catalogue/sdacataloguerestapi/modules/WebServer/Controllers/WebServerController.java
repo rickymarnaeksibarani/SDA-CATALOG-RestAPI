@@ -28,9 +28,11 @@ public class WebServerController {
 
     //Getting data Web Server with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchWebServer(@ModelAttribute WebServerDTO searchDTO) {
+    public ResponseEntity<?> searchWebServer(@ModelAttribute WebServerDTO searchDTO,
+                                             @RequestParam("page")String page,
+                                             @RequestParam("size")String size) {
         try {
-            PaginationUtil<WebServerEntity, WebServerDTO> result = webServerService.getAllWebServerByPagination();
+            PaginationUtil<WebServerEntity, WebServerDTO> result = webServerService.getAllWebServerByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data web server!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

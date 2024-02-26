@@ -26,8 +26,8 @@ public class WebServerService {
     private WebServerRepository webServerRepository;
 
     //Getting data Web Server with search and pagination
-    public PaginationUtil<WebServerEntity, WebServerDTO> getAllWebServerByPagination() {
-        Pageable paging = PageRequest.of(0, 20);
+    public PaginationUtil<WebServerEntity, WebServerDTO> getAllWebServerByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size);
         Specification<WebServerEntity> specs = Specification.where(null);
         Page<WebServerEntity> pagedResult = webServerRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, WebServerDTO.class);
