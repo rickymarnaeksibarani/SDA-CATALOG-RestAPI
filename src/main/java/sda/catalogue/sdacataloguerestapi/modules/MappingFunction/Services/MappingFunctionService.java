@@ -36,13 +36,12 @@ public class MappingFunctionService {
     private DinasRepository dinasRepository;
 
     //Getting data PIC Developer with search and pagination
-    @Transactional
-    public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<MappingFunctionEntity> result = mappingFunctionRepository.findBySearchTerm(searchTerm, pageable);
-        long total = mappingFunctionRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+
+    public PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> getAllMappingFunctionPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<MappingFunctionEntity> specs = Specification.where(null);
+        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, MappingFunctionDTO.class);
     }
 
     public MappingFunctionEntity getMappingFunctionByUuid(UUID uuid) {

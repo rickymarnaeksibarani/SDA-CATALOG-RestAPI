@@ -25,6 +25,7 @@ public class FrontEndService {
     @Autowired
     private FrontEndRepository frontEndRepository;
 
+    //Getting data Front end with pagination
     public PaginationUtil<FrontEndEntity, FrontEndDTO> getAllFrontendByPagination(Integer page, Integer size) {
         Pageable paging = PageRequest.of(page - 1, size);
         Specification<FrontEndEntity> specs = Specification.where(null);
@@ -32,6 +33,7 @@ public class FrontEndService {
         return new PaginationUtil<>(pagedResult, FrontEndDTO.class);
     }
 
+    //Get data Front end by UUID
     public FrontEndEntity getFrontEndByUuid(UUID uuid) {
         FrontEndEntity result = frontEndRepository.findByUuid(uuid);
         if (result == null) {
@@ -40,6 +42,7 @@ public class FrontEndService {
         return result;
     }
 
+    //Creating data Front end
     public FrontEndEntity createFrontEnd(FrontEndDTO request) {
         FrontEndEntity data = new FrontEndEntity();
         data.setFrontEnd(request.getFrontEnd());
@@ -47,6 +50,7 @@ public class FrontEndService {
     }
 
 
+    //Updating data Front end by UUID
     @Transactional
     public FrontEndEntity updateFrontEnd(UUID uuid, FrontEndDTO request) {
         int result = frontEndRepository.findByUuidAndUpdate(uuid, request.getFrontEnd());
@@ -58,6 +62,7 @@ public class FrontEndService {
         }
     }
 
+    //Deleting data Front end by UUID
     @Transactional
     public FrontEndEntity deleteFrontEnd(UUID uuid) {
         FrontEndEntity findData = frontEndRepository.findByUuid(uuid);

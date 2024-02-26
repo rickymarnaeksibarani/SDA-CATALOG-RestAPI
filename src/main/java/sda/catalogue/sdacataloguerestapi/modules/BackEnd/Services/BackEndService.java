@@ -39,9 +39,12 @@ public class BackEndService {
 
     //Getting data Back end by UUID
     public BackEndEntity getBackEndByUuid(UUID uuid) {
-        return backendRepository.findByUuid(uuid);
+        BackEndEntity result = backendRepository.findByUuid(uuid);
+        if (result == null) {
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+        }
+        return result;
     }
-
     //Creating data Back end
     public BackEndEntity createBackend(BackEndDTO request) {
         BackEndEntity data = new BackEndEntity();
@@ -56,6 +59,7 @@ public class BackEndService {
                 uuid,
                 request.getBackEnd()
         );
+        BackEndEntity findData = backendRepository.findByUuid(uuid);
         if (result > 0) {
             return backendRepository.findByUuid(uuid);
         } else {

@@ -29,13 +29,9 @@ public class MappingFunctionController {
 
     //Getting data Mapping Function with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchMappingFunction(
-            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
-            @RequestParam(name = "page", defaultValue = "1") long page,
-            @RequestParam(name = "size", defaultValue = "10") long size
-    ) {
+    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO) {
         try {
-            PaginateResponse<List<MappingFunctionEntity>> result = mappingFunctionService.searchAndPaginate(searchTerm, page, size);
+            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionPagination();
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data mapping function!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
