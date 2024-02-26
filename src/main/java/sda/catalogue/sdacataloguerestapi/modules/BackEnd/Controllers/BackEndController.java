@@ -31,8 +31,6 @@ public class BackEndController {
                                            @RequestParam("page") String page,
                                            @RequestParam("size") String size
     ) {
-        log.info("page"+page);
-        log.info("size"+size);
         try {
             PaginationUtil<BackEndEntity, BackEndDTO> result = backEndService.getAllBackendByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
