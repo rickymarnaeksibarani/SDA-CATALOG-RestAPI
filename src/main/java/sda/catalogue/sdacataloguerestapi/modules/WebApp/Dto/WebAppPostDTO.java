@@ -1,42 +1,69 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
 import lombok.*;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangAnnotation.*;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class WebAppPostDTO {
-
-//    @TGRNotEmpty
-//    @TGRString
+    @NotNull
+    @NotEmpty
     private String applicationName;
 
-//    @TGRNotEmpty
+    @NotNull
+    @NotEmpty
+    private String categoryApp;
+
+    @NotNull
+    @NotEmpty
     private String description;
 
-//    @TGRString
+    @NotNull
+    @NotEmpty
     private String functionApplication;
 
-//    @TGRNotEmpty
+    @NotNull
+    @NotEmpty
     private String address;
 
-//    @TGRNotEmpty
-    private String dinas;
-
-//    @TGRNotEmpty
-    private String mappingFunction;
-
-//    @TGRNotEmpty
+    @NotNull
+    @NotEmpty
     private String businessImpactPriority;
 
-//    @TGRNotEmpty
-//    @TGREmail
+    @NotNull
+    @NotEmpty
     private String status;
 
-//    @TGRNotEmpty
-    private String sdaCloud;
+    private String linkIOS;
+
+    private String linkAndroid;
+
+    private MultipartFile fileManifest;
+
+    private MultipartFile fileIpa;
+
+    private MultipartFile fileAndroid;
+
+    @NotNull
+    @NotEmpty
+    private String applicationSourceFe;
+
+    @NotNull
+    @NotEmpty
+    private String applicationSourceBe;
+
+    @NotNull
+    @NotEmpty
+    private String ipDatabase;
+
+    @NotNull
+    private Long sdaHostingEntity;
+
+    @NotNull
+    private List<MultipartFile> documentUploadList;
 }

@@ -3,31 +3,37 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
+import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 @Repository
-public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
-
+public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, JpaSpecificationExecutor<WebAppEntity> {
     //Getting data WebApp with search and pagination
     @Query("SELECT w FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.dinas) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
-            "ORDER BY w.updatedAt DESC")
-    List<WebAppEntity> findBySearchTerm(String searchTerm, Pageable pageable);
+            "ORDER BY CASE WHEN :order = 'asc' THEN :by END ASC, CASE WHEN :order = 'desc' THEN :by END DESC")
+    List<WebAppEntity> findBySearchTerm(String searchTerm, String order, String by, Pageable pageable);
 
     //Counting data WebApp with search
     @Query("SELECT COUNT(w) FROM WebAppEntity w " +
@@ -35,11 +41,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.dinas) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.mappingFunction) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.businessImpactPriority) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaCloud) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+            "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) ")
     long countBySearchTerm(String searchTerm);
 
     //Getting data WebApp by UUID
@@ -48,31 +51,39 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long> {
 
     //Updating data WebApp by UUID
     @Modifying
-    @Query("UPDATE WebAppEntity w SET " +
-            "w.applicationName = :applicationName, " +
-            "w.description = :description, " +
-            "w.functionApplication = :functionApplication, " +
-            "w.address = :address, " +
-            "w.dinas = :dinas, " +
-            "w.mappingFunction = :mappingFunction, " +
-            "w.businessImpactPriority = :businessImpactPriority, " +
-            "w.status = :status, " +
-            "w.sdaCloud = :sdaCloud " +
+    @Transactional
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.categoryApp = :categoryApp, " +
+            "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
+            "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
+            "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
+            "w.fileAndroid = :fileAndroid, w.applicationSourceFe = :applicationSourceFe, " +
+            "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
             "WHERE w.uuid = :uuid")
-    WebAppEntity updateByUuid(
-            UUID uuid,
-            String applicationName,
-            String description,
-            String functionApplication,
-            String address,
-            String dinas,
-            String mappingFunction,
-            String businessImpactPriority,
-            String status,
-            String sdaCloud);
+    int updateByUuid(UUID uuid,
+                     String applicationName,
+                     String categoryApp,
+                     String description,
+                     String functionApplication,
+                     String address,
+                     String businessImpactPriority,
+                     String status,
+                     String linkIOS,
+                     String linkAndroid,
+                     String fileManifest,
+                     String fileIpa,
+                     String fileAndroid,
+                     String applicationSourceFe,
+                     String applicationSourceBe,
+                     String ipDatabase);
 
     //Deleting data WebApp by UUID
     @Modifying
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")
     WebAppEntity findByUuidAndDelete(UUID uuid);
+
+    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
+    int countByStatus(String status);
+
+    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
+    Long countBySdaHosting(String sdaHosting);
 }

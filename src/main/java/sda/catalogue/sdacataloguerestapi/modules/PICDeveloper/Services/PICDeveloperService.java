@@ -2,12 +2,17 @@ package sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.TangerangResponse.PaginateResponse;
-import sda.catalogue.sdacataloguerestapi.core.TangerangValidation.TangerangRequestException;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
@@ -22,20 +27,18 @@ public class PICDeveloperService {
 
 
     //Getting data PIC Developer with search and pagination
-    @Transactional
-    public PaginateResponse<List<PICDeveloperEntity>> searchAndPaginate(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<PICDeveloperEntity> result = pICDeveloperRepository.findBySearchTerm(searchTerm, pageable);
-        long total = pICDeveloperRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    public PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> getAllPICDeveloperByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size );
+        Specification<PICDeveloperEntity> specs = Specification.where(null);
+        Page<PICDeveloperEntity> pagedResult = pICDeveloperRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, PICDeveloperDTO.class);
     }
 
     //Getting data PIC Developer by UUID
     public PICDeveloperEntity getPICDeveloperByUUID(UUID uuid) {
         PICDeveloperEntity result = pICDeveloperRepository.findByUuid(uuid);
         if (result == null) {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
@@ -59,7 +62,7 @@ public class PICDeveloperService {
         if (result > 0) {
             return pICDeveloperRepository.findByUuid(uuid);
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("uuid " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -72,7 +75,7 @@ public class PICDeveloperService {
         if (result > 0) {
             return findData;
         } else {
-            throw new TangerangRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
         }
     }
 
