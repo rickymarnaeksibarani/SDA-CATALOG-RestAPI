@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Controllers;
 
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/type-database")
 @CrossOrigin(origins = "${spring.frontend}")
 public class TypeDatabaseController {
@@ -27,9 +30,14 @@ public class TypeDatabaseController {
 
     //Getting data PIC Developer with pagination
     @GetMapping()
-    public ResponseEntity<?> searchTypeDatabase(@ModelAttribute TypeDatabaseDTO searchDTO) {
+    public ResponseEntity<?> searchTypeDatabase(@ModelAttribute TypeDatabaseDTO searchDTO,
+                                                @RequestParam("page") String page,
+                                                @RequestParam("size") String size
+    ) {
+        log.info("page: "+page);
+        log.info("size: "+size);
         try {
-            PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> result = typeDatabaseService.getAllTypeDatabaseByPagination();
+            PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> result = typeDatabaseService.getAllTypeDatabaseByPagination(Integer.parseInt(page), Integer.parseInt(size));
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data type database!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

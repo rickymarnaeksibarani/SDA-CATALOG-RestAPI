@@ -26,8 +26,8 @@ public class TypeDatabaseService {
     private TypeDatabaseRepository typeDatabaseRepository;
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> getAllTypeDatabaseByPagination() {
-        Pageable paging = PageRequest.of(0, 20);
+    public PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> getAllTypeDatabaseByPagination(Integer page, Integer size) {
+        Pageable paging = PageRequest.of(page - 1, size);
         Specification<TypeDatabaseEntity> specs = Specification.where(null);
         Page<TypeDatabaseEntity> pagedResult = typeDatabaseRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, TypeDatabaseDTO.class);
