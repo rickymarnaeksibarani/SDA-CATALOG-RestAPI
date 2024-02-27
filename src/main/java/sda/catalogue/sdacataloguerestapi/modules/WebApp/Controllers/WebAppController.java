@@ -33,7 +33,7 @@ public class WebAppController {
     @GetMapping()
     public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO,
                                           @RequestParam("page") String page,
-                                          @RequestPart("size") String size
+                                          @RequestParam("size") String size
     ) {
 
         try {
