@@ -31,13 +31,10 @@ public class WebAppController {
 
     //Getting Data Web App by Pagination
     @GetMapping()
-    public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO,
-                                          @RequestParam("page") String page,
-                                          @RequestParam("size") String size
-    ) {
+    public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
 
         try {
-            PaginationUtil<WebAppEntity, WebAppPostDTO> result = webAppService.getAllWebAppByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

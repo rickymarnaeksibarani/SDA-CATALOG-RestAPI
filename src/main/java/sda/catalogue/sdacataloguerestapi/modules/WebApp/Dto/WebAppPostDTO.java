@@ -1,69 +1,81 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebAppPostDTO {
-    @NotNull
-    @NotEmpty
+
+    @JsonProperty("idWebApp")
+    private long idWebApp;
+
+
+    @JsonProperty("applicationName")
     private String applicationName;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("categoryApp")
     private String categoryApp;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("description")
     private String description;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("functionApplication")
     private String functionApplication;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("address")
     private String address;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("businessImpactPriority")
     private String businessImpactPriority;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("status")
     private String status;
 
+    @JsonProperty("linkIOS")
     private String linkIOS;
 
+    @JsonProperty("linkAndroid")
     private String linkAndroid;
 
+    @JsonProperty("fileManifest")
     private MultipartFile fileManifest;
 
+    @JsonProperty("fileIpa")
     private MultipartFile fileIpa;
 
+    @JsonProperty("fileAndroid")
     private MultipartFile fileAndroid;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("applicationSourceFe")
     private String applicationSourceFe;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("applicationSourceBe")
     private String applicationSourceBe;
 
-    @NotNull
-    @NotEmpty
+    @JsonProperty("ipDatabase")
     private String ipDatabase;
 
-    @NotNull
+    @JsonProperty("sdaHostingEntity")
     private Long sdaHostingEntity;
 
-    @NotNull
+    @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;
+
+
 }

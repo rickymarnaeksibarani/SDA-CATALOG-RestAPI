@@ -82,11 +82,11 @@ public class WebAppService extends BaseController {
 
 
     //Getting data Web App with search and pagination
-    public PaginationUtil<WebAppEntity, WebAppPostDTO> getAllWebAppByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<WebAppEntity> specs = Specification.where(null);
         Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebAppPostDTO.class);
+        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
     }
 
     //Getting data by UUID
