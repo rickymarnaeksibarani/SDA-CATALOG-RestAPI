@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,15 +36,19 @@ public class MappingFunctionService {
     @Autowired
     private DinasRepository dinasRepository;
 
-    //Getting data PIC Developer with search and pagination
-
-    public PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> getAllMappingFunctionPagination() {
-        Pageable paging = PageRequest.of(0, 20);
-        Specification<MappingFunctionEntity> specs = Specification.where(null);
-        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, MappingFunctionDTO.class);
+    //Getting data Mapping Function with search and pagination
+    @Transactional
+    public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
+        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
+        List<MappingFunctionEntity> result = mappingFunctionRepository.findBySearchTerm(searchTerm, pageable);
+        long total = mappingFunctionRepository.countBySearchTerm(searchTerm);
+        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
+        return new PaginateResponse<>(result, pageInfo);
     }
 
+
+
+    //Getting data Mapping Function with UUID
     public MappingFunctionEntity getMappingFunctionByUuid(UUID uuid) {
         MappingFunctionEntity result = mappingFunctionRepository.findByUuid(uuid);
         if (result == null) {
@@ -52,6 +57,7 @@ public class MappingFunctionService {
         return result;
     }
 
+    //Creating data Mapping Function
     @Transactional
     public MappingFunctionEntity createMappingFunction(MappingFunctionDTO request) {
         MappingFunctionEntity data = new MappingFunctionEntity();

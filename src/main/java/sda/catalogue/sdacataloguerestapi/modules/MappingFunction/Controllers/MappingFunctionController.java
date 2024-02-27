@@ -29,14 +29,20 @@ public class MappingFunctionController {
 
     //Getting data Mapping Function with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchMappingFunction(@ModelAttribute MappingFunctionDTO searchDTO) {
+    public ResponseEntity<?> searchMappingFunction(
+            @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+            @RequestParam(name = "page", defaultValue = "1") long page,
+            @RequestParam(name = "size", defaultValue = "10") long size
+    ) {
         try {
-            PaginationUtil<MappingFunctionEntity, MappingFunctionDTO> result = mappingFunctionService.getAllMappingFunctionPagination();
+            PaginateResponse<List<MappingFunctionEntity>> result = mappingFunctionService.searchAndPaginate(searchTerm, page, size);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data mapping function!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
+
+    //Getting data Mapping Function with UUID
     @GetMapping("/{uuid}")
     public ResponseEntity<?> getMappingFunctionByUuid(
             @PathVariable("uuid") UUID uuid
@@ -50,6 +56,7 @@ public class MappingFunctionController {
         }
     }
 
+    //Creating data Mapping Function
     @PostMapping()
     public ResponseEntity<?> createMappingFunction(
             @Valid @RequestBody MappingFunctionDTO request
@@ -63,6 +70,7 @@ public class MappingFunctionController {
         }
     }
 
+    //Update data Mapping Function by UUID
     @PutMapping("/{uuid}")
     public ResponseEntity<?> updateMappingFunction(
             @PathVariable("uuid") UUID uuid,
@@ -77,6 +85,7 @@ public class MappingFunctionController {
         }
     }
 
+    //Delete data Mapping Function by UUID
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteMappingFunction(
             @PathVariable("uuid") UUID uuid
