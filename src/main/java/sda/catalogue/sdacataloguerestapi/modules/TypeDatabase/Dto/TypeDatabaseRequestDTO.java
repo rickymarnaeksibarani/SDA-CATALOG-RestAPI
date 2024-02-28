@@ -39,4 +39,6 @@ public class TypeDatabaseRequestDTO {
     @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
 
+    @JsonProperty("typeDatabaseEntity")
+    private List<DatabaseEntity> databaseEntities;
 }

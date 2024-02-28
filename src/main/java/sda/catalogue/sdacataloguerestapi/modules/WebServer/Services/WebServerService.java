@@ -13,7 +13,10 @@ import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerDTO;
+import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
 
@@ -26,11 +29,11 @@ public class WebServerService {
     private WebServerRepository webServerRepository;
 
     //Getting data Web Server with search and pagination
-    public PaginationUtil<WebServerEntity, WebServerDTO> getAllWebServerByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<WebServerEntity, WebServerEntity> getAllWebServerByPagination(WebServerRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<WebServerEntity> specs = Specification.where(null);
         Page<WebServerEntity> pagedResult = webServerRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebServerDTO.class);
+        return new PaginationUtil<>(pagedResult, WebServerEntity.class);
     }
 
     public WebServerEntity getWebServerByUuid(UUID uuid) {

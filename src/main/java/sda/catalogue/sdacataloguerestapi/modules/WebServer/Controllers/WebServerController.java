@@ -12,7 +12,10 @@ import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerDTO;
+import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Services.WebServerService;
 
@@ -28,12 +31,11 @@ public class WebServerController {
 
     //Getting data Web Server with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchWebServer(@ModelAttribute WebServerDTO searchDTO,
-                                             @RequestParam("page")String page,
-                                             @RequestParam("size")String size) {
+    public ResponseEntity<?> searchWebServer(WebServerRequestDTO searchDTO) {
+
         try {
-            PaginationUtil<WebServerEntity, WebServerDTO> result = webServerService.getAllWebServerByPagination(Integer.parseInt(page), Integer.parseInt(size));
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data web server!", result), HttpStatus.OK);
+            PaginationUtil<WebServerEntity, WebServerEntity> result = webServerService.getAllWebServerByPagination(searchDTO);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data Web Server!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
