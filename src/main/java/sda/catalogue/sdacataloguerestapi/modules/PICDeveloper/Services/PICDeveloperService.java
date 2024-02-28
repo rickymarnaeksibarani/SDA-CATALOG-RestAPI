@@ -14,8 +14,11 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,11 +30,11 @@ public class PICDeveloperService {
 
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> getAllPICDeveloperByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size );
+    public PaginationUtil<PICDeveloperEntity, PICDeveloperEntity> getAllPICDeveloperByPagination(PICDeveloperRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<PICDeveloperEntity> specs = Specification.where(null);
         Page<PICDeveloperEntity> pagedResult = pICDeveloperRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, PICDeveloperDTO.class);
+        return new PaginationUtil<>(pagedResult, PICDeveloperEntity.class);
     }
 
     //Getting data PIC Developer by UUID

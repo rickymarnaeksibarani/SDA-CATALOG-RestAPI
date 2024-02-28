@@ -14,8 +14,11 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Services.PICDeveloperService;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,15 +33,10 @@ public class PICDeveloperController {
 
     //Getting data PIC Developer with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchPICDeveloper(@ModelAttribute PICDeveloperDTO searchDTO,
-                                                @RequestParam("page")String page,
-                                                @RequestParam("size")String size
+    public ResponseEntity<?> searchPIC(PICDeveloperRequestDTO searchDTO) {
 
-    ) {
-        log.info("page: " + page);
-        log.info(("size: " + size));
         try {
-            PaginationUtil<PICDeveloperEntity, PICDeveloperDTO> result = picDeveloperService.getAllPICDeveloperByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<PICDeveloperEntity, PICDeveloperEntity> result = picDeveloperService.getAllPICDeveloperByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
