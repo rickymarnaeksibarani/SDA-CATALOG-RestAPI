@@ -11,8 +11,11 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services.FrontEndService;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +29,10 @@ public class FrontEndController {
     private FrontEndService frontEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchFrontEnd(@ModelAttribute FrontEndDTO searchDTO,
-                @RequestParam("page") String page,
-                @RequestParam("size") String size
-    ) {
+    public ResponseEntity<?> searchFrontEnd(FrontEndRequestDTO searchDTO) {
+
         try {
-            PaginationUtil<FrontEndEntity, FrontEndDTO> result = frontEndService.getAllFrontendByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<FrontEndEntity, FrontEndEntity> result = frontEndService.getAllFrontendByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

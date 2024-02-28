@@ -29,20 +29,17 @@ public class WebAppController {
     @Autowired
     WebAppService webAppService;
 
+    //Getting Data Web App by Pagination
+    @GetMapping()
+    public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
 
-@GetMapping()
-public ResponseEntity<?> searchWebApp(@ModelAttribute WebAppPostDTO searchDTO,
-                                      @RequestParam("page") String page,
-                                      @RequestPart("size") String size
-) {
-
-    try {
-        PaginationUtil<WebAppEntity, WebAppPostDTO> result = webAppService.getAllWebAppByPagination(Integer.parseInt(page), Integer.parseInt(size));
-        return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
-    } catch (CustomRequestException error) {
-        return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        try {
+            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data Web App!", result), HttpStatus.OK);
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
     }
-}
 
     //Getting Data Web App By UUID
     @GetMapping("/{uuid}")

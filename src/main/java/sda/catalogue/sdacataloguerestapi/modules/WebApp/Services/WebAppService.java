@@ -82,11 +82,11 @@ public class WebAppService extends BaseController {
 
 
     //Getting data Web App with search and pagination
-    public PaginationUtil<WebAppEntity, WebAppPostDTO> getAllWebAppByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<WebAppEntity> specs = Specification.where(null);
         Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebAppPostDTO.class);
+        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
     }
 
     //Getting data by UUID
@@ -101,9 +101,7 @@ public class WebAppService extends BaseController {
     //Creating data WebApp
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
-        //Upload Apk, Ipa, and Manifests Process
-        //TODO: FIX UPLOAD FILE DOCUMENT
-        //TODO: FIX UPDATE DATA CAUSE NEED MORE ACTION
+
         try {
             super.isValidApkType(request.getFileAndroid());
             String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
@@ -161,7 +159,7 @@ public class WebAppService extends BaseController {
             if (findSdaHosting.isPresent()) {
                 data.setSdaHostingEntity(findSdaHosting.get());
             } else {
-                throw new CustomRequestException("SDA Hosting with ID :" + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
+                throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
             }
 
             WebAppEntity result = webAppRepository.save(data);
@@ -194,7 +192,7 @@ public class WebAppService extends BaseController {
                     databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
                     databaseListData.add(databaseItem);
                 } else {
-                    throw new CustomRequestException("Database with ID :" + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
+                    throw new CustomRequestException("Database with ID : " + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
                 }
             }
 
@@ -212,7 +210,7 @@ public class WebAppService extends BaseController {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
-                throw new CustomRequestException("WebApp with UUID :" + uuid + " not found", HttpStatus.NOT_FOUND);
+                throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
             }
             super.isValidApkType(request.getFileAndroid());
             String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));

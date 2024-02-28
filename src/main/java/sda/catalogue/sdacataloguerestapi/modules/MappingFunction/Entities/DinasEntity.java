@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "tb_dinas_mapping_function")
-public class DinasEntity {
+public class DinasEntity extends DinasDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_dinas")
