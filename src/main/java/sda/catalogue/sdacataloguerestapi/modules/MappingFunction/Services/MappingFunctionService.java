@@ -14,12 +14,15 @@ import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.MappingFunctionDTO;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.MappingFunctionRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.DinasRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +40,11 @@ public class MappingFunctionService {
     private DinasRepository dinasRepository;
 
     //Getting data Mapping Function with search and pagination
-    @Transactional
-    public PaginateResponse<List<MappingFunctionEntity>> searchAndPaginate(String searchTerm, long page, long size) {
-        Pageable pageable = PageRequest.of((int) (page - 1), (int) size);
-        List<MappingFunctionEntity> result = mappingFunctionRepository.findBySearchTerm(searchTerm, pageable);
-        long total = mappingFunctionRepository.countBySearchTerm(searchTerm);
-        PaginateResponse.Page pageInfo = new PaginateResponse.Page(size, total, page);
-        return new PaginateResponse<>(result, pageInfo);
+    public PaginationUtil<MappingFunctionEntity, MappingFunctionEntity> getAllMappingFunctionByPagination(MappingFunctionRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
+        Specification<MappingFunctionEntity> specs = Specification.where(null);
+        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, MappingFunctionEntity.class);
     }
 
 
