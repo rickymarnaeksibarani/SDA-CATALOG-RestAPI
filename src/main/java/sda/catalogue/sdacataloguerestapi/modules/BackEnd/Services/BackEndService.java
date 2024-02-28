@@ -13,12 +13,15 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,11 +33,11 @@ public class BackEndService {
     private BackEndRepository backendRepository;
 
     //Getting data Backend with pagination
-    public PaginationUtil<BackEndEntity, BackEndDTO> getAllBackendByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<BackEndEntity, BackEndEntity> getAllBackendByPagination(BackEndRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<BackEndEntity> specs = Specification.where(null);
         Page<BackEndEntity> pagedResult = backendRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, BackEndDTO.class);
+        return new PaginationUtil<>(pagedResult, BackEndEntity.class);
     }
 
     //Getting data Back end by UUID

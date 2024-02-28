@@ -13,8 +13,11 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services.BackEndService;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,12 +30,10 @@ public class BackEndController {
     private BackEndService backEndService;
 
     @GetMapping()
-    public ResponseEntity<?> searchBackEnd(@ModelAttribute BackEndDTO searchDTO,
-                                           @RequestParam("page") String page,
-                                           @RequestParam("size") String size
-    ) {
+    public ResponseEntity<?> searchBackEnd(BackEndRequestDTO searchDTO) {
+
         try {
-            PaginationUtil<BackEndEntity, BackEndDTO> result = backEndService.getAllBackendByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<BackEndEntity, BackEndEntity> result = backEndService.getAllBackendByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
