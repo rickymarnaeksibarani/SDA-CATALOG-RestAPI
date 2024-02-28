@@ -14,6 +14,7 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseDTO;
+import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Repositories.TypeDatabaseRepository;
 
@@ -26,11 +27,11 @@ public class TypeDatabaseService {
     private TypeDatabaseRepository typeDatabaseRepository;
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> getAllTypeDatabaseByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<TypeDatabaseEntity, TypeDatabaseEntity> getAllTypeDatabaseByPagination(TypeDatabaseRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage()-1, searchRequest.getSize());
         Specification<TypeDatabaseEntity> specs = Specification.where(null);
         Page<TypeDatabaseEntity> pagedResult = typeDatabaseRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, TypeDatabaseDTO.class);
+        return new PaginationUtil<>(pagedResult, TypeDatabaseEntity.class);
     }
 
     public TypeDatabaseEntity getTypeDatabaseByUuid(UUID uuid) {

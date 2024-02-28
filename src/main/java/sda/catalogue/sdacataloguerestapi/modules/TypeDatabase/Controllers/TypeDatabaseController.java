@@ -14,8 +14,11 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseDTO;
+import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto.TypeDatabaseRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Services.TypeDatabaseService;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,14 +33,10 @@ public class TypeDatabaseController {
 
     //Getting data PIC Developer with pagination
     @GetMapping()
-    public ResponseEntity<?> searchTypeDatabase(@ModelAttribute TypeDatabaseDTO searchDTO,
-                                                @RequestParam("page") String page,
-                                                @RequestParam("size") String size
-    ) {
-        log.info("page: "+page);
-        log.info("size: "+size);
+    public ResponseEntity<?> searchTypeDatabase(TypeDatabaseRequestDTO searchDTO) {
+
         try {
-            PaginationUtil<TypeDatabaseEntity, TypeDatabaseDTO> result = typeDatabaseService.getAllTypeDatabaseByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<TypeDatabaseEntity, TypeDatabaseEntity> result = typeDatabaseService.getAllTypeDatabaseByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data type database!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
