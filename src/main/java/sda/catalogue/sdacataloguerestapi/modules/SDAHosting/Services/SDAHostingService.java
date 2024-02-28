@@ -12,6 +12,7 @@ import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingDTO;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
 
@@ -26,11 +27,11 @@ public class SDAHostingService {
 
 
     //Getting data PIC Developer with search and pagination
-    public PaginationUtil<SDAHostingEntity, SDAHostingDTO> getAllSDAHostingByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<SDAHostingEntity, SDAHostingEntity> getAllSDAHostingByPagination(SDAHostingRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage()-1, searchRequest.getSize());
         Specification<SDAHostingEntity> specs = Specification.where(null);
         Page<SDAHostingEntity> pagedResult = sdaHostingRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, SDAHostingDTO.class);
+        return new PaginationUtil<>(pagedResult, SDAHostingEntity.class);
     }
 
 

@@ -14,8 +14,11 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingDTO;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Services.SDAHostingService;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,14 +33,10 @@ public class SDAHostingController {
 
     //Getting data SDA Hosting with search and pagination
     @GetMapping()
-    public ResponseEntity<?> searchSDAHosting(@ModelAttribute SDAHostingDTO searchDTO,
-                                              @RequestParam("page")String page,
-                                              @RequestParam("size")String size
-    ) {
-        log.info("page: "+ page);
-        log.info("size: "+ size);
+    public ResponseEntity<?> searchSDAHosting(SDAHostingRequestDTO searchDTO) {
+
         try {
-            PaginationUtil<SDAHostingEntity, SDAHostingDTO> result = sdaHostingService.getAllSDAHostingByPagination(Integer.parseInt(page), Integer.parseInt(size));
+            PaginationUtil<SDAHostingEntity, SDAHostingEntity> result = sdaHostingService.getAllSDAHostingByPagination(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data sda hosting!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
