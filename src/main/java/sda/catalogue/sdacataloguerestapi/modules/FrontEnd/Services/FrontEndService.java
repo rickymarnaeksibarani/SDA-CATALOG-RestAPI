@@ -14,8 +14,11 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,11 +29,11 @@ public class FrontEndService {
     private FrontEndRepository frontEndRepository;
 
     //Getting data Front end with pagination
-    public PaginationUtil<FrontEndEntity, FrontEndDTO> getAllFrontendByPagination(Integer page, Integer size) {
-        Pageable paging = PageRequest.of(page - 1, size);
+    public PaginationUtil<FrontEndEntity, FrontEndEntity> getAllFrontendByPagination(FrontEndRequestDTO searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
         Specification<FrontEndEntity> specs = Specification.where(null);
         Page<FrontEndEntity> pagedResult = frontEndRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, FrontEndDTO.class);
+        return new PaginationUtil<>(pagedResult, FrontEndEntity.class);
     }
 
     //Get data Front end by UUID
