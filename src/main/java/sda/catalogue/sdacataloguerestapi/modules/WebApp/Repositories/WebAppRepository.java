@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
@@ -17,6 +18,7 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningAppli
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -76,10 +78,10 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
                      String applicationSourceBe,
                      String ipDatabase);
 
-    //Deleting data WebApp by UUID
     @Modifying
+    @Transactional
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")
-    WebAppEntity findByUuidAndDelete(UUID uuid);
+    int findByUuidAndDelete(UUID uuid);
 
     @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
     int countByStatus(String status);

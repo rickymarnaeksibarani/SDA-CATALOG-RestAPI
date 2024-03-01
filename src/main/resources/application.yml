@@ -28,6 +28,11 @@
           jdbc:
             lob:
               non_contextual_creation: true
+          jpa:
+            show-sql: true
+          connection:
+            datasource:
+              log-statement: true
     mvc:
       validation: true
     servlet:

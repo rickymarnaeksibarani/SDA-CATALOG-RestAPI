@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
@@ -136,18 +138,19 @@ public class WebAppController {
         }
     }
 
-    //Delete Data Web App by UUID
+
     @DeleteMapping("/{uuid}")
-//    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> deleteWebAppByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
         try {
             WebAppEntity result = webAppService.deleteWebAppByUuid(uuid);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully deleted data webapp!", result);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data web app!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
+
 }
+

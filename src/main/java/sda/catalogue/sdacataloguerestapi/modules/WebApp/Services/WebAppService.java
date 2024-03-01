@@ -1,6 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
@@ -212,6 +212,14 @@ public class WebAppService extends BaseController {
             if (findData == null) {
                 throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
             }
+            MultipartFile fileAndroid = request.getFileAndroid();
+            MultipartFile fileIpa = request.getFileIpa();
+            MultipartFile fileManifest = request.getFileManifest();
+
+            if (fileAndroid == null || fileIpa == null || fileManifest == null){
+                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
+            }
+
             super.isValidApkType(request.getFileAndroid());
             String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
             Path newApkPath = Paths.get(UPLOAD_DIR_APK);
@@ -258,10 +266,16 @@ public class WebAppService extends BaseController {
     }
 
     //Deleting data WebApp by UUID
+    @Transactional
     public WebAppEntity deleteWebAppByUuid(UUID uuid) {
-        return webAppRepository.findByUuidAndDelete(uuid);
+        WebAppEntity findData = webAppRepository.findByUuid(uuid);
+        int result = webAppRepository.findByUuidAndDelete(uuid);
+        if (result > 0) {
+            return findData;
+        } else {
+            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+        }
     }
-
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {
