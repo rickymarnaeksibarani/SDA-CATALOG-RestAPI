@@ -10,6 +10,7 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,4 +46,7 @@ public class SDAHostingEntity {
 
     @OneToMany(mappedBy = "sdaHostingEntity")
     private List<WebAppEntity> sdaHostingEntities;
+
+    @OneToMany(mappedBy = "sdaHosting")
+    private List<MobileAppEntity> mobileApp;
 }

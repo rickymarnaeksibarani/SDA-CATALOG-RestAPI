@@ -1,6 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,4 +45,7 @@ public class MappingFunctionEntity {
 
     @OneToMany(mappedBy = "mappingFunctionEntity", cascade = CascadeType.ALL)
     private List<DinasEntity> dinasEntityList;
+
+    @OneToMany(mappedBy = "mappingFunction")
+    private List<MobileAppEntity> mobileApp;
 }

@@ -1,18 +1,21 @@
 package sda.catalogue.sdacataloguerestapi.core.CustomResponse;
 
-import lombok.Getter;
+import lombok.*;
 import org.springframework.http.HttpStatusCode;
 
-@Getter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
-    private final HttpStatusCode status;
-    private final String message;
-    private final T result;
+    private HttpStatusCode status;
+    private String message;
+    private T result;
 
 
-    public ApiResponse(HttpStatusCode status, String message, T result) {
-        this.status = status;
-        this.message = message;
-        this.result = result;
-    }
+//    private ApiResponse(HttpStatusCode status, String message, T result) {
+//        this.status = status;
+//        this.message = message;
+//        this.result = result;
+//    }
 }
