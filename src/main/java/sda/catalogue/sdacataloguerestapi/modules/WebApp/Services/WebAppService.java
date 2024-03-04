@@ -262,8 +262,12 @@ public class WebAppService extends BaseController {
     //Deleting data WebApp by UUID
     @Transactional
     public void deleteWebAppByUuid(UUID uuid) {
+        try {
             webAppRepository.findByUuidAndDelete(uuid);
-    }
+        } catch (Exception e){
+            throw new CustomRequestException(e.toString(), HttpStatus.UNAUTHORIZED);
+        }
+   }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {
