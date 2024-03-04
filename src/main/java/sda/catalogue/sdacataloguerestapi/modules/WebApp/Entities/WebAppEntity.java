@@ -147,7 +147,7 @@ public class WebAppEntity {
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
     private List<VersioningApplicationEntity> versioningApplicationList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DatabaseEntity> databaseList;
 
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
