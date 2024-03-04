@@ -15,4 +15,9 @@ public class ApiResponse<T> {
         this.message = message;
         this.result = result;
     }
+    public ApiResponse(HttpStatusCode status, String message) {
+        this.status = status;
+        this.message = message;
+        this.result = null;
+    }
 }

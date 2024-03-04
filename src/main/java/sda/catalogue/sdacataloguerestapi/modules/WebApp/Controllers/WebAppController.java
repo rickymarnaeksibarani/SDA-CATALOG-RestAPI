@@ -144,8 +144,8 @@ public class WebAppController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            WebAppEntity result = webAppService.deleteWebAppByUuid(uuid);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data web app!", result);
+            webAppService.deleteWebAppByUuid(uuid);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.NO_CONTENT, "Success delete data web app!");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

@@ -11,18 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
-import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -45,9 +42,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService.UPLOAD_DIR;
 
 @Service
 public class WebAppService extends BaseController {
@@ -267,14 +261,8 @@ public class WebAppService extends BaseController {
 
     //Deleting data WebApp by UUID
     @Transactional
-    public WebAppEntity deleteWebAppByUuid(UUID uuid) {
-        WebAppEntity findData = webAppRepository.findByUuid(uuid);
-        int result = webAppRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deleteWebAppByUuid(UUID uuid) {
+            webAppRepository.findByUuidAndDelete(uuid);
     }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {

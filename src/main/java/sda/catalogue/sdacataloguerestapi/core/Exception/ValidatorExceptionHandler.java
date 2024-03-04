@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ExceptionResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,4 +31,11 @@ public class ValidatorExceptionHandler {
         ValidatorExceptionDTO response = new ValidatorExceptionDTO(HttpStatus.BAD_REQUEST, "Validation failed", errors);
         return new ResponseEntity<>(response, response.getStatus());
     }
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    public ResponseEntity<ExceptionResponse> handleUnauthorizedValidationException(MethodArgumentNotValidException ex){
+//        ExceptionResponse response = new ExceptionResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+//        return new ResponseEntity<>(response, response.getStatus());
+//
+//    }
 }

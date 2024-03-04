@@ -81,7 +81,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     @Modifying
     @Transactional
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")
-    int findByUuidAndDelete(UUID uuid);
+    void findByUuidAndDelete(UUID uuid);
 
     @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
     int countByStatus(String status);
