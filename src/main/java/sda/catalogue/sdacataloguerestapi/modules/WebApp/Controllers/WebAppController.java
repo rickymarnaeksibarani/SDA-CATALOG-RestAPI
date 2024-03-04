@@ -145,7 +145,7 @@ public class WebAppController {
     ) {
         try {
             webAppService.deleteWebAppByUuid(uuid);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.NO_CONTENT, "Success delete data web app!");
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data web app!", null);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

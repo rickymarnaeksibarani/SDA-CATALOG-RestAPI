@@ -46,6 +46,6 @@ public class MappingFunctionEntity {
     @OneToMany(mappedBy = "mappingFunctionEntity", cascade = CascadeType.ALL)
     private List<DinasEntity> dinasEntityList;
 
-    @OneToMany(mappedBy = "mappingFunction")
-    private List<MobileAppEntity> mobileApp;
+//    @OneToMany(mappedBy = "mappingFunction")
+//    private List<MobileAppEntity> mobileApp;
 }

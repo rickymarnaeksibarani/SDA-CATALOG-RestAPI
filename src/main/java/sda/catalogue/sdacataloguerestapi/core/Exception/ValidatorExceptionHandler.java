@@ -31,11 +31,5 @@ public class ValidatorExceptionHandler {
         ValidatorExceptionDTO response = new ValidatorExceptionDTO(HttpStatus.BAD_REQUEST, "Validation failed", errors);
         return new ResponseEntity<>(response, response.getStatus());
     }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<ExceptionResponse> handleUnauthorizedValidationException(MethodArgumentNotValidException ex){
-        ExceptionResponse response = new ExceptionResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return new ResponseEntity<>(response, response.getStatus());
 
-    }
 }
