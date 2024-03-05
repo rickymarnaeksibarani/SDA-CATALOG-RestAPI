@@ -45,6 +45,9 @@ public class WebAppEntity {
     @Column(name = "application_name")
     private String applicationName;
 
+    @Column(name = "pmo_number")
+    private String pmoNumber;
+
     @Column(name = "category_app")
     private String categoryApp;
 
