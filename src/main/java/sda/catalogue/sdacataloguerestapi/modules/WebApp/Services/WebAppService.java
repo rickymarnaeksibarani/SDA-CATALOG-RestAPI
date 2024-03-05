@@ -181,6 +181,7 @@ public class WebAppService extends BaseController {
                 databaseItem.setApiAddress(databaseId.getApiAddress());
                 databaseItem.setPassword(databaseId.getPassword());
                 databaseItem.setApiName(databaseId.getApiName());
+                databaseItem.setUserName(databaseId.getUserName());
                 Optional<TypeDatabaseEntity> typeDatabaseEntityOptional = typeDatabaseRepository.findById(databaseId.getIdTypeDatabase());
                 if (typeDatabaseEntityOptional.isPresent()) {
                     TypeDatabaseEntity typeDatabaseEntity = typeDatabaseEntityOptional.get();
