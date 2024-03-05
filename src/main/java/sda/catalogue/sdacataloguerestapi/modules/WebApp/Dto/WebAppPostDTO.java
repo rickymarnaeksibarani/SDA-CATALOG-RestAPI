@@ -29,6 +29,9 @@ public class WebAppPostDTO {
     @JsonProperty("applicationName")
     private String applicationName;
 
+    @JsonProperty("pmoNumber")
+    private String pmoNumber;
+
     @JsonProperty("categoryApp")
     private String categoryApp;
 

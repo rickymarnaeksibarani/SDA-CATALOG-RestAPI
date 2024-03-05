@@ -239,6 +239,7 @@ public class WebAppService extends BaseController {
             webAppRepository.updateByUuid(
                     uuid,
                     request.getApplicationName(),
+                    request.getPmoNumber(),
                     request.getCategoryApp(),
                     request.getDescription(),
                     request.getFunctionApplication(),

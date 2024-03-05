@@ -29,6 +29,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Getting data WebApp with search and pagination
     @Query("SELECT w FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "   OR LOWER(w.pmoNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
@@ -40,6 +41,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Counting data WebApp with search
     @Query("SELECT COUNT(w) FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "   OR LOWER(w.pmoNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
@@ -54,7 +56,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Updating data WebApp by UUID
     @Modifying
     @Transactional
-    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.categoryApp = :categoryApp, " +
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber,w.categoryApp = :categoryApp, " +
             "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
             "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
             "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
@@ -63,6 +65,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
             "WHERE w.uuid = :uuid")
     int updateByUuid(UUID uuid,
                      String applicationName,
+                     String pmoNumber,
                      String categoryApp,
                      String description,
                      String functionApplication,
