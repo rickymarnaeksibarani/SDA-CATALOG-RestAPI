@@ -240,6 +240,7 @@ public class WebAppService extends BaseController {
                     uuid,
                     request.getApplicationName(),
                     request.getPmoNumber(),
+                    request.getSapIntegration(),
                     request.getCategoryApp(),
                     request.getDescription(),
                     request.getFunctionApplication(),
