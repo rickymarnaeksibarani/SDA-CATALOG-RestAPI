@@ -47,6 +47,6 @@ public class SDAHostingEntity {
     @OneToMany(mappedBy = "sdaHostingEntity")
     private List<WebAppEntity> sdaHostingEntities;
 
-    @OneToMany(mappedBy = "sdaHosting")
-    private List<MobileAppEntity> mobileApp;
+//    @OneToMany(mappedBy = "sdaHosting")
+//    private List<MobileAppEntity> mobileApp;
 }

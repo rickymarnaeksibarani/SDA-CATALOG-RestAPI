@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class WebAppService extends BaseController {
 
@@ -95,7 +97,6 @@ public class WebAppService extends BaseController {
     //Creating data WebApp
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
-
         try {
             super.isValidApkType(request.getFileAndroid());
             String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
@@ -265,7 +266,7 @@ public class WebAppService extends BaseController {
         try {
             webAppRepository.findByUuidAndDelete(uuid);
         } catch (Exception e){
-            throw new CustomRequestException(e.toString(), HttpStatus.UNAUTHORIZED);
+            throw new CustomRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
    }
 

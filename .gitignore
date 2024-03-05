@@ -32,8 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/uploads/apk/
-/src/main/resources/uploads/document/
-/src/main/resources/uploads/ipa/
-/src/main/resources/uploads/manifest/
-/src/main/resources/file-test/
+#/src/main/resources/uploads/apk/
+#/src/main/resources/uploads/document/
+#/src/main/resources/uploads/ipa/
+#/src/main/resources/uploads/manifest/
+#/src/main/resources/file-test/
+/src/main/resources/uploads/
+
