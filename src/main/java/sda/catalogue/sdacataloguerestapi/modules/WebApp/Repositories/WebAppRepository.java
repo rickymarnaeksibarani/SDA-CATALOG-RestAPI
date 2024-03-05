@@ -5,24 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
-import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
-import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
-import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
-import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
+import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
-import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
 @Repository
 public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, JpaSpecificationExecutor<WebAppEntity> {
@@ -30,6 +20,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     @Query("SELECT w FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.pmoNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+            "   OR LOWER(w.sapIntegration) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
@@ -42,6 +33,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     @Query("SELECT COUNT(w) FROM WebAppEntity w " +
             "WHERE LOWER(w.applicationName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.pmoNumber) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "   OR LOWER(w.sapIntegration) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.functionApplication) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
             "   OR LOWER(w.address) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
@@ -56,7 +48,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Updating data WebApp by UUID
     @Modifying
     @Transactional
-    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber,w.categoryApp = :categoryApp, " +
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber, w.sapIntegration = :sapIntegration,w.categoryApp = :categoryApp, " +
             "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
             "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
             "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
@@ -66,6 +58,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     int updateByUuid(UUID uuid,
                      String applicationName,
                      String pmoNumber,
+                     SapIntegration sapIntegration,
                      String categoryApp,
                      String description,
                      String functionApplication,

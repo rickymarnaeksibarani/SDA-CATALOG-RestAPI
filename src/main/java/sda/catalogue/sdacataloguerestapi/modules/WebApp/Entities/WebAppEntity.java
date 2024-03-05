@@ -12,6 +12,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
@@ -32,6 +34,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "tb_webapp")
+@EntityListeners({AuditingEntityListener.class})
 public class WebAppEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,6 +50,10 @@ public class WebAppEntity {
 
     @Column(name = "pmo_number")
     private String pmoNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sap_integration", nullable = false)
+    private SapIntegration sapIntegration;
 
     @Column(name = "category_app")
     private String categoryApp;

@@ -1,8 +1,10 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 
 import java.util.List;
 
@@ -31,6 +33,12 @@ public class WebAppRequestDto {
 
     @JsonProperty("applicationName")
     private String applicationName;
+
+    @JsonProperty("pmoNumber")
+    private String pmoNumber;
+
+    @JsonProperty("sapIntegration")
+    private SapIntegration sapIntegration;
 
     @JsonProperty("categoryApp")
     private String categoryApp;

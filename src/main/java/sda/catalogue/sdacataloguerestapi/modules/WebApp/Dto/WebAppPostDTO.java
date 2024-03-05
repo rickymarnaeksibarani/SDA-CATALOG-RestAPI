@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
+import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
@@ -31,6 +32,9 @@ public class WebAppPostDTO {
 
     @JsonProperty("pmoNumber")
     private String pmoNumber;
+
+    @JsonProperty("sapIntegration")
+    private SapIntegration sapIntegration;
 
     @JsonProperty("categoryApp")
     private String categoryApp;
