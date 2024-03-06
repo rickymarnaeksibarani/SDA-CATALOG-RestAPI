@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -79,12 +80,15 @@ public class WebAppEntity {
     @Column(name = "link_android")
     private String linkAndroid;
 
+    @Nullable
     @Column(name = "file_manifest")
     private String fileManifest;
 
+    @Nullable
     @Column(name = "file_ipa")
     private String fileIpa;
 
+    @Nullable
     @Column(name = "file_android")
     private String fileAndroid;
 

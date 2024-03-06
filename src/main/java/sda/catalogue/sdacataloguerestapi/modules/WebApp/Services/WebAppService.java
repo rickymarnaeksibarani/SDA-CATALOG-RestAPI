@@ -186,10 +186,11 @@ public class WebAppService extends BaseController {
                 apiItem.setIpApi(apiId.getIpApi());
                 apiItem.setUserName(apiId.getUserName());
                 apiItem.setPassword(apiId.getPassword());
+                apiItem.setWebAppEntity(result);
                 apiListData.add(apiItem);
             }
 
-            apiRepository.saveAll(apiListData);
+
 
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();
@@ -210,6 +211,7 @@ public class WebAppService extends BaseController {
                 }
             }
 
+            apiRepository.saveAll(apiListData);
             databaseRepository.saveAll(databaseListData);
             versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
