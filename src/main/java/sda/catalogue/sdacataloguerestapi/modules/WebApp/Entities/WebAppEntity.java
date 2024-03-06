@@ -74,22 +74,11 @@ public class WebAppEntity {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "link_ios")
+
     private String linkIOS;
-
-    @Column(name = "link_android")
     private String linkAndroid;
-
-    @Nullable
-    @Column(name = "file_manifest")
     private String fileManifest;
-
-    @Nullable
-    @Column(name = "file_ipa")
     private String fileIpa;
-
-    @Nullable
-    @Column(name = "file_android")
     private String fileAndroid;
 
     @Column(name = "application_source_fe")
