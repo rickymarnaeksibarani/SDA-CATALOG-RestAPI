@@ -32,17 +32,17 @@ public class DatabaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "api_name")
-    private String apiName;
+    @Column(name = "db_name")
+    private String dbName;
 
-    @Column(name = "ip_address")
-    private String apiAddress;
+    @Column(name = "db_address")
+    private String dbAddress;
 
     @Column(name = "username")
-    private String userName;
+    private String dbUserName;
 
     @Column(name = "password")
-    private String password;
+    private String dbPassword;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)

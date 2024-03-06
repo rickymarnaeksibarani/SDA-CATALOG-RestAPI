@@ -151,15 +151,18 @@ public class WebAppEntity {
     @JsonIgnoreProperties("sdaHostingEntities")
     private SDAHostingEntity sdaHostingEntity;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentUploadEntity> documentUploadList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VersioningApplicationEntity> versioningApplicationList;
+
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ApiEntity> apiList;
 
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DatabaseEntity> databaseList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FeedbackEntity> feedbackList;
 }

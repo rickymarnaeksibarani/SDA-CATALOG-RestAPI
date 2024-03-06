@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.ApiEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 
 import java.util.List;
 import java.util.UUID;

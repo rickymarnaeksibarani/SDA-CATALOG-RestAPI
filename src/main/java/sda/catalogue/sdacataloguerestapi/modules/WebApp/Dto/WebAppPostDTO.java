@@ -26,7 +26,6 @@ public class WebAppPostDTO {
     @JsonProperty("idWebApp")
     private long idWebApp;
 
-
     @JsonProperty("applicationName")
     private String applicationName;
 

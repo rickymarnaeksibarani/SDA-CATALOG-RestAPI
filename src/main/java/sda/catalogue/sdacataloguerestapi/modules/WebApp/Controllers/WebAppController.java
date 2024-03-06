@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -94,7 +95,7 @@ public class WebAppController {
 
 
     //Create Data Web App
-    @PostMapping
+    @PostMapping()
 //    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
@@ -104,11 +105,13 @@ public class WebAppController {
             @RequestPart("backEndList") List<Long> backEndList,
             @RequestPart("webServerList") List<Long> webServerList,
             @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
+            @RequestPart("apiList") List<ApiDTO> apiList
 
     ) {
+        log.info("Nilai apiList: {}", apiList);
         try {
-            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -128,10 +131,11 @@ public class WebAppController {
             @RequestPart("backEndList") List<Long> backEndList,
             @RequestPart("webServerList") List<Long> webServerList,
             @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
+            @RequestPart("apiList") List<ApiDTO> apiList
     ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

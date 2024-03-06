@@ -28,9 +28,11 @@ import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHost
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Repositories.TypeDatabaseRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.ApiEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.ApiRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.DatabaseRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningApplicationRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
@@ -65,10 +67,11 @@ public class WebAppService extends BaseController {
     @Autowired
     private DatabaseRepository databaseRepository;
     @Autowired
+    private ApiRepository apiRepository;
+    @Autowired
     private DocumentUploadService documentUploadService;
     @Autowired
     private TypeDatabaseRepository typeDatabaseRepository;
-
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
 
@@ -96,7 +99,7 @@ public class WebAppService extends BaseController {
 
     //Creating data WebApp
     @Transactional
-    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
+    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
         try {
             super.isValidApkType(request.getFileAndroid());
             String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
@@ -173,15 +176,30 @@ public class WebAppService extends BaseController {
                 versioningApplicationListData.add(versioningApplicationItem);
             }
 
+            //API Process
+            List<ApiEntity> apiListData = new ArrayList<>();
+//            ApiEntity apiItem = new ApiEntity();
+//            List<ApiEntity> apiEntities = sda.catalogue.sdacataloguerestapi.core.utils.ObjectMapperUtil.mapAll(apiList, ApiEntity.class);
+            for (ApiDTO apiId : apiList){
+                ApiEntity apiItem = new ApiEntity();
+                apiItem.setApiName(apiId.getApiName());
+                apiItem.setIpApi(apiId.getIpApi());
+                apiItem.setUserName(apiId.getUserName());
+                apiItem.setPassword(apiId.getPassword());
+                apiListData.add(apiItem);
+            }
+
+            apiRepository.saveAll(apiListData);
+
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();
             for (DatabaseDTO databaseId : databaseList) {
                 DatabaseEntity databaseItem = new DatabaseEntity();
                 databaseItem.setWebAppEntity(result);
-                databaseItem.setApiAddress(databaseId.getApiAddress());
-                databaseItem.setPassword(databaseId.getPassword());
-                databaseItem.setApiName(databaseId.getApiName());
-                databaseItem.setUserName(databaseId.getUserName());
+                databaseItem.setDbAddress(databaseId.getDbAddress());
+                databaseItem.setDbPassword(databaseId.getDbPassword());
+                databaseItem.setDbName(databaseId.getDbName());
+                databaseItem.setDbUserName(databaseId.getDbUserName());
                 Optional<TypeDatabaseEntity> typeDatabaseEntityOptional = typeDatabaseRepository.findById(databaseId.getIdTypeDatabase());
                 if (typeDatabaseEntityOptional.isPresent()) {
                     TypeDatabaseEntity typeDatabaseEntity = typeDatabaseEntityOptional.get();
@@ -202,7 +220,7 @@ public class WebAppService extends BaseController {
 
 
     //Updating data WebApp by UUID
-    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
+    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
