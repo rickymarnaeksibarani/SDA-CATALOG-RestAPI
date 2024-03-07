@@ -101,27 +101,36 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
         try {
-            super.isValidApkType(request.getFileAndroid());
-            String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-            Files.createDirectories(newApkPath);
-            Path apkPath = newApkPath.resolve(apkFileName);
-            Files.copy(request.getFileAndroid().getInputStream(), apkPath);
 
+
+            Path apkPath = null;
+            if (request.getFileAndroid() != null) {
+                super.isValidApkType(request.getFileAndroid());
+                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
+                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
+                Files.createDirectories(newApkPath);
+                apkPath = newApkPath.resolve(apkFileName);
+                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+            }
             //Ipa Process
-            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-            Files.createDirectories(newIpaPath);
-            Path ipaPath = newIpaPath.resolve(ipaFileName);
-            Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            Path ipaPath = null;
+            if (request.getFileIpa() != null) {
+                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
+                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
+                Files.createDirectories(newIpaPath);
+                ipaPath = newIpaPath.resolve(ipaFileName);
+                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            }
 
             //Manifest Process
-            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-            Files.createDirectories(newManifestPath);
-            Path manifestPath = newManifestPath.resolve(manifestFileName);
-            Files.copy(request.getFileManifest().getInputStream(), manifestPath);
-
+            Path manifestPath = null;
+            if (request.getFileManifest() != null) {
+                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
+                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
+                Files.createDirectories(newManifestPath);
+                manifestPath = newManifestPath.resolve(manifestFileName);
+                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+            }
 
             //PIC Developer Process
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
@@ -147,10 +156,17 @@ public class WebAppService extends BaseController {
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
+
             //Path File
-            data.setFileAndroid(String.valueOf(apkPath));
-            data.setFileIpa(String.valueOf(ipaPath));
-            data.setFileManifest(String.valueOf(manifestPath));
+            if (apkPath != null) {
+                data.setFileAndroid(String.valueOf(apkPath));
+            }
+            if (ipaPath != null) {
+                data.setFileIpa(String.valueOf(ipaPath));
+            }
+            if (manifestPath != null) {
+                data.setFileManifest(String.valueOf(manifestPath));
+            }
 
             // Modify SDA Hosting
             Optional<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findById(request.getSdaHostingEntity());
