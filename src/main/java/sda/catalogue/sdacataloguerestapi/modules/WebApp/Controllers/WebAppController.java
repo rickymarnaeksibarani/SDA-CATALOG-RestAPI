@@ -109,7 +109,6 @@ public class WebAppController {
             @RequestPart("apiList") List<ApiDTO> apiList
 
     ) {
-        log.info("Nilai apiList: {}", apiList);
         try {
             WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);

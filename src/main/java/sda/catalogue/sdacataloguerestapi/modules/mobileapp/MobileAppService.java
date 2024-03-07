@@ -74,7 +74,6 @@ public class MobileAppService {
 
         Specification<MobileAppEntity> specification = null;
         if (queryParam != null || !queryParam.isEmpty()) {
-            log.info("query: " + queryParam);
             specification = Specification.where((root, query, criteriaBuilder) -> query.where(
                     criteriaBuilder.or(
                             criteriaBuilder.like(criteriaBuilder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
