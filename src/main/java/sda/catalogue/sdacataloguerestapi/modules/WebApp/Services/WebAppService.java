@@ -105,7 +105,6 @@ public class WebAppService extends BaseController {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())){
                 throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
             }
-
             //File Android Process
             Path apkPath = null;
             if (request.getFileAndroid() != null) {
@@ -184,7 +183,9 @@ public class WebAppService extends BaseController {
             WebAppEntity result = webAppRepository.save(data);
 
             //Document Process
-            documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+            if (request.getDocumentUploadList() != null){
+                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+            }
 
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
