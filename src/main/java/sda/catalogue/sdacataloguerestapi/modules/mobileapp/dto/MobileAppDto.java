@@ -1,5 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,6 +15,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -33,7 +36,6 @@ public class MobileAppDto {
     @NotEmpty
     private String[] mappingFunction;
 
-    @NotEmpty
     private String[] department;
 
     @NotEmpty
@@ -51,13 +53,17 @@ public class MobileAppDto {
     @NotBlank
     private String applicationFunction;
 
+    @JsonIgnore
     private List<MultipartFile> documentation;
 
     private List<VersioningAppDto> versioningApplication;
 
     private ApplicationUrlDto applicationUrl;
 
+    @JsonIgnore
     private MultipartFile ipaFile;
+
+    @JsonIgnore
     private MultipartFile androidFile;
 
     @NotEmpty
@@ -81,6 +87,7 @@ public class MobileAppDto {
     @NotBlank
     private String databaseIp;
 
+    @JsonProperty("applicationApiList")
     private List<AppApiListDto> applicationApiList;
 
     private List<DbListDto> applicationDatabaseList;
