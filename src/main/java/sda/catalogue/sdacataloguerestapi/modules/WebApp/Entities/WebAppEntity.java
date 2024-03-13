@@ -46,7 +46,7 @@ public class WebAppEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "application_name")
+    @Column(name = "application_name", nullable = false)
     private String applicationName;
 
     @Column(name = "pmo_number")
@@ -105,7 +105,6 @@ public class WebAppEntity {
             inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
     )
     private List<PICDeveloperEntity> picDeveloperList;
-
 
     @ManyToMany
     @JoinTable(

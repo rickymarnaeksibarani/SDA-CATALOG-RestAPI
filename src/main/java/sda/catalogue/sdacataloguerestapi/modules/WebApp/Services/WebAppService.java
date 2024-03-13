@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
@@ -101,8 +102,11 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
         try {
+            if (webAppRepository.existsByApplicationName(request.getApplicationName())){
+                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+            }
 
-
+            //File Android Process
             Path apkPath = null;
             if (request.getFileAndroid() != null) {
                 super.isValidApkType(request.getFileAndroid());
@@ -175,6 +179,7 @@ public class WebAppService extends BaseController {
             } else {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
             }
+
 
             WebAppEntity result = webAppRepository.save(data);
 

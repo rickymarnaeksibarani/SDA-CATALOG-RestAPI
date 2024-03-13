@@ -10,6 +10,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -84,4 +85,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
 
     @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
     Long countBySdaHosting(String sdaHosting);
+
+    boolean existsByApplicationName(String applicationName);
 }
