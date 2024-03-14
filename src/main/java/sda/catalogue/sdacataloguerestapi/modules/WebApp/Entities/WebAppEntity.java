@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,7 +46,7 @@ public class WebAppEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "application_name")
+    @Column(name = "application_name", nullable = false)
     private String applicationName;
 
     @Column(name = "pmo_number")
@@ -73,19 +74,11 @@ public class WebAppEntity {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "link_ios")
+
     private String linkIOS;
-
-    @Column(name = "link_android")
     private String linkAndroid;
-
-    @Column(name = "file_manifest")
     private String fileManifest;
-
-    @Column(name = "file_ipa")
     private String fileIpa;
-
-    @Column(name = "file_android")
     private String fileAndroid;
 
     @Column(name = "application_source_fe")
@@ -112,7 +105,6 @@ public class WebAppEntity {
             inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
     )
     private List<PICDeveloperEntity> picDeveloperList;
-
 
     @ManyToMany
     @JoinTable(
@@ -151,15 +143,18 @@ public class WebAppEntity {
     @JsonIgnoreProperties("sdaHostingEntities")
     private SDAHostingEntity sdaHostingEntity;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentUploadEntity> documentUploadList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VersioningApplicationEntity> versioningApplicationList;
+
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ApiEntity> apiList;
 
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DatabaseEntity> databaseList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FeedbackEntity> feedbackList;
 }

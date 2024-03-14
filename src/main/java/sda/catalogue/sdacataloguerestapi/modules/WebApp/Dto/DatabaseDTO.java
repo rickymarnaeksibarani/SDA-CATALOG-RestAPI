@@ -12,18 +12,18 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class DatabaseDTO {
     @NotNull
     @NotEmpty
-    private String apiName;
+    private String dbName;
 
     @NotNull
     @NotEmpty
-    private String apiAddress;
+    private String dbAddress;
 
     @NotNull
-    @NotEmpty String userName;
+    @NotEmpty String dbUserName;
 
     @NotNull
     @NotEmpty
-    private String password;
+    private String dbPassword;
 
     @NotNull
     @NotEmpty

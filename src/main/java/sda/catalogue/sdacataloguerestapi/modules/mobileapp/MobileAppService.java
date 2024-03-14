@@ -90,7 +90,7 @@ public class MobileAppService {
         Boolean existsByApplicationName = mobileAppRepository.existsByApplicationName(request.getApplicationName());
 
         if (existsByApplicationName) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Application Name already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Application Name already exists");
         }
 
         // Documentation

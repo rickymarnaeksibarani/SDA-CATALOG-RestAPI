@@ -58,12 +58,6 @@ public class WebAppRequestDto {
     @JsonProperty("status")
     private String status;
 
-    @JsonProperty("linkIOS")
-    private String linkIOS;
-
-    @JsonProperty("linkAndroid")
-    private String linkAndroid;
-
     @JsonProperty("applicationSourceFe")
     private String applicationSourceFe;
 

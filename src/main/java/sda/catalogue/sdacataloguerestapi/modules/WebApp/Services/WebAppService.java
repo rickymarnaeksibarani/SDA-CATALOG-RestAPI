@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
@@ -28,9 +29,11 @@ import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHost
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Repositories.TypeDatabaseRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.ApiEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.ApiRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.DatabaseRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningApplicationRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
@@ -65,10 +68,11 @@ public class WebAppService extends BaseController {
     @Autowired
     private DatabaseRepository databaseRepository;
     @Autowired
+    private ApiRepository apiRepository;
+    @Autowired
     private DocumentUploadService documentUploadService;
     @Autowired
     private TypeDatabaseRepository typeDatabaseRepository;
-
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
 
@@ -96,29 +100,40 @@ public class WebAppService extends BaseController {
 
     //Creating data WebApp
     @Transactional
-    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
+    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
         try {
-            super.isValidApkType(request.getFileAndroid());
-            String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-            Files.createDirectories(newApkPath);
-            Path apkPath = newApkPath.resolve(apkFileName);
-            Files.copy(request.getFileAndroid().getInputStream(), apkPath);
-
+            if (webAppRepository.existsByApplicationName(request.getApplicationName())){
+                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+            }
+            //File Android Process
+            Path apkPath = null;
+            if (request.getFileAndroid() != null) {
+                super.isValidApkType(request.getFileAndroid());
+                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
+                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
+                Files.createDirectories(newApkPath);
+                apkPath = newApkPath.resolve(apkFileName);
+                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+            }
             //Ipa Process
-            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-            Files.createDirectories(newIpaPath);
-            Path ipaPath = newIpaPath.resolve(ipaFileName);
-            Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            Path ipaPath = null;
+            if (request.getFileIpa() != null) {
+                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
+                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
+                Files.createDirectories(newIpaPath);
+                ipaPath = newIpaPath.resolve(ipaFileName);
+                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            }
 
             //Manifest Process
-            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-            Files.createDirectories(newManifestPath);
-            Path manifestPath = newManifestPath.resolve(manifestFileName);
-            Files.copy(request.getFileManifest().getInputStream(), manifestPath);
-
+            Path manifestPath = null;
+            if (request.getFileManifest() != null) {
+                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
+                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
+                Files.createDirectories(newManifestPath);
+                manifestPath = newManifestPath.resolve(manifestFileName);
+                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+            }
 
             //PIC Developer Process
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
@@ -144,10 +159,17 @@ public class WebAppService extends BaseController {
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
+
             //Path File
-            data.setFileAndroid(String.valueOf(apkPath));
-            data.setFileIpa(String.valueOf(ipaPath));
-            data.setFileManifest(String.valueOf(manifestPath));
+            if (apkPath != null) {
+                data.setFileAndroid(String.valueOf(apkPath));
+            }
+            if (ipaPath != null) {
+                data.setFileIpa(String.valueOf(ipaPath));
+            }
+            if (manifestPath != null) {
+                data.setFileManifest(String.valueOf(manifestPath));
+            }
 
             // Modify SDA Hosting
             Optional<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findById(request.getSdaHostingEntity());
@@ -157,10 +179,13 @@ public class WebAppService extends BaseController {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
             }
 
+
             WebAppEntity result = webAppRepository.save(data);
 
             //Document Process
-            documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+            if (request.getDocumentUploadList() != null){
+                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+            }
 
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
@@ -173,15 +198,31 @@ public class WebAppService extends BaseController {
                 versioningApplicationListData.add(versioningApplicationItem);
             }
 
+            //API Process
+            List<ApiEntity> apiListData = new ArrayList<>();
+//            ApiEntity apiItem = new ApiEntity();
+//            List<ApiEntity> apiEntities = sda.catalogue.sdacataloguerestapi.core.utils.ObjectMapperUtil.mapAll(apiList, ApiEntity.class);
+            for (ApiDTO apiId : apiList){
+                ApiEntity apiItem = new ApiEntity();
+                apiItem.setApiName(apiId.getApiName());
+                apiItem.setIpApi(apiId.getIpApi());
+                apiItem.setUserName(apiId.getUserName());
+                apiItem.setPassword(apiId.getPassword());
+                apiItem.setWebAppEntity(result);
+                apiListData.add(apiItem);
+            }
+
+
+
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();
             for (DatabaseDTO databaseId : databaseList) {
                 DatabaseEntity databaseItem = new DatabaseEntity();
                 databaseItem.setWebAppEntity(result);
-                databaseItem.setApiAddress(databaseId.getApiAddress());
-                databaseItem.setPassword(databaseId.getPassword());
-                databaseItem.setApiName(databaseId.getApiName());
-                databaseItem.setUserName(databaseId.getUserName());
+                databaseItem.setDbAddress(databaseId.getDbAddress());
+                databaseItem.setDbPassword(databaseId.getDbPassword());
+                databaseItem.setDbName(databaseId.getDbName());
+                databaseItem.setDbUserName(databaseId.getDbUserName());
                 Optional<TypeDatabaseEntity> typeDatabaseEntityOptional = typeDatabaseRepository.findById(databaseId.getIdTypeDatabase());
                 if (typeDatabaseEntityOptional.isPresent()) {
                     TypeDatabaseEntity typeDatabaseEntity = typeDatabaseEntityOptional.get();
@@ -192,6 +233,7 @@ public class WebAppService extends BaseController {
                 }
             }
 
+            apiRepository.saveAll(apiListData);
             databaseRepository.saveAll(databaseListData);
             versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
@@ -202,7 +244,7 @@ public class WebAppService extends BaseController {
 
 
     //Updating data WebApp by UUID
-    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList) {
+    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
