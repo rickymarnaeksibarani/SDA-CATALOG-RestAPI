@@ -39,12 +39,12 @@ public class FrontEndController {
         }
     }
 
-    @GetMapping("/{uuid}")
-    public ResponseEntity<?> getFrontEndByUuid(
-            @PathVariable("uuid") UUID uuid
+    @GetMapping("/{id_frontend}")
+    public ResponseEntity<?> getFrontEndyById(
+            @PathVariable("id_frontend") Long id_frontend
     ) {
         try {
-            FrontEndEntity result = frontEndService.getFrontEndByUuid(uuid);
+            FrontEndEntity result = frontEndService.getFrontEndById(id_frontend);
             ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data front end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
