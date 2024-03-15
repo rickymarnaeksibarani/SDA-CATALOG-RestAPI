@@ -1,9 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -132,16 +129,27 @@ public class WebAppEntity {
 
     @ManyToMany
     @JoinTable(
+            name = "webapp_sda_hosting",
+            joinColumns = @JoinColumn(name = "id_webapp"),
+            inverseJoinColumns = @JoinColumn(name = "id_sda_hosting")
+    )
+    private List<SDAHostingEntity> sdaHostingList;
+
+    @ManyToMany
+    @JoinTable(
             name = "webapp_web_server",
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_web_server")
     )
     private List<WebServerEntity> webServerList;
 
-    @ManyToOne
-    @JoinColumn(name = "id_sda_hosting")
-    @JsonIgnoreProperties("sdaHostingEntities")
-    private SDAHostingEntity sdaHostingEntity;
+//    @ManyToOne
+//    @JoinColumn(name = "id_sda_hosting")
+//    @JsonIgnoreProperties("sdaHostingEntities")
+//    private SDAHostingEntity sdaHostingEntity;
+
+    @Column(name = "sda_hosting_id", columnDefinition = "json")
+    private String sdaHosting;
 
     @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentUploadEntity> documentUploadList;

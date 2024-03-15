@@ -77,8 +77,8 @@ public class WebAppPostDTO {
     @JsonProperty("ipDatabase")
     private String ipDatabase;
 
-    @JsonProperty("sdaHostingEntity")
-    private Long sdaHostingEntity;
+    @JsonProperty("sdaHosting")
+    private List<Long> sdaHosting;
 
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;

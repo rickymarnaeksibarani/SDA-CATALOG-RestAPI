@@ -107,7 +107,6 @@ public class WebAppController {
             @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
             @RequestPart("databaseList") List<DatabaseDTO> databaseList,
             @RequestPart("apiList") List<ApiDTO> apiList
-
     ) {
         try {
             WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);

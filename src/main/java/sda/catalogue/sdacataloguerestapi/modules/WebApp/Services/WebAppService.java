@@ -150,6 +150,18 @@ public class WebAppService extends BaseController {
             //Web Server Process
             List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
 
+            // Modify SDA Hosting
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            if (!findSdaHosting.isEmpty()) {
+                List<Long> sdaHostingId = new ArrayList<>();
+                findSdaHosting.forEach(hostingData -> {
+                    sdaHostingId.add(hostingData.getIdSDAHosting());
+                });
+
+                request.setSdaHosting(sdaHostingId);
+            } else {
+                throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
+            }
 
             //WebApp Process
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
@@ -170,15 +182,6 @@ public class WebAppService extends BaseController {
             if (manifestPath != null) {
                 data.setFileManifest(String.valueOf(manifestPath));
             }
-
-            // Modify SDA Hosting
-            Optional<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findById(request.getSdaHostingEntity());
-            if (findSdaHosting.isPresent()) {
-                data.setSdaHostingEntity(findSdaHosting.get());
-            } else {
-                throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHostingEntity() + " not found", HttpStatus.NOT_FOUND);
-            }
-
 
             WebAppEntity result = webAppRepository.save(data);
 
@@ -348,7 +351,7 @@ public class WebAppService extends BaseController {
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
             SDAHostingStatsDTO dataModified = new SDAHostingStatsDTO();
             dataModified.setName(sdaHosting.getSdaHosting());
-            dataModified.setTotal(webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting()));
+//            dataModified.setTotal(webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting()));
             statsList.add(dataModified);
         }
         return statsList;
@@ -358,8 +361,8 @@ public class WebAppService extends BaseController {
         Map<String, Long> statsMap = new HashMap<>();
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
             String hostingName = sdaHosting.getSdaHosting().replace(" ", ""); // Remove spaces
-            long total = webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting());
-            statsMap.put(hostingName, total);
+//            long total = webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting());
+//            statsMap.put(hostingName, total);
         }
         return statsMap;
     }
