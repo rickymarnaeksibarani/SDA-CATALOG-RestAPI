@@ -40,11 +40,11 @@ public class BackEndService {
         return new PaginationUtil<>(pagedResult, BackEndEntity.class);
     }
 
-    //Getting data Back end by UUID
-    public BackEndEntity getBackEndByUuid(UUID uuid) {
-        BackEndEntity result = backendRepository.findByUuid(uuid);
+    //Getting data Back end by ID
+    public BackEndEntity getBackEndById(Long id_backend) {
+        BackEndEntity result = backendRepository.findById(id_backend).orElse(null);
         if (result == null) {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("ID " + id_backend + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
