@@ -89,7 +89,7 @@ public class WebAppService extends BaseController {
         return new PaginationUtil<>(pagedResult, WebAppEntity.class);
     }
 
-    //Getting data by UUID
+    //Getting data by ID
     public WebAppEntity getWebAppById(Long id_webapp) {
         WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
         if (result == null) {

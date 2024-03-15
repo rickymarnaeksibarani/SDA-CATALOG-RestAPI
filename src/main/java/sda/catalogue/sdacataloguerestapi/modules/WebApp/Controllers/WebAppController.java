@@ -44,7 +44,7 @@ public class WebAppController {
         }
     }
 
-    //Getting Data Web App By UUID
+    //Getting Data Web App By ID
     @GetMapping("/{id_webapp}")
 //    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getWebAppById(
