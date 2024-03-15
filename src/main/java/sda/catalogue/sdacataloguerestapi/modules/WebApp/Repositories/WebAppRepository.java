@@ -83,8 +83,8 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
     int countByStatus(String status);
 
-    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
-    Long countBySdaHosting(String sdaHosting);
+//    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
+//    Long countBySdaHosting(String sdaHosting);
 
     boolean existsByApplicationName(String applicationName);
 }

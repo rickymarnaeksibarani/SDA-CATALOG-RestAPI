@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,4 +41,6 @@ public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Lo
     @Transactional
     @Query("DELETE FROM SDAHostingEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    List<SDAHostingEntity> findByIdSDAHostingIsIn(Collection<Long> id);
 }
