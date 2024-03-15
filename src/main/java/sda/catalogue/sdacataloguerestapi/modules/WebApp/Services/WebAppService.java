@@ -90,10 +90,10 @@ public class WebAppService extends BaseController {
     }
 
     //Getting data by UUID
-    public WebAppEntity getWebAppByUuid(UUID uuid) {
-        WebAppEntity result = webAppRepository.findByUuid(uuid);
+    public WebAppEntity getWebAppById(Long id_webapp) {
+        WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
         if (result == null) {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("UUID " + id_webapp + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }

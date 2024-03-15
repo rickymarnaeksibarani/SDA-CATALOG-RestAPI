@@ -45,19 +45,21 @@ public class WebAppController {
     }
 
     //Getting Data Web App By UUID
-    @GetMapping("/{uuid}")
+    @GetMapping("/{id_webapp}")
 //    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getWebAppByUuid(
-            @PathVariable("uuid") UUID uuid
+            @PathVariable("id_webapp")Long id_webapp
     ) {
         try {
-            WebAppEntity result = webAppService.getWebAppByUuid(uuid);
+            WebAppEntity result = webAppService.getWebAppById(id_webapp);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
+
+
 
 
     @GetMapping("/stats-status")
