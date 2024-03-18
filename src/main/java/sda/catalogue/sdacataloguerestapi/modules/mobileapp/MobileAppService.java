@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
@@ -187,7 +188,7 @@ public class MobileAppService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MobileAppResponseDto> getAllMobileApp(Integer page, Integer perPage, String queryParam) throws JsonProcessingException {
+    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, String queryParam) {
         Specification<MobileAppEntity> specification = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -205,13 +206,8 @@ public class MobileAppService {
 
         PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
         Page<MobileAppEntity> mobileApp = mobileAppRepository.findAll(specification, pageRequest);
-        List<MobileAppResponseDto> mobileAppResponse = new ArrayList<>();
-        for (MobileAppEntity mobileAppEntity : mobileApp.getContent()) {
-            MobileAppResponseDto appResponse = toMobileAppResponse(mobileAppEntity);
-            mobileAppResponse.add(appResponse);
-        }
 
-        return new PageImpl<>(mobileAppResponse, pageRequest, mobileApp.getTotalElements());
+        return new PaginationUtil<>(mobileApp, MobileAppEntity.class);
     }
 
     public MobileAppResponseDto getMobileAppById(Long id) throws Exception {

@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PagingResponse;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.util.List;
 import java.util.Objects;
@@ -83,17 +85,11 @@ public class MobileAppController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<List<MobileAppResponseDto>> getAllMobileApp(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer perPage, @RequestParam(defaultValue = "") String search) throws Exception {
-        Page<MobileAppResponseDto> allMobileApp = mobileAppService.getAllMobileApp(page, perPage, search);
+    public ApiResponse<Object> getAllMobileApp(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer perPage, @RequestParam(defaultValue = "") String search) throws Exception {
+        Object allMobileApp = mobileAppService.getAllMobileApp(page, perPage, search);
 
-        return ApiResponse.<List<MobileAppResponseDto>>builder()
-                .result(allMobileApp.getContent())
-                .paging(PagingResponse.builder()
-                        .currentPage(allMobileApp.getNumber() + 1)
-                        .size(allMobileApp.getSize())
-                        .totalPage(allMobileApp.getTotalPages())
-                        .totalItems(allMobileApp.getTotalElements())
-                        .build())
+        return ApiResponse.builder()
+                .result(allMobileApp)
                 .status(HttpStatus.OK)
                 .message("Get All Data")
                 .build();
