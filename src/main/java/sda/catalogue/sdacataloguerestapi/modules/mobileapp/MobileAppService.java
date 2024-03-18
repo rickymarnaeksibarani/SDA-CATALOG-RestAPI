@@ -3,9 +3,11 @@ package sda.catalogue.sdacataloguerestapi.modules.mobileapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,7 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
-import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppRepository;
@@ -31,15 +42,23 @@ import java.util.*;
 public class MobileAppService {
     @Autowired
     private MobileAppRepository mobileAppRepository;
-
+    @Autowired
+    private MappingFunctionRepository mappingFunctionRepository;
+    @Autowired
+    private PICDeveloperRepository picDeveloperRepository;
+    @Autowired
+    private SDAHostingRepository sdaHostingRepository;
+    @Autowired
+    private FrontEndRepository frontEndRepository;
+    @Autowired
+    private BackEndRepository backEndRepository;
     @Autowired
     private ObjectMapper objectMapper;
-
     private final Path uploadpath = Paths.get("src/main/resources/uploads/");
     private final Date date = new Date();
     private final Long time = date.getTime();
 
-    private MobileAppResponseDto toMobileAppResponse(MobileAppEntity mobileApp) throws Exception {
+    private MobileAppResponseDto toMobileAppResponse(MobileAppEntity mobileApp) throws JsonProcessingException {
         List<AppApiListDto> appApiList = objectMapper.readValue(mobileApp.getApplicationApiList(), new TypeReference<>() {});
         List<DbListDto> dbList = objectMapper.readValue(mobileApp.getApplicationDatabaseList(), new TypeReference<>() {});
         ApplicationUrlDto applicationUrl = objectMapper.readValue(mobileApp.getApplicationUrl(), new TypeReference<>() {});
@@ -49,7 +68,7 @@ public class MobileAppService {
         String[] picDevelopers = objectMapper.readValue(mobileApp.getPicDeveloper(), new TypeReference<>() {});
         List<String> appFilePaths = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
         List<VersioningAppDto> versioningApp = objectMapper.readValue(mobileApp.getVersioningApplication(), new TypeReference<>() {});
-        List<String> sdaHostings = objectMapper.readValue(mobileApp.getSdaHosting(), new TypeReference<>() {});
+        List<String> sdaHosting = objectMapper.readValue(mobileApp.getSdaHosting(), new TypeReference<>() {});
         List<String> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<>() {});
         List<String> sdaBackend = objectMapper.readValue(mobileApp.getSdaBackEnd(), new TypeReference<>() {});
         List<String> sdaFrontend = objectMapper.readValue(mobileApp.getSdaFrontEnd(), new TypeReference<>() {});
@@ -78,7 +97,7 @@ public class MobileAppService {
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
                 .pmoNumber(mobileApp.getPmoNumber())
-                .sdaHosting(sdaHostings)
+                .sdaHosting(sdaHosting)
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
@@ -88,10 +107,66 @@ public class MobileAppService {
     @Transactional
     public MobileAppResponseDto createMobileApp(MobileAppDto request) throws Exception {
         Boolean existsByApplicationName = mobileAppRepository.existsByApplicationName(request.getApplicationName());
-
         if (existsByApplicationName) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Application Name already exists");
         }
+
+        List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByMappingFunctionIsIn(request.getMappingFunction());
+        if (mappingFunction.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
+        }
+
+        List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByPersonalNameIsIn(request.getPicDeveloper());
+        if (picDeveloper.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+        }
+
+        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(request.getSdaHosting());
+        List<String> hostingName = new ArrayList<>();
+        if (Objects.nonNull(sdaHosting) && !sdaHosting.isEmpty()) {
+            sdaHosting.forEach(data -> {
+                hostingName.add(data.getSdaHosting());
+            });
+        }
+        request.setSdaHosting(hostingName);
+
+        List<FrontEndEntity> frontEndData = frontEndRepository.findByFrontEndIsIn(request.getSdaFrontEnd());
+        if (frontEndData.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+        }
+
+        List<BackEndEntity> backendData = backEndRepository.findByBackEndIsIn(request.getSdaBackEnd());
+        if (backendData.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+        }
+
+        // Replace request mapping function with mapping function from DB
+        List<String> mappingFunctionName = new ArrayList<>();
+        mappingFunction.forEach(data -> {
+            mappingFunctionName.add(data.getMappingFunction());
+        });
+        request.setMappingFunction(mappingFunctionName);
+
+        // Replace request pic developer with pic developer from DB
+        List<String> picName = new ArrayList<>();
+        picDeveloper.forEach(data -> {
+            picName.add(data.getPersonalName());
+        });
+        request.setPicDeveloper(picName);
+
+        // Replace request front end with front end from DB
+        List<String> frontEnd = new ArrayList<>();
+        frontEndData.forEach(data -> {
+            frontEnd.add(data.getFrontEnd());
+        });
+        request.setSdaFrontEnd(frontEnd);
+
+        // Replace request back end with back end from DB
+        List<String> backend = new ArrayList<>();
+        backendData.forEach(data -> {
+            backend.add(data.getBackEnd());
+        });
+        request.setSdaBackEnd(backend);
 
         // Documentation
         List<String> documentPaths = uploadDocument(request.getDocumentation());
@@ -112,21 +187,31 @@ public class MobileAppService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, String queryParam) {
-        PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
+    public Page<MobileAppResponseDto> getAllMobileApp(Integer page, Integer perPage, String queryParam) throws JsonProcessingException {
+        Specification<MobileAppEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        Specification<MobileAppEntity> specification = null;
-        if (queryParam != null || !queryParam.isEmpty()) {
-            specification = Specification.where((root, query, criteriaBuilder) -> query.where(
-                    criteriaBuilder.or(
-                            criteriaBuilder.like(criteriaBuilder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
-                            criteriaBuilder.like(criteriaBuilder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
-                    )
-            ).getRestriction());
+            if (Objects.nonNull(queryParam)) {
+                predicates.add(
+                        builder.or(
+                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
+                        )
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
+        PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
+        Page<MobileAppEntity> mobileApp = mobileAppRepository.findAll(specification, pageRequest);
+        List<MobileAppResponseDto> mobileAppResponse = new ArrayList<>();
+        for (MobileAppEntity mobileAppEntity : mobileApp.getContent()) {
+            MobileAppResponseDto appResponse = toMobileAppResponse(mobileAppEntity);
+            mobileAppResponse.add(appResponse);
         }
 
-        Page<MobileAppEntity> mobileApp = mobileAppRepository.findAll(specification, pageRequest);
-        return new PaginationUtil<>(mobileApp, MobileAppEntity.class);
+        return new PageImpl<>(mobileAppResponse, pageRequest, mobileApp.getTotalElements());
     }
 
     public MobileAppResponseDto getMobileAppById(Long id) throws Exception {
@@ -137,6 +222,63 @@ public class MobileAppService {
     @Transactional
     public MobileAppResponseDto updateMobileApp(Long id, MobileAppDto request) throws Exception {
         MobileAppEntity mobileApp = mobileAppRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+
+        List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByMappingFunctionIsIn(request.getMappingFunction());
+        if (mappingFunction.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
+        }
+
+        List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByPersonalNameIsIn(request.getPicDeveloper());
+        if (picDeveloper.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+        }
+
+        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(request.getSdaHosting());
+        List<String> hostingName = new ArrayList<>();
+        if (Objects.nonNull(sdaHosting) && !sdaHosting.isEmpty()) {
+            sdaHosting.forEach(data -> {
+                hostingName.add(data.getSdaHosting());
+            });
+        }
+        request.setSdaHosting(hostingName);
+
+        List<FrontEndEntity> frontEndData = frontEndRepository.findByFrontEndIsIn(request.getSdaFrontEnd());
+        if (frontEndData.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+        }
+
+        List<BackEndEntity> backendData = backEndRepository.findByBackEndIsIn(request.getSdaBackEnd());
+        if (backendData.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+        }
+
+        // Replace request mapping function with mapping function from DB
+        List<String> mappingFunctionName = new ArrayList<>();
+        mappingFunction.forEach(data -> {
+            mappingFunctionName.add(data.getMappingFunction());
+        });
+        request.setMappingFunction(mappingFunctionName);
+
+        // Replace request pic developer with pic developer from DB
+        List<String> picName = new ArrayList<>();
+        picDeveloper.forEach(data -> {
+            picName.add(data.getPersonalName());
+        });
+        request.setPicDeveloper(picName);
+
+        // Replace request front end with front end from DB
+        List<String> frontEnd = new ArrayList<>();
+        frontEndData.forEach(data -> {
+            frontEnd.add(data.getFrontEnd());
+        });
+        request.setSdaFrontEnd(frontEnd);
+
+        // Replace request back end with back end from DB
+        List<String> backend = new ArrayList<>();
+        backendData.forEach(data -> {
+            backend.add(data.getBackEnd());
+        });
+        request.setSdaBackEnd(backend);
 
         // Documentation
         List<String> documentPaths = uploadDocument(request.getDocumentation());
@@ -285,6 +427,10 @@ public class MobileAppService {
         String generatedString = generateRandomString();
 
         if (Objects.equals(appFileCategory, "apk")) {
+            if (!Objects.equals(file.getContentType(), "application/vnd.android.package-archive")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid android file");
+            }
+
             String androidFilename = time + generatedString + "_" + file.getOriginalFilename();
             Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
             Path resolve = fileDestination.resolve(androidFilename.trim());
@@ -293,8 +439,9 @@ public class MobileAppService {
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
-            String ipaFilename = time + generatedString + "_" + file.getOriginalFilename();
+//            if (!Objects.equals(file.getOriginalFilename(), ".ipa")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
 
+            String ipaFilename = time + generatedString + "_" + file.getOriginalFilename();
             Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
             Path resolve = fileDestination.resolve(ipaFilename.trim());
             Files.copy(file.getInputStream(), resolve);

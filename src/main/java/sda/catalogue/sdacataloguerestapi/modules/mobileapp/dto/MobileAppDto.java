@@ -15,7 +15,6 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -34,7 +33,7 @@ public class MobileAppDto {
     private List<String> sdaHosting;
 
     @NotEmpty
-    private String[] mappingFunction;
+    private List<String> mappingFunction;
 
     private String[] department;
 
@@ -45,7 +44,7 @@ public class MobileAppDto {
     private BusinessImpactPriority businessImpactPriority;
 
     @NotEmpty
-    private String[] picDeveloper;
+    private List<String> picDeveloper;
 
     @NotBlank
     private String description;
@@ -67,12 +66,11 @@ public class MobileAppDto {
     private MultipartFile androidFile;
 
     @NotEmpty
-    private String[] sdaFrontEnd;
+    private List<String> sdaFrontEnd;
 
     @NotEmpty
-    private String[] sdaBackEnd;
+    private List<String> sdaBackEnd;
 
-    @NotBlank
     private String webServer;
 
     @NotNull
