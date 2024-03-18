@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,5 +51,7 @@ public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity
     @Transactional
     @Query("DELETE FROM PICDeveloperEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    List<PICDeveloperEntity> findByPersonalNameIsIn(Collection<String> name);
 }
 

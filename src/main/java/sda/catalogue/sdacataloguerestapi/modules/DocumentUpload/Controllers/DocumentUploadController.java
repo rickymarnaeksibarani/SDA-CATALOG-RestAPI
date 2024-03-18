@@ -27,7 +27,13 @@ public class DocumentUploadController {
     ) {
         try {
             List<DocumentUploadEntity> result = documentUploadService.createDocumentUpload(documents, webAppId);
-            ApiResponse<List<DocumentUploadEntity>> response = new ApiResponse<>(HttpStatus.OK, "Success upload documents!", result);
+            ApiResponse<List<DocumentUploadEntity>> response = ApiResponse.<List<DocumentUploadEntity>>builder()
+                    .status(HttpStatus.OK)
+                    .message("Success upload documents")
+                    .result(result)
+                    .build();
+
+//            ApiResponse<List<DocumentUploadEntity>> response = new ApiResponse<>(HttpStatus.OK, "Success upload documents!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
