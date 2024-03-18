@@ -30,14 +30,14 @@ public class DashboardController {
                 .build();
     }
 
-    @GetMapping("stats-by-hosting")
-    public ApiResponse<List<StatisticByHostingDto>> statsByHosting() {
-        List<StatisticByHostingDto> statisticByHosting = dashboardService.statisticByHosting();
-
-        return ApiResponse.<List<StatisticByHostingDto>>builder()
-                .result(statisticByHosting)
-                .status(HttpStatus.OK)
-                .message("Success get statistic by hosting")
-                .build();
-    }
+//    @GetMapping("stats-by-hosting")
+//    public ApiResponse<List<StatisticByHostingDto>> statsByHosting() {
+//        List<StatisticByHostingDto> statisticByHosting = dashboardService.statisticByHosting();
+//
+//        return ApiResponse.<List<StatisticByHostingDto>>builder()
+//                .result(statisticByHosting)
+//                .status(HttpStatus.OK)
+//                .message("Success get statistic by hosting")
+//                .build();
+//    }
 }

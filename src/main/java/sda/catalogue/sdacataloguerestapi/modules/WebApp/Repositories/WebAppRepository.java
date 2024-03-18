@@ -93,5 +93,5 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
 
     Integer countAllByStatus(String status);
 
-    List<Integer> countAllBySdaHostingEntityIsIn(Collection<SDAHostingEntity> name);
+//    List<Integer> countAllBySdaHostingEntityIsIn(Collection<SDAHostingEntity> name);
 }

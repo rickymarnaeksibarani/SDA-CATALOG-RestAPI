@@ -45,18 +45,18 @@ public class DashboardService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    public List<StatisticByHostingDto> statisticByHosting() {
-        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findAll();
-
-        List<StatisticByHostingDto> statsByHosting = new ArrayList<>();
-        sdaHosting.forEach(data -> {
-            StatisticByHostingDto statsByHostingData = new StatisticByHostingDto();
-            statsByHostingData.setName(data.getSdaHosting());
-            statsByHostingData.setTotal(webAppRepository.countBySdaHosting(data.getSdaHosting()));
-            statsByHosting.add(statsByHostingData);
-        });
-
-        return statsByHosting;
-    }
+//    @Transactional(readOnly = true)
+//    public List<StatisticByHostingDto> statisticByHosting() {
+//        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findAll();
+//
+//        List<StatisticByHostingDto> statsByHosting = new ArrayList<>();
+//        sdaHosting.forEach(data -> {
+//            StatisticByHostingDto statsByHostingData = new StatisticByHostingDto();
+//            statsByHostingData.setName(data.getSdaHosting());
+//            statsByHostingData.setTotal(webAppRepository.countBySdaHosting(data.getSdaHosting()));
+//            statsByHosting.add(statsByHostingData);
+//        });
+//
+//        return statsByHosting;
+//    }
 }
