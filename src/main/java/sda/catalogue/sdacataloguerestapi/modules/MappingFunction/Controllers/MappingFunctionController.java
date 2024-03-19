@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/mapping-function")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 public class MappingFunctionController {
     @Autowired
     private MappingFunctionService mappingFunctionService;

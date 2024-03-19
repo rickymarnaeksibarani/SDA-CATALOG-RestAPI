@@ -4,32 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PagingResponse;
-import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.util.List;
 import java.util.Objects;
 
-
 @Slf4j
 @RestController
 @RequestMapping("api/v1/mobile-app")
-@CrossOrigin("${spring.frontend}")
 public class MobileAppController {
     @Autowired
     private MobileAppService mobileAppService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MobileAppResponseDto> createMobileApp(
             @RequestPart @Valid MobileAppDto request,
             @RequestPart(value = "documentation", required = false) List<MultipartFile> documentation,

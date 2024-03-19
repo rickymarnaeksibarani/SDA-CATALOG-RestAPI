@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/front-end")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 public class FrontEndController {
     @Autowired
     private FrontEndService frontEndService;

@@ -27,7 +27,7 @@ import java.util.*;
 @RestController
 @Validated
 @RequestMapping("/api/v1/web-app")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 public class WebAppController {
     @Autowired
     WebAppService webAppService;
