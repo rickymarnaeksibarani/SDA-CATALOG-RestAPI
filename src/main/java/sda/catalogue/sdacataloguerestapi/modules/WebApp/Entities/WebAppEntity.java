@@ -129,14 +129,6 @@ public class WebAppEntity {
 
     @ManyToMany
     @JoinTable(
-            name = "webapp_sda_hosting",
-            joinColumns = @JoinColumn(name = "id_webapp"),
-            inverseJoinColumns = @JoinColumn(name = "id_sda_hosting")
-    )
-    private List<SDAHostingEntity> sdaHostingList;
-
-    @ManyToMany
-    @JoinTable(
             name = "webapp_web_server",
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_web_server")

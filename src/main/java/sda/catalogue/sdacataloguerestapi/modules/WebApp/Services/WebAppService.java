@@ -203,8 +203,6 @@ public class WebAppService extends BaseController {
 
             //API Process
             List<ApiEntity> apiListData = new ArrayList<>();
-//            ApiEntity apiItem = new ApiEntity();
-//            List<ApiEntity> apiEntities = sda.catalogue.sdacataloguerestapi.core.utils.ObjectMapperUtil.mapAll(apiList, ApiEntity.class);
             for (ApiDTO apiId : apiList){
                 ApiEntity apiItem = new ApiEntity();
                 apiItem.setApiName(apiId.getApiName());
@@ -214,8 +212,6 @@ public class WebAppService extends BaseController {
                 apiItem.setWebAppEntity(result);
                 apiListData.add(apiItem);
             }
-
-
 
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();

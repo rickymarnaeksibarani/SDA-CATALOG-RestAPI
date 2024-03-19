@@ -59,9 +59,6 @@ public class WebAppController {
         }
     }
 
-
-
-
     @GetMapping("/stats-status")
 //    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getStatsStatus() {
@@ -73,7 +70,6 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
 
     @GetMapping("/stats-sda-hosting")
 //    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
@@ -94,7 +90,6 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
 
     //Create Data Web App
     @PostMapping()
@@ -142,7 +137,6 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteWebAppByUuid(
