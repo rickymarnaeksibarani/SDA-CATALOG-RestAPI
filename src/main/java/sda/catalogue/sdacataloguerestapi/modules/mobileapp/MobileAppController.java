@@ -23,7 +23,7 @@ public class MobileAppController {
     private MobileAppService mobileAppService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MobileAppResponseDto> createMobileApp(
             @RequestPart @Valid MobileAppDto request,
             @RequestPart(value = "documentation", required = false) List<MultipartFile> documentation,
