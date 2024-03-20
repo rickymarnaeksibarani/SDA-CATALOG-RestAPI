@@ -26,47 +26,18 @@ public class WebAppRequestDto {
         }
     }
 
-
-    @JsonProperty("idWebApp")
     private long idWebApp;
-
-
-    @JsonProperty("applicationName")
     private String applicationName;
-
-    @JsonProperty("pmoNumber")
     private String pmoNumber;
-
-    @JsonProperty("sapIntegration")
     private SapIntegration sapIntegration;
-
-    @JsonProperty("categoryApp")
     private String categoryApp;
-
-    @JsonProperty("description")
     private String description;
-
-    @JsonProperty("functionApplication")
     private String functionApplication;
-
-    @JsonProperty("address")
     private String address;
-
-    @JsonProperty("businessImpactPriority")
     private String businessImpactPriority;
-
-    @JsonProperty("status")
     private String status;
-
-    @JsonProperty("applicationSourceFe")
     private String applicationSourceFe;
-
-    @JsonProperty("applicationSourceBe")
     private String applicationSourceBe;
-
-    @JsonProperty("ipDatabase")
     private String ipDatabase;
-
-    @JsonProperty("sdaHostingEntity")
     private Long sdaHostingEntity;
 }

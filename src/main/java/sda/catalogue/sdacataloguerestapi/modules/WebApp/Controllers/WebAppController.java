@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -18,6 +19,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
 
 import javax.validation.Valid;
 
@@ -31,6 +33,30 @@ import java.util.*;
 public class WebAppController {
     @Autowired
     WebAppService webAppService;
+
+    //Create Data Web App
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    @PreAuthorize("hasAuthority('Administrator')")
+    public ResponseEntity<?> createWebApp(
+            @Valid @RequestPart WebAppPostDTO request,
+            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
+            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
+            @RequestPart("frontEndList") List<Long> frontEndList,
+            @RequestPart("backEndList") List<Long> backEndList,
+            @RequestPart("webServerList") List<Long> webServerList,
+            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
+            @RequestPart("apiList") List<ApiDTO> apiList
+    ) {
+        try {
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
 
     //Getting Data Web App by Pagination
     @GetMapping()
@@ -86,29 +112,6 @@ public class WebAppController {
                 ApiResponse<List<SDAHostingStatsDTO>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
                 return new ResponseEntity<>(response, response.getStatus());
             }
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
-    }
-
-    //Create Data Web App
-    @PostMapping()
-//    @PreAuthorize("hasAuthority('Administrator')")
-    public ResponseEntity<?> createWebApp(
-            @Valid @ModelAttribute WebAppPostDTO request,
-            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
-            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
-            @RequestPart("frontEndList") List<Long> frontEndList,
-            @RequestPart("backEndList") List<Long> backEndList,
-            @RequestPart("webServerList") List<Long> webServerList,
-            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
-            @RequestPart("apiList") List<ApiDTO> apiList
-    ) {
-        try {
-            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
-            return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
