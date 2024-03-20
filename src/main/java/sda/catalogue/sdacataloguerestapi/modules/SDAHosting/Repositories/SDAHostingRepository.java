@@ -43,4 +43,6 @@ public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Lo
     int findByUuidAndDelete(UUID uuid);
 
     List<SDAHostingEntity> findByIdSDAHostingIsIn(Collection<Long> id);
+
+    List<SDAHostingEntity> findBySdaHostingIsIn(Collection<String> name);
 }

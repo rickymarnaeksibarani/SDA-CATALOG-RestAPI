@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
-import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
 
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -20,10 +22,28 @@ public class MobileAppController {
     @Autowired
     private MobileAppService mobileAppService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<MobileAppEntity> createMobileApp(@Valid @ModelAttribute MobileAppDto request) throws Exception {
-        MobileAppEntity mobileApp = mobileAppService.createMobileApp(request);
-        return ApiResponse.<MobileAppEntity>builder()
+    public ApiResponse<MobileAppResponseDto> createMobileApp(
+            @RequestPart @Valid MobileAppDto request,
+            @RequestPart(value = "documentation", required = false) List<MultipartFile> documentation,
+            @RequestPart(value = "ipaFile", required = false) MultipartFile ipaFile,
+            @RequestPart(value = "androidFile", required = false) MultipartFile androidFile
+    ) throws Exception {
+        if (Objects.nonNull(documentation)) {
+            request.setDocumentation(documentation);
+        }
+
+        if (Objects.nonNull(ipaFile)) {
+            request.setIpaFile(ipaFile);
+        }
+
+        if (Objects.nonNull(androidFile)) {
+            request.setAndroidFile(androidFile);
+        }
+
+        MobileAppResponseDto mobileApp = mobileAppService.createMobileApp(request);
+        return ApiResponse.<MobileAppResponseDto>builder()
                 .result(mobileApp)
                 .status(HttpStatus.CREATED)
                 .message("Success create data")
@@ -31,9 +51,27 @@ public class MobileAppController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<MobileAppEntity> updateMobileAppById(@PathVariable Long id, @ModelAttribute @Valid MobileAppDto request) throws Exception {
-        MobileAppEntity mobileApp = mobileAppService.updateMobileApp(id, request);
-        return ApiResponse.<MobileAppEntity>builder()
+    public ApiResponse<MobileAppResponseDto> updateMobileAppById(
+        @PathVariable Long id,
+        @RequestPart @Valid MobileAppDto request,
+        @RequestPart(value = "documentation", required = false) List<MultipartFile> documentation,
+        @RequestPart(value = "ipaFile", required = false) MultipartFile ipaFile,
+        @RequestPart(value = "androidFile", required = false) MultipartFile androidFile
+    ) throws Exception {
+        if (Objects.nonNull(documentation)) {
+            request.setDocumentation(documentation);
+        }
+
+        if (Objects.nonNull(ipaFile)) {
+            request.setIpaFile(ipaFile);
+        }
+
+        if (Objects.nonNull(androidFile)) {
+            request.setAndroidFile(androidFile);
+        }
+
+        MobileAppResponseDto mobileApp = mobileAppService.updateMobileApp(id, request);
+        return ApiResponse.<MobileAppResponseDto>builder()
                 .message("Success update data")
                 .status(HttpStatus.OK)
                 .result(mobileApp)
@@ -41,19 +79,20 @@ public class MobileAppController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<PaginationUtil> getAllMobileApp(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer perPage, @RequestParam(defaultValue = "") String search) {
+    public ApiResponse<Object> getAllMobileApp(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer perPage, @RequestParam(defaultValue = "") String search) throws Exception {
         Object allMobileApp = mobileAppService.getAllMobileApp(page, perPage, search);
-        return ApiResponse.<PaginationUtil>builder()
-                .result((PaginationUtil) allMobileApp)
+
+        return ApiResponse.builder()
+                .result(allMobileApp)
                 .status(HttpStatus.OK)
                 .message("Get All Data")
                 .build();
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<MobileAppEntity> getMobileAppById(@PathVariable Long id) {
-        MobileAppEntity mobileApp = mobileAppService.getMobileAppById(id);
-        return ApiResponse.<MobileAppEntity>builder()
+    public ApiResponse<MobileAppResponseDto> getMobileAppById(@PathVariable Long id) throws Exception {
+        MobileAppResponseDto mobileApp = mobileAppService.getMobileAppById(id);
+        return ApiResponse.<MobileAppResponseDto>builder()
                 .message("Success get data")
                 .status(HttpStatus.OK)
                 .result(mobileApp)

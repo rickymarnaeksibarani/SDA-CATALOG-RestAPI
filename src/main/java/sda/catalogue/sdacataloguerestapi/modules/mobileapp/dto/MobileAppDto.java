@@ -1,5 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,9 +33,8 @@ public class MobileAppDto {
     private List<String> sdaHosting;
 
     @NotEmpty
-    private String[] mappingFunction;
+    private List<String> mappingFunction;
 
-    @NotEmpty
     private String[] department;
 
     @NotEmpty
@@ -43,7 +44,7 @@ public class MobileAppDto {
     private BusinessImpactPriority businessImpactPriority;
 
     @NotEmpty
-    private String[] picDeveloper;
+    private List<String> picDeveloper;
 
     @NotBlank
     private String description;
@@ -51,22 +52,25 @@ public class MobileAppDto {
     @NotBlank
     private String applicationFunction;
 
+    @JsonIgnore
     private List<MultipartFile> documentation;
 
     private List<VersioningAppDto> versioningApplication;
 
     private ApplicationUrlDto applicationUrl;
 
+    @JsonIgnore
     private MultipartFile ipaFile;
+
+    @JsonIgnore
     private MultipartFile androidFile;
 
     @NotEmpty
-    private String[] sdaFrontEnd;
+    private List<String> sdaFrontEnd;
 
     @NotEmpty
-    private String[] sdaBackEnd;
+    private List<String> sdaBackEnd;
 
-    @NotBlank
     private String webServer;
 
     @NotNull
@@ -81,6 +85,7 @@ public class MobileAppDto {
     @NotBlank
     private String databaseIp;
 
+    @JsonProperty("applicationApiList")
     private List<AppApiListDto> applicationApiList;
 
     private List<DbListDto> applicationDatabaseList;

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,4 +37,6 @@ public interface MappingFunctionRepository extends JpaRepository<MappingFunction
 
     @Transactional
     int deleteByUuid(UUID uuid);
+
+    List<MappingFunctionEntity> findByMappingFunctionIsIn(Collection<String> mappingFunction);
 }

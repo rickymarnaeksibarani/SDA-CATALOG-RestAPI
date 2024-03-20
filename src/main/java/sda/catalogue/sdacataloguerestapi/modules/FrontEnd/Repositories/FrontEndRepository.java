@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,4 +45,6 @@ public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long>,
     @Transactional
     @Query("DELETE FROM FrontEndEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    List<FrontEndEntity> findByFrontEndIsIn(Collection<String> name);
 }

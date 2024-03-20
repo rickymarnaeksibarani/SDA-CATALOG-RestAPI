@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/web-server")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 public class WebServerController {
     @Autowired
     private WebServerService webServerService;

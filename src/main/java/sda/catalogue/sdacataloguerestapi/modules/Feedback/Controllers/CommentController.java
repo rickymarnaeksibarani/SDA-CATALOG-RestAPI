@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/comment")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 @Validated
 public class CommentController {
     @Autowired

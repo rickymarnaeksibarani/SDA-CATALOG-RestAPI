@@ -26,7 +26,7 @@ import java.util.UUID;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/sda-hosting")
-@CrossOrigin(origins = "${spring.frontend}")
+//@CrossOrigin(origins = "${spring.frontend}")
 public class SDAHostingController {
     @Autowired
     private SDAHostingService sdaHostingService;
