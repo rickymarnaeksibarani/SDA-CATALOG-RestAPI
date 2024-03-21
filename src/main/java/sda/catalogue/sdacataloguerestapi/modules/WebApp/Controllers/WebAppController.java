@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -18,6 +19,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
 
 import javax.validation.Valid;
 
@@ -32,72 +34,9 @@ public class WebAppController {
     @Autowired
     WebAppService webAppService;
 
-    //Getting Data Web App by Pagination
-    @GetMapping()
-    public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
-
-        try {
-            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data Web App!", result), HttpStatus.OK);
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
-    }
-
-    //Getting Data Web App By UUID
-    @GetMapping("/{id_webapp}")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
-    public ResponseEntity<?> getWebAppByUuid(
-            @PathVariable("id_webapp")Long id_webapp
-    ) {
-        try {
-            WebAppEntity result = webAppService.getWebAppById(id_webapp);
-            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);
-            return new ResponseEntity<>(response, response.getStatus());
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
-    }
-
-
-
-
-    @GetMapping("/stats-status")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
-    public ResponseEntity<?> getStatsStatus() {
-        try {
-            SDAStatusStatsDTO result = webAppService.statsWebByStatus();
-            ApiResponse<SDAStatusStatsDTO> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by status!", result);
-            return new ResponseEntity<>(response, response.getStatus());
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
-    }
-
-
-    @GetMapping("/stats-sda-hosting")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
-    public ResponseEntity<?> getStatsSdaHosting(
-            @RequestParam(name = "dataType", defaultValue = "array") String dataType
-    ) {
-        try {
-            if (Objects.equals(dataType, "object")) {
-                Map<String, Long> result = webAppService.statsSdaHostingObject();
-                ApiResponse<Map<String, Long>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
-                return new ResponseEntity<>(response, response.getStatus());
-            } else {
-                List<SDAHostingStatsDTO> result = webAppService.statsSdaHostingArray();
-                ApiResponse<List<SDAHostingStatsDTO>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
-                return new ResponseEntity<>(response, response.getStatus());
-            }
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
-    }
-
-
     //Create Data Web App
-    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
@@ -114,6 +53,65 @@ public class WebAppController {
             WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    //Getting Data Web App by Pagination
+    @GetMapping()
+    public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
+
+        try {
+            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data Web App!", result), HttpStatus.OK);
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    //Getting Data Web App By ID
+    @GetMapping("/{id_webapp}")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
+    public ResponseEntity<?> getWebAppById(
+            @PathVariable("id_webapp")Long id_webapp
+    ) {
+        try {
+            WebAppEntity result = webAppService.getWebAppById(id_webapp);
+            ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    @GetMapping("/stats-status")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
+    public ResponseEntity<?> getStatsStatus() {
+        try {
+            SDAStatusStatsDTO result = webAppService.statsWebByStatus();
+            ApiResponse<SDAStatusStatsDTO> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by status!", result);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+
+    @GetMapping("/stats-sda-hosting")
+//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
+    public ResponseEntity<?> getStatsSdaHosting(
+            @RequestParam(name = "dataType", defaultValue = "array") String dataType
+    ) {
+        try {
+            if (Objects.equals(dataType, "object")) {
+                Map<String, Long> result = webAppService.statsSdaHostingObject();
+                ApiResponse<Map<String, Long>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
+                return new ResponseEntity<>(response, response.getStatus());
+            } else {
+                List<SDAHostingStatsDTO> result = webAppService.statsSdaHostingArray();
+                ApiResponse<List<SDAHostingStatsDTO>> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved statistic by sda hosting!", result);
+                return new ResponseEntity<>(response, response.getStatus());
+            }
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
@@ -142,7 +140,6 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
-
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteWebAppByUuid(

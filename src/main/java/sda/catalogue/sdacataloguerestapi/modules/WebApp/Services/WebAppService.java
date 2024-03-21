@@ -81,26 +81,17 @@ public class WebAppService extends BaseController {
     private static final String UPLOAD_DIR_MANIFEST = "src/main/resources/uploads/manifest";
 
 
-    //Getting data Web App with search and pagination
-    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
-        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<WebAppEntity> specs = Specification.where(null);
-        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
-    }
-
-    //Getting data by UUID
-    public WebAppEntity getWebAppById(Long id_webapp) {
-        WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
-        if (result == null) {
-            throw new CustomRequestException("UUID " + id_webapp + " not found", HttpStatus.NOT_FOUND);
-        }
-        return result;
-    }
-
     //Creating data WebApp
     @Transactional
-    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
+    public WebAppEntity createWebApp(WebAppPostDTO request,
+                                     List<Long> picDeveloperList,
+                                     List<Long> mappingFunctionList,
+                                     List<Long> frontEndList,
+                                     List<Long> backEndList,
+                                     List<Long> webServerList,
+                                     List<VersioningApplicationDTO> versioningApplicationList,
+                                     List<DatabaseDTO> databaseList,
+                                     List<ApiDTO>  apiList){
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())){
                 throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
@@ -203,8 +194,6 @@ public class WebAppService extends BaseController {
 
             //API Process
             List<ApiEntity> apiListData = new ArrayList<>();
-//            ApiEntity apiItem = new ApiEntity();
-//            List<ApiEntity> apiEntities = sda.catalogue.sdacataloguerestapi.core.utils.ObjectMapperUtil.mapAll(apiList, ApiEntity.class);
             for (ApiDTO apiId : apiList){
                 ApiEntity apiItem = new ApiEntity();
                 apiItem.setApiName(apiId.getApiName());
@@ -214,8 +203,6 @@ public class WebAppService extends BaseController {
                 apiItem.setWebAppEntity(result);
                 apiListData.add(apiItem);
             }
-
-
 
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();
@@ -245,6 +232,22 @@ public class WebAppService extends BaseController {
         }
     }
 
+    //Getting data Web App with search and pagination
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
+        Specification<WebAppEntity> specs = Specification.where(null);
+        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
+    }
+
+    //Getting data by ID
+    public WebAppEntity getWebAppById(Long id_webapp) {
+        WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
+        if (result == null) {
+            throw new CustomRequestException("ID " + id_webapp + " not found", HttpStatus.NOT_FOUND);
+        }
+        return result;
+    }
 
     //Updating data WebApp by UUID
     public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
