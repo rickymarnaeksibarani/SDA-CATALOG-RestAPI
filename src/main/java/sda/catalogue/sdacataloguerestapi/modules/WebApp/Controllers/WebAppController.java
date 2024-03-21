@@ -39,7 +39,7 @@ public class WebAppController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> createWebApp(
-            @Valid @RequestPart WebAppPostDTO request,
+            @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
             @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
             @RequestPart("frontEndList") List<Long> frontEndList,
