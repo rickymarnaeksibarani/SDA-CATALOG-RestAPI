@@ -12,8 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticByHostin
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticStatusResponseDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -23,7 +22,7 @@ public class DashboardService {
     @Autowired
     private WebAppRepository webAppRepository;
     @Autowired
-    private SDAHostingRepository sdaHostingRepository;
+    SDAHostingRepository sdaHostingRepository;
 
     @Transactional(readOnly = true)
     public StatisticStatusResponseDto statisticSdaByStatus() {
@@ -45,18 +44,32 @@ public class DashboardService {
                 .build();
     }
 
-//    @Transactional(readOnly = true)
-//    public List<StatisticByHostingDto> statisticByHosting() {
-//        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findAll();
-//
-//        List<StatisticByHostingDto> statsByHosting = new ArrayList<>();
-//        sdaHosting.forEach(data -> {
-//            StatisticByHostingDto statsByHostingData = new StatisticByHostingDto();
-//            statsByHostingData.setName(data.getSdaHosting());
-//            statsByHostingData.setTotal(webAppRepository.countBySdaHosting(data.getSdaHosting()));
-//            statsByHosting.add(statsByHostingData);
-//        });
-//
-//        return statsByHosting;
-//    }
+    @Transactional(readOnly = true)
+    public List<StatisticByHostingDto> statisticByHosting() {
+        List<Object[]> mobileAppStats = mobileAppRepository.countAllBySdaHosting();
+        List<Object[]> webAppStats = webAppRepository.countAllBySdaHosting();
+
+        List<StatisticByHostingDto> webAppStatData = webAppStats.stream().map(val -> {
+            Optional<SDAHostingEntity> hostingData = sdaHostingRepository.findById(Long.parseLong((String) val[0]));
+
+            StatisticByHostingDto hostingStat = new StatisticByHostingDto();
+            hostingStat.setName(hostingData.get().getSdaHosting());
+            hostingStat.setTotal((Long) val[1]);
+            return hostingStat;
+        }).toList();
+
+        List<StatisticByHostingDto> mobileAppStatData = mobileAppStats.stream().map(val -> {
+            StatisticByHostingDto hostingStat = new StatisticByHostingDto();
+            hostingStat.setName((String) val[0]);
+            hostingStat.setTotal((Long) val[1]);
+            return hostingStat;
+        }).toList();
+
+        List<StatisticByHostingDto> statsByHosting = new ArrayList<>();
+        statsByHosting.addAll(webAppStatData);
+        statsByHosting.addAll(mobileAppStatData);
+        log.info("statsByHosting {}", statsByHosting);
+
+        return statsByHosting;
+    }
 }

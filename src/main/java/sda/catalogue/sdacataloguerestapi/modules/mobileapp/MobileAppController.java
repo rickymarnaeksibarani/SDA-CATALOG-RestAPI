@@ -89,7 +89,7 @@ public class MobileAppController {
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MobileAppResponseDto> getMobileAppById(@PathVariable Long id) throws Exception {
         MobileAppResponseDto mobileApp = mobileAppService.getMobileAppById(id);
         return ApiResponse.<MobileAppResponseDto>builder()
@@ -99,7 +99,7 @@ public class MobileAppController {
                 .build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<String> deleteById(@PathVariable Long id) throws JsonProcessingException {
         mobileAppService.deleteById(id);
         return ApiResponse.<String>builder()
