@@ -257,43 +257,60 @@ public class WebAppService extends BaseController {
             if (findData == null) {
                 throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
             }
+
             MultipartFile fileAndroid = request.getFileAndroid();
             MultipartFile fileIpa = request.getFileIpa();
             MultipartFile fileManifest = request.getFileManifest();
 
-            if (fileAndroid == null || fileIpa == null || fileManifest == null){
-                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
-            }
+
+//
+//            if (fileAndroid == null || fileIpa == null || fileManifest == null){
+//                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
+//            }
+
+//            boolean filePresent = fileAndroid != null && fileIpa != null && fileManifest != null;
+//            if (!filePresent){
+//                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
+//            }
+
+            Path apkPath = null;
+            Path ipaPath = null;
+            Path manifestPath = null;
 
             //Apk Andorid Process
-            Path apkPath = null;
-            if (request.getFileAndroid()!=null) {
-                super.isValidApkType(request.getFileAndroid());
-                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
+            if (fileAndroid != null) {
+                super.isValidApkType(fileAndroid);
+                String apkFileName = super.generateNewFilename(Objects.requireNonNull(fileAndroid.getOriginalFilename()));
                 Path newApkPath = Paths.get(UPLOAD_DIR_APK);
                 Files.createDirectories(newApkPath);
                 apkPath = newApkPath.resolve(apkFileName);
-                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+                Files.copy(fileAndroid.getInputStream(), apkPath);
             }
 
             //Ipa Process
-            Path ipaPath = null;
-            if (request.getFileIpa() != null) {
-                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
+            if (fileIpa != null) {
+                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(fileIpa.getOriginalFilename()));
                 Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
                 Files.createDirectories(newIpaPath);
                 ipaPath = newIpaPath.resolve(ipaFileName);
-                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+                Files.copy(fileIpa.getInputStream(), ipaPath);
             }
+
             //Manifest Process
-            Path manifestPath = null;
-            if (request.getFileManifest() != null) {
-                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
+            if (fileManifest != null) {
+                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(fileManifest.getOriginalFilename()));
                 Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
                 Files.createDirectories(newManifestPath);
                 manifestPath = newManifestPath.resolve(manifestFileName);
-                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+                Files.copy(fileManifest.getInputStream(), manifestPath);
             }
+
+            // Check if any of the files were present
+            if (apkPath == null && ipaPath == null && manifestPath == null) {
+                throw new CustomRequestException("At least one file (APK, IPA, Manifest) must be provided", HttpStatus.BAD_REQUEST);
+            }
+
+
             webAppRepository.updateByUuid(
                     uuid,
                     request.getApplicationName(),
