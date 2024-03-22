@@ -71,6 +71,8 @@ public class WebAppEntity {
     @Column(name = "status")
     private String status;
 
+//    @Column(name = "role")
+//    private String role;
 
     private String linkIOS;
     private String linkAndroid;

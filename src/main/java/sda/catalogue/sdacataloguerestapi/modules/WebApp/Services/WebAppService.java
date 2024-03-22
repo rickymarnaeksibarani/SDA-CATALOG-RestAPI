@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -264,27 +265,35 @@ public class WebAppService extends BaseController {
                 throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
             }
 
-            super.isValidApkType(request.getFileAndroid());
-            String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-            Files.createDirectories(newApkPath);
-            Path apkPath = newApkPath.resolve(apkFileName);
-            Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+            //Apk Andorid Process
+            Path apkPath = null;
+            if (request.getFileAndroid()!=null) {
+                super.isValidApkType(request.getFileAndroid());
+                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
+                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
+                Files.createDirectories(newApkPath);
+                apkPath = newApkPath.resolve(apkFileName);
+                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+            }
 
             //Ipa Process
-            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-            Files.createDirectories(newIpaPath);
-            Path ipaPath = newIpaPath.resolve(ipaFileName);
-            Files.copy(request.getFileIpa().getInputStream(), ipaPath);
-
+            Path ipaPath = null;
+            if (request.getFileIpa() != null) {
+                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
+                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
+                Files.createDirectories(newIpaPath);
+                ipaPath = newIpaPath.resolve(ipaFileName);
+                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            }
             //Manifest Process
-            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-            Files.createDirectories(newManifestPath);
-            Path manifestPath = newManifestPath.resolve(manifestFileName);
-            Files.copy(request.getFileManifest().getInputStream(), manifestPath);
-
+            Path manifestPath = null;
+            if (request.getFileManifest() != null) {
+                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
+                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
+                Files.createDirectories(newManifestPath);
+                manifestPath = newManifestPath.resolve(manifestFileName);
+                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+            }
             webAppRepository.updateByUuid(
                     uuid,
                     request.getApplicationName(),
@@ -313,11 +322,11 @@ public class WebAppService extends BaseController {
 
     //Deleting data WebApp by UUID
     @Transactional
-    public void deleteWebAppByUuid(UUID uuid) {
+    public void deleteWebAppByUuid(UUID uuid){
         try {
             webAppRepository.findByUuidAndDelete(uuid);
         } catch (Exception e){
-            throw new CustomRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
    }
 
