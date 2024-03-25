@@ -142,7 +142,7 @@ public class WebAppService extends BaseController {
             //Web Server Process
             List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
 
-            // Modify SDA Hosting
+            //SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()) {
                 List<Long> sdaHostingId = new ArrayList<>();
@@ -263,10 +263,18 @@ public class WebAppService extends BaseController {
             MultipartFile fileManifest = request.getFileManifest();
 
 
-//
+
 //            if (fileAndroid == null || fileIpa == null || fileManifest == null){
 //                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
 //            }
+
+            //SDA Hosting
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            if (!findSdaHosting.isEmpty()){
+                findData.setSdaHosting(findSdaHosting.toString());
+            }else {
+                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
+            }
 
 //            boolean filePresent = fileAndroid != null && fileIpa != null && fileManifest != null;
 //            if (!filePresent){
@@ -306,9 +314,9 @@ public class WebAppService extends BaseController {
             }
 
             // Check if any of the files were present
-            if (apkPath == null && ipaPath == null && manifestPath == null) {
-                throw new CustomRequestException("At least one file (APK, IPA, Manifest) must be provided", HttpStatus.BAD_REQUEST);
-            }
+//            if (apkPath == null && ipaPath == null && manifestPath == null) {
+//                throw new CustomRequestException("At least one file (APK, IPA, Manifest) must be provided", HttpStatus.BAD_REQUEST);
+//            }
 
 
             webAppRepository.updateByUuid(
@@ -324,9 +332,9 @@ public class WebAppService extends BaseController {
                     request.getStatus(),
                     request.getLinkIOS(),
                     request.getLinkAndroid(),
-                    manifestPath.toString(),
-                    ipaPath.toString(),
-                    apkPath.toString(),
+                    Objects.nonNull(manifestPath) ? manifestPath.toString() : null,
+                    ipaPath != null ? ipaPath.toString() : null,
+                    apkPath != null ?  apkPath.toString() : null,
                     request.getApplicationSourceFe(),
                     request.getApplicationSourceBe(),
                     request.getIpDatabase()
