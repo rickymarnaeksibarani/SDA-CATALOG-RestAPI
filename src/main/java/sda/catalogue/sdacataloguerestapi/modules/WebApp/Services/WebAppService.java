@@ -77,6 +77,7 @@ public class WebAppService extends BaseController {
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
 
+
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
     private static final String UPLOAD_DIR_IPA = "src/main/resources/uploads/ipa";
     private static final String UPLOAD_DIR_MANIFEST = "src/main/resources/uploads/manifest";
@@ -149,7 +150,6 @@ public class WebAppService extends BaseController {
                 findSdaHosting.forEach(hostingData -> {
                     sdaHostingId.add(hostingData.getIdSDAHosting());
                 });
-
                 request.setSdaHosting(sdaHostingId);
             } else {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
@@ -191,6 +191,7 @@ public class WebAppService extends BaseController {
                 versioningApplicationItem.setReleaseDate(versioningApplicationId.getReleaseDate());
                 versioningApplicationItem.setWebAppEntity(result);
                 versioningApplicationListData.add(versioningApplicationItem);
+
             }
 
             //API Process
@@ -263,11 +264,6 @@ public class WebAppService extends BaseController {
             MultipartFile fileManifest = request.getFileManifest();
 
 
-
-//            if (fileAndroid == null || fileIpa == null || fileManifest == null){
-//                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
-//            }
-
             //SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
@@ -275,11 +271,6 @@ public class WebAppService extends BaseController {
             }else {
                 throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
-
-//            boolean filePresent = fileAndroid != null && fileIpa != null && fileManifest != null;
-//            if (!filePresent){
-//                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
-//            }
 
             Path apkPath = null;
             Path ipaPath = null;
@@ -312,12 +303,6 @@ public class WebAppService extends BaseController {
                 manifestPath = newManifestPath.resolve(manifestFileName);
                 Files.copy(fileManifest.getInputStream(), manifestPath);
             }
-
-            // Check if any of the files were present
-//            if (apkPath == null && ipaPath == null && manifestPath == null) {
-//                throw new CustomRequestException("At least one file (APK, IPA, Manifest) must be provided", HttpStatus.BAD_REQUEST);
-//            }
-
 
             webAppRepository.updateByUuid(
                     uuid,
@@ -388,7 +373,6 @@ public class WebAppService extends BaseController {
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
             SDAHostingStatsDTO dataModified = new SDAHostingStatsDTO();
             dataModified.setName(sdaHosting.getSdaHosting());
-//            dataModified.setTotal(webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting()));
             statsList.add(dataModified);
         }
         return statsList;
@@ -397,9 +381,7 @@ public class WebAppService extends BaseController {
     public Map<String, Long> statsSdaHostingObject() {
         Map<String, Long> statsMap = new HashMap<>();
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
-            String hostingName = sdaHosting.getSdaHosting().replace(" ", ""); // Remove spaces
-//            long total = webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting());
-//            statsMap.put(hostingName, total);
+            String hostingName = sdaHosting.getSdaHosting().replace(" ", "");
         }
         return statsMap;
     }
