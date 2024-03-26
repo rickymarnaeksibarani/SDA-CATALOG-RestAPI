@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -236,7 +237,7 @@ public class WebAppService extends BaseController {
 
     //Getting data Web App with search and pagination
     public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
-        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize(), Sort.by(Sort.Order.desc("createdAt")));
         Specification<WebAppEntity> specs = Specification.where(null);
         Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
         return new PaginationUtil<>(pagedResult, WebAppEntity.class);
