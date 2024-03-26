@@ -27,7 +27,7 @@ public class SDAHostingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_sda_hosting")
-    private long idSDAHosting;
+    private Long idSDAHosting;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)

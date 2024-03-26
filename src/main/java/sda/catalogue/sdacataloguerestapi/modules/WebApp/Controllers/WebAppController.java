@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Controllers;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -75,7 +76,7 @@ public class WebAppController {
     @GetMapping("/{id_webapp}")
     public ResponseEntity<?> getWebAppById(
             @PathVariable("id_webapp")Long id_webapp
-    ) {
+    ) throws JsonProcessingException {
         try {
             WebAppEntity result = webAppService.getWebAppById(id_webapp);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);

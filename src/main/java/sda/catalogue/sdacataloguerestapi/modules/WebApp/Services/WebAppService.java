@@ -1,6 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,6 +79,8 @@ public class WebAppService extends BaseController {
     private TypeDatabaseRepository typeDatabaseRepository;
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
@@ -244,11 +248,18 @@ public class WebAppService extends BaseController {
     }
 
     //Getting data by ID
-    public WebAppEntity getWebAppById(Long id_webapp) {
-        WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
-        if (result == null) {
-            throw new CustomRequestException("ID " + id_webapp + " not found", HttpStatus.NOT_FOUND);
-        }
+    public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
+        WebAppEntity result = webAppRepository.findById(id_webapp)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+
+        List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
+
+        log.info("sdaHostingId {}", sdaHostingId);
+        List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
+        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
+        log.info("hostingName {}", hostingName);
+        result.setSdaHosting(hostingName.toString());
+
         return result;
     }
 
