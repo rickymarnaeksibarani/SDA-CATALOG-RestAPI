@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponse
 
 import javax.validation.Valid;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -36,8 +38,7 @@ public class WebAppController {
 
     //Create Data Web App
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasAuthority('Administrator')")
+    @PostMapping()
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
@@ -64,7 +65,7 @@ public class WebAppController {
 
         try {
             PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data Web App!", result), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success get data", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
@@ -72,7 +73,6 @@ public class WebAppController {
 
     //Getting Data Web App By ID
     @GetMapping("/{id_webapp}")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getWebAppById(
             @PathVariable("id_webapp")Long id_webapp
     ) {
@@ -86,7 +86,6 @@ public class WebAppController {
     }
 
     @GetMapping("/stats-status")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getStatsStatus() {
         try {
             SDAStatusStatsDTO result = webAppService.statsWebByStatus();
@@ -98,7 +97,6 @@ public class WebAppController {
     }
 
     @GetMapping("/stats-sda-hosting")
-//    @PreAuthorize("hasAuthority('Administrator') or hasAuthority('User')")
     public ResponseEntity<?> getStatsSdaHosting(
             @RequestParam(name = "dataType", defaultValue = "array") String dataType
     ) {
@@ -119,7 +117,6 @@ public class WebAppController {
 
     //Update Data Web App By UUID
     @PutMapping("/{uuid}")
-//    @PreAuthorize("hasAuthority('Administrator')")
     public ResponseEntity<?> updateWebApp(
             @PathVariable("uuid") UUID uuid,
             @Valid @ModelAttribute WebAppPostDTO request,

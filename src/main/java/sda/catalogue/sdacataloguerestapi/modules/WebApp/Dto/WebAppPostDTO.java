@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
+import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
@@ -34,6 +35,9 @@ public class WebAppPostDTO {
 
     @JsonProperty("sapIntegration")
     private SapIntegration sapIntegration;
+
+//    @JsonProperty("role")
+//    private Role role;
 
     @JsonProperty("categoryApp")
     private String categoryApp;

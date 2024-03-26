@@ -7,8 +7,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.CommentDTO;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.FeedbackDTO;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.CommentEntity;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Services.CommentService;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
@@ -31,6 +34,15 @@ public class CommentController {
             CommentEntity result = commentService.createComment(request);
             ApiResponse<CommentEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Success created data comment!", result);
             return new ResponseEntity<>(response, response.getStatus());
+        } catch (CustomRequestException error) {
+            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
+        }
+    }
+    @GetMapping()
+    public ResponseEntity<?> searchFilterComment(@ModelAttribute CommentDTO searchDTO) {
+        try {
+            PaginationUtil<CommentEntity, CommentDTO> result = commentService.getAllCommentByPagination();
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data feedback!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }

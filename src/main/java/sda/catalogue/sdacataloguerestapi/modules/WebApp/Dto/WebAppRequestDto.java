@@ -29,6 +29,7 @@ public class WebAppRequestDto {
     private long idWebApp;
     private String applicationName;
     private String pmoNumber;
+//    private String role;
     private SapIntegration sapIntegration;
     private String categoryApp;
     private String description;
