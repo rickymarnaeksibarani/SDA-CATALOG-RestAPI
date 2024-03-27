@@ -36,11 +36,11 @@ public class FrontEndService {
         return new PaginationUtil<>(pagedResult, FrontEndEntity.class);
     }
 
-    //Get data Front end by UUID
-    public FrontEndEntity getFrontEndByUuid(UUID uuid) {
-        FrontEndEntity result = frontEndRepository.findByUuid(uuid);
+    //Get data Front end by ID
+    public FrontEndEntity getFrontEndById(Long id_frontend) {
+        FrontEndEntity result = frontEndRepository.findById(id_frontend).orElse(null);
         if (result == null) {
-            throw new CustomRequestException("UUID" + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("ID" + id_frontend + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }

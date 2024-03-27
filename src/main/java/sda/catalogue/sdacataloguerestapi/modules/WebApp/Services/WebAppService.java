@@ -1,10 +1,14 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -75,32 +79,26 @@ public class WebAppService extends BaseController {
     private TypeDatabaseRepository typeDatabaseRepository;
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
     private static final String UPLOAD_DIR_IPA = "src/main/resources/uploads/ipa";
     private static final String UPLOAD_DIR_MANIFEST = "src/main/resources/uploads/manifest";
 
 
-    //Getting data Web App with search and pagination
-    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
-        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<WebAppEntity> specs = Specification.where(null);
-        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
-    }
-
-    //Getting data by UUID
-    public WebAppEntity getWebAppById(Long id_webapp) {
-        WebAppEntity result = webAppRepository.findById(id_webapp).orElse(null);
-        if (result == null) {
-            throw new CustomRequestException("UUID " + id_webapp + " not found", HttpStatus.NOT_FOUND);
-        }
-        return result;
-    }
-
     //Creating data WebApp
     @Transactional
-    public WebAppEntity createWebApp(WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO>  apiList){
+    public WebAppEntity createWebApp(WebAppPostDTO request,
+                                     List<Long> picDeveloperList,
+                                     List<Long> mappingFunctionList,
+                                     List<Long> frontEndList,
+                                     List<Long> backEndList,
+                                     List<Long> webServerList,
+                                     List<VersioningApplicationDTO> versioningApplicationList,
+                                     List<DatabaseDTO> databaseList,
+                                     List<ApiDTO>  apiList){
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())){
                 throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
@@ -150,14 +148,13 @@ public class WebAppService extends BaseController {
             //Web Server Process
             List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
 
-            // Modify SDA Hosting
+            //SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()) {
                 List<Long> sdaHostingId = new ArrayList<>();
                 findSdaHosting.forEach(hostingData -> {
                     sdaHostingId.add(hostingData.getIdSDAHosting());
                 });
-
                 request.setSdaHosting(sdaHostingId);
             } else {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
@@ -199,12 +196,11 @@ public class WebAppService extends BaseController {
                 versioningApplicationItem.setReleaseDate(versioningApplicationId.getReleaseDate());
                 versioningApplicationItem.setWebAppEntity(result);
                 versioningApplicationListData.add(versioningApplicationItem);
+
             }
 
             //API Process
             List<ApiEntity> apiListData = new ArrayList<>();
-//            ApiEntity apiItem = new ApiEntity();
-//            List<ApiEntity> apiEntities = sda.catalogue.sdacataloguerestapi.core.utils.ObjectMapperUtil.mapAll(apiList, ApiEntity.class);
             for (ApiDTO apiId : apiList){
                 ApiEntity apiItem = new ApiEntity();
                 apiItem.setApiName(apiId.getApiName());
@@ -214,8 +210,6 @@ public class WebAppService extends BaseController {
                 apiItem.setWebAppEntity(result);
                 apiListData.add(apiItem);
             }
-
-
 
             //Database Process
             List<DatabaseEntity> databaseListData = new ArrayList<>();
@@ -245,6 +239,31 @@ public class WebAppService extends BaseController {
         }
     }
 
+    //Getting data Web App with search and pagination
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize(), Sort.by(Sort.Order.desc("createdAt")));
+        Specification<WebAppEntity> specs = Specification.where(null);
+        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
+    }
+
+    //Getting data by ID
+    public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
+        WebAppEntity result = webAppRepository.findById(id_webapp)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+
+        List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
+
+//        log.info("sdaHostingId {}", sdaHostingId);
+        List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
+        List<String> formattedSdaHostingList = sdaHostingList.stream()
+                .map(sdaHosting -> sdaHosting.getSdaHosting()).toList();
+//        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
+//        log.info("hostingName {}", hostingName);
+        result.setSdaHosting(formattedSdaHostingList.toString());
+
+        return result;
+    }
 
     //Updating data WebApp by UUID
     public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
@@ -253,34 +272,51 @@ public class WebAppService extends BaseController {
             if (findData == null) {
                 throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
             }
+
             MultipartFile fileAndroid = request.getFileAndroid();
             MultipartFile fileIpa = request.getFileIpa();
             MultipartFile fileManifest = request.getFileManifest();
 
-            if (fileAndroid == null || fileIpa == null || fileManifest == null){
-                throw new CustomRequestException("One or more files are missing", HttpStatus.BAD_REQUEST);
+
+            //SDA Hosting
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            if (!findSdaHosting.isEmpty()){
+                findData.setSdaHosting(findSdaHosting.toString());
+            }else {
+                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
 
-            super.isValidApkType(request.getFileAndroid());
-            String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-            Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-            Files.createDirectories(newApkPath);
-            Path apkPath = newApkPath.resolve(apkFileName);
-            Files.copy(request.getFileAndroid().getInputStream(), apkPath);
+            Path apkPath = null;
+            Path ipaPath = null;
+            Path manifestPath = null;
+
+            //Apk Andorid Process
+            if (fileAndroid != null) {
+                super.isValidApkType(fileAndroid);
+                String apkFileName = super.generateNewFilename(Objects.requireNonNull(fileAndroid.getOriginalFilename()));
+                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
+                Files.createDirectories(newApkPath);
+                apkPath = newApkPath.resolve(apkFileName);
+                Files.copy(fileAndroid.getInputStream(), apkPath);
+            }
 
             //Ipa Process
-            String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-            Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-            Files.createDirectories(newIpaPath);
-            Path ipaPath = newIpaPath.resolve(ipaFileName);
-            Files.copy(request.getFileIpa().getInputStream(), ipaPath);
+            if (fileIpa != null) {
+                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(fileIpa.getOriginalFilename()));
+                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
+                Files.createDirectories(newIpaPath);
+                ipaPath = newIpaPath.resolve(ipaFileName);
+                Files.copy(fileIpa.getInputStream(), ipaPath);
+            }
 
             //Manifest Process
-            String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-            Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-            Files.createDirectories(newManifestPath);
-            Path manifestPath = newManifestPath.resolve(manifestFileName);
-            Files.copy(request.getFileManifest().getInputStream(), manifestPath);
+            if (fileManifest != null) {
+                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(fileManifest.getOriginalFilename()));
+                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
+                Files.createDirectories(newManifestPath);
+                manifestPath = newManifestPath.resolve(manifestFileName);
+                Files.copy(fileManifest.getInputStream(), manifestPath);
+            }
 
             webAppRepository.updateByUuid(
                     uuid,
@@ -295,9 +331,9 @@ public class WebAppService extends BaseController {
                     request.getStatus(),
                     request.getLinkIOS(),
                     request.getLinkAndroid(),
-                    manifestPath.toString(),
-                    ipaPath.toString(),
-                    apkPath.toString(),
+                    Objects.nonNull(manifestPath) ? manifestPath.toString() : null,
+                    ipaPath != null ? ipaPath.toString() : null,
+                    apkPath != null ?  apkPath.toString() : null,
                     request.getApplicationSourceFe(),
                     request.getApplicationSourceBe(),
                     request.getIpDatabase()
@@ -310,11 +346,11 @@ public class WebAppService extends BaseController {
 
     //Deleting data WebApp by UUID
     @Transactional
-    public void deleteWebAppByUuid(UUID uuid) {
+    public void deleteWebAppByUuid(UUID uuid){
         try {
             webAppRepository.findByUuidAndDelete(uuid);
         } catch (Exception e){
-            throw new CustomRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
    }
 
@@ -351,7 +387,6 @@ public class WebAppService extends BaseController {
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
             SDAHostingStatsDTO dataModified = new SDAHostingStatsDTO();
             dataModified.setName(sdaHosting.getSdaHosting());
-//            dataModified.setTotal(webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting()));
             statsList.add(dataModified);
         }
         return statsList;
@@ -360,9 +395,7 @@ public class WebAppService extends BaseController {
     public Map<String, Long> statsSdaHostingObject() {
         Map<String, Long> statsMap = new HashMap<>();
         for (SDAHostingEntity sdaHosting : sdaHostingRepository.findAll()) {
-            String hostingName = sdaHosting.getSdaHosting().replace(" ", ""); // Remove spaces
-//            long total = webAppRepository.countBySdaHosting(sdaHosting.getSdaHosting());
-//            statsMap.put(hostingName, total);
+            String hostingName = sdaHosting.getSdaHosting().replace(" ", "");
         }
         return statsMap;
     }

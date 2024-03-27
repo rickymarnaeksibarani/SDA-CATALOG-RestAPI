@@ -1,11 +1,17 @@
 package sda.catalogue.sdacataloguerestapi.modules.Feedback.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.CommentDTO;
+import sda.catalogue.sdacataloguerestapi.modules.Feedback.Dto.FeedbackDTO;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.CommentEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Repositories.CommentRepository;
@@ -31,6 +37,14 @@ public class CommentService {
         } else {
             throw new CustomRequestException("ID Feedback" + request.getFeedBackEntity() + " not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    public PaginationUtil<CommentEntity, CommentDTO> getAllCommentByPagination() {
+        Pageable paging = PageRequest.of(0, 20);
+        Specification<CommentEntity> specs = Specification.where(null);
+        Page<CommentEntity> pagedResult = commentRepository.findAll(specs, paging);
+
+        return new PaginationUtil<>(pagedResult, CommentDTO.class);
     }
 
     public CommentEntity updateComment(UUID uuid, CommentDTO request) {

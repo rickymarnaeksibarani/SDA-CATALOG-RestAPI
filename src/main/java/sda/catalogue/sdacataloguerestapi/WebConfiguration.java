@@ -13,9 +13,10 @@ import java.util.List;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("POST", "GET", "PUT", "DELETE");
+        registry.addMapping("/**").allowedMethods("*");
     }
 
     @Override
@@ -27,7 +28,8 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter jsonConverter) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;
                 jsonConverter.setSupportedMediaTypes(Arrays.asList(MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON));
             }
         }

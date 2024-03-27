@@ -40,12 +40,12 @@ public class BackEndController {
         }
     }
 
-    @GetMapping("/{uuid}")
-    public ResponseEntity<?> getBackendByUuid(
-            @PathVariable("uuid") UUID uuid
+    @GetMapping("/{id_backend}")
+    public ResponseEntity<?> getBackEndById(
+            @PathVariable("id_backend") Long id_backend
     ) {
         try {
-            BackEndEntity result = backEndService.getBackEndByUuid(uuid);
+            BackEndEntity result = backEndService.getBackEndById(id_backend);
             ApiResponse<BackEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data back end!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
