@@ -12,6 +12,7 @@ import org.hibernate.annotations.UuidGenerator;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
+import java.awt.font.TextHitInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -43,5 +44,16 @@ public class SDAHostingEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public class FormattedSDAHostingEntity{
+        private long idSDAHosting;
+        private String sdaHosting;
+
+        public FormattedSDAHostingEntity(long idSDAHosting, String sdaHosting){
+            this.idSDAHosting = idSDAHosting;
+            this.sdaHosting = sdaHosting;
+        }
+    }
+
 
 }

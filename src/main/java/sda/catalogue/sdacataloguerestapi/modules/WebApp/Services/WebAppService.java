@@ -254,11 +254,13 @@ public class WebAppService extends BaseController {
 
         List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
 
-        log.info("sdaHostingId {}", sdaHostingId);
+//        log.info("sdaHostingId {}", sdaHostingId);
         List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
-        log.info("hostingName {}", hostingName);
-        result.setSdaHosting(hostingName.toString());
+        List<String> formattedSdaHostingList = sdaHostingList.stream()
+                .map(sdaHosting -> sdaHosting.getSdaHosting()).toList();
+//        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
+//        log.info("hostingName {}", hostingName);
+        result.setSdaHosting(formattedSdaHostingList.toString());
 
         return result;
     }
