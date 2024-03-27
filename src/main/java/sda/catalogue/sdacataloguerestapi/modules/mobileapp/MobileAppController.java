@@ -79,8 +79,11 @@ public class MobileAppController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<Object> getAllMobileApp(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer perPage, @RequestParam(defaultValue = "") String search) throws Exception {
-        Object allMobileApp = mobileAppService.getAllMobileApp(page, perPage, search);
+    public ApiResponse<Object> getAllMobileApp(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "") String search) {
+        Object allMobileApp = mobileAppService.getAllMobileApp(page, size, search);
 
         return ApiResponse.builder()
                 .result(allMobileApp)

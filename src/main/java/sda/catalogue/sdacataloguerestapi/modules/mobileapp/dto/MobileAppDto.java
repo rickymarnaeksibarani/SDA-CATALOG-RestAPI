@@ -37,7 +37,6 @@ public class MobileAppDto {
 
     private String[] department;
 
-    @NotEmpty
     private List<Role> role;
 
     @Enumerated
