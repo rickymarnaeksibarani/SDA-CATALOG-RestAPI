@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 
@@ -14,6 +15,13 @@ public class WebAppRequestDto {
     private Integer page;
 
     private Integer size;
+
+    @Getter
+    private String searchTerm;
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
 
     WebAppRequestDto() {
         if(this.getPage() == null) {

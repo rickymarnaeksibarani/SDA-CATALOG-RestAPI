@@ -65,8 +65,8 @@ public class WebAppController {
     public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
 
         try {
-            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebAppByPagination(searchDTO);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success get data", result), HttpStatus.OK);
+            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebApp(searchDTO.getPage(), searchDTO.getSize(), searchDTO.getSearchTerm());
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Awokowkokwk Success Gan", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
