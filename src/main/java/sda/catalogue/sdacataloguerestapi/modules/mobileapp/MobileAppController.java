@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
 
 import java.util.List;
 import java.util.Objects;
@@ -82,8 +83,8 @@ public class MobileAppController {
     public ApiResponse<Object> getAllMobileApp(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "") String search) {
-        Object allMobileApp = mobileAppService.getAllMobileApp(page, size, search);
+            UserFilterRequest filterRequest) {
+        Object allMobileApp = mobileAppService.getAllMobileApp(page, size, filterRequest);
 
         return ApiResponse.builder()
                 .result(allMobileApp)
