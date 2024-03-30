@@ -7,7 +7,6 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -69,7 +68,6 @@ public class MobileAppService {
         String[] picDevelopers = objectMapper.readValue(mobileApp.getPicDeveloper(), new TypeReference<>() {});
         List<String> appFilePaths = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
         List<VersioningAppDto> versioningApp = objectMapper.readValue(mobileApp.getVersioningApplication(), new TypeReference<>() {});
-//        List<String> sdaHosting = objectMapper.readValue(mobileApp.getSdaHosting(), new TypeReference<>() {});
         String[] sdaHosting = mobileApp.getSdaHosting();
         List<String> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<>() {});
         List<String> sdaBackend = objectMapper.readValue(mobileApp.getSdaBackEnd(), new TypeReference<>() {});
@@ -99,7 +97,7 @@ public class MobileAppService {
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
                 .pmoNumber(mobileApp.getPmoNumber())
-                .sdaHosting(List.of(sdaHosting))
+                .sdaHosting(Objects.nonNull(sdaHosting) ? List.of(sdaHosting) : null)
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
@@ -179,16 +177,22 @@ public class MobileAppService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, String queryParam) {
+    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, UserFilterRequest filterRequest) {
         Specification<MobileAppEntity> specification = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (Objects.nonNull(queryParam)) {
+            if (Objects.nonNull(filterRequest.getSearchTerm())) {
                 predicates.add(
                         builder.or(
-                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("applicationName")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("pmoNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
                         )
+                );
+            }
+
+            if (Objects.nonNull(filterRequest.getFilterByStatus())) {
+                predicates.add(
+                        builder.in(root.get("status")).value(filterRequest.getFilterByStatus())
                 );
             }
 
