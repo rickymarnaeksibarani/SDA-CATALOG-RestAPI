@@ -3,6 +3,8 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -272,14 +274,21 @@ public class WebAppService extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
 
         List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
-
-//        log.info("sdaHostingId {}", sdaHostingId);
         List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        List<String> formattedSdaHostingList = sdaHostingList.stream()
-                .map(sdaHosting -> sdaHosting.getSdaHosting()).toList();
-//        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
-//        log.info("hostingName {}", hostingName);
-        result.setSdaHosting(formattedSdaHostingList.toString());
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode sdaHostingArray = mapper.createArrayNode();
+        for (SDAHostingEntity sdaHosting : sdaHostingList) {
+            ObjectNode hostingNode = mapper.createObjectNode();
+            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
+            hostingNode.put("uuid", sdaHosting.getUuid().toString());
+            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
+            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
+            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
+            sdaHostingArray.add(hostingNode);
+        }
+
+        result.setSdaHosting(sdaHostingArray.toString());
 
         return result;
     }
