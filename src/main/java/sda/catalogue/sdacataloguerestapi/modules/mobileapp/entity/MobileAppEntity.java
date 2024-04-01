@@ -1,12 +1,13 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity;
 
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
-import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 
@@ -39,7 +40,9 @@ public class MobileAppEntity {
 //    @JoinColumn(name = "sda_hosting_id", referencedColumnName = "id_sda_hosting")
 //    private SDAHostingEntity sdaHosting;
 
-    private String sdaHosting;
+    @Column(columnDefinition = "text[]")
+    @Type(StringArrayType.class)
+    private String[] sdaHosting;
 
 //    @ManyToOne
 //    @JoinColumn(name = "mapping_function_id", referencedColumnName = "id_mapping_function")
@@ -50,7 +53,6 @@ public class MobileAppEntity {
     @Column(nullable = false, columnDefinition = "json")
     private String department;
 
-    @Column(nullable = false)
 //    @Enumerated(EnumType.STRING)
     private String role;
 

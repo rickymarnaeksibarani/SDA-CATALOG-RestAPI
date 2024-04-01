@@ -30,14 +30,13 @@ public class MobileAppDto {
     @Enumerated
     private Status status;
 
-    private List<String> sdaHosting;
+    private String[] sdaHosting;
 
     @NotEmpty
     private List<String> mappingFunction;
 
     private String[] department;
 
-    @NotEmpty
     private List<Role> role;
 
     @Enumerated
