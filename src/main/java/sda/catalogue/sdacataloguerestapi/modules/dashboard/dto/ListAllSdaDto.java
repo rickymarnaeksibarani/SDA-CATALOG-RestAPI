@@ -20,4 +20,5 @@ public class ListAllSdaDto {
     private List<String> role;
     private List<String> department;
     private Status status;
+    private String category;
 }

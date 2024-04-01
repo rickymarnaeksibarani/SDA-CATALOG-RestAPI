@@ -3,7 +3,6 @@ package sda.catalogue.sdacataloguerestapi.modules.dashboard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,8 +121,8 @@ public class DashboardService {
         Sort.Order newOrder = Objects.equals(order, "ASC") ? Sort.Order.asc(orderBy) : Sort.Order.desc(orderBy);
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(newOrder));
-        Page<MobileAppEntity> allMobileApps = mobileAppRepository.findAll(specification(pagingRequest), pageRequest);
-        Page<WebAppEntity> allWebApps = webAppRepository.findAll(specification(pagingRequest), pageRequest);
+        Page<MobileAppEntity> allMobileApps = mobileAppRepository.findAll(specification(pagingRequest, "mobile"), pageRequest);
+        Page<WebAppEntity> allWebApps = webAppRepository.findAll(specification(pagingRequest, "web"), pageRequest);
 
         List<ListAllSdaDto> mobileAppList = allMobileApps.getContent().stream().map(data -> {
             List<String> mappingFunction;
@@ -148,6 +147,7 @@ public class DashboardService {
             allSdaDto.setStatus(data.getStatus());
             allSdaDto.setDepartment(department);
             allSdaDto.setName(data.getApplicationName());
+            allSdaDto.setCategory("mobile");
             return allSdaDto;
         }).toList();
 
@@ -171,6 +171,7 @@ public class DashboardService {
             allSdaDto.setName(data.getApplicationName());
             allSdaDto.setStatus(Status.valueOf(data.getStatus().toUpperCase()));
             allSdaDto.setMappingFunction(mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList());
+            allSdaDto.setCategory("web");
             return allSdaDto;
         }).toList();
 
@@ -181,9 +182,28 @@ public class DashboardService {
         return new PageImpl<>(listAllSda, pageRequest, allMobileApps.getTotalElements() + allWebApps.getTotalElements());
     }
 
-    private <T> Specification<T> specification(PagingRequest request) {
+    private <T> Specification<T> specification(PagingRequest request, String category) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (Objects.nonNull(request.getFilterByTech()) && !request.getFilterByTech().isEmpty()) {
+                log.info("byTech {}", request.getFilterByTech());
+                if (category.equals("mobile")) {
+                    predicates.add(
+                            builder.or(
+                                    root.get("sdaFrontEnd").in(request.getFilterByTech()),
+                                    root.get("sdaBackEnd").in(request.getFilterByTech())
+                            )
+                    );
+                } else if (category.equals("web")){
+                    predicates.add(
+                            builder.or(
+                                    builder.in(root.get("frontEndList").get("frontEnd")).value(request.getFilterByTech()),
+                                    builder.in(root.get("backEndList").get("backEnd")).value(request.getFilterByTech())
+                            )
+                    );
+                }
+            }
 
             if (Objects.nonNull(request.getSearch())) {
                 predicates.add(
@@ -191,48 +211,56 @@ public class DashboardService {
                 );
             }
 
-            if (Objects.nonNull(request.getAdvanceFilter().getMappingFunction())) {
-                List<String> mappingFunction = request.getAdvanceFilter().getMappingFunction();
-                Expression delimiter = builder.literal(",");
+            if (Objects.nonNull(request.getMappingFunction()) && !request.getMappingFunction().isEmpty()) {
+                List<String> mappingFunction = request.getMappingFunction();
+                log.info("mappingFunction {}", mappingFunction);
 
-                predicates.add(
-                        builder.like(
-                                builder.function("array_to_string", String.class, root.get("mappingFunction"), delimiter),
-                                "%" + mappingFunction + "%"
-                        )
-                );
-//                predicates.add(builder.equal(root.get("mappingFunction"), mappingFunction));
+                if (category.equals("mobile")) {
+                    predicates.add(
+                            builder.in(root.get("mappingFunction")).value(mappingFunction)
+                    );
+                } else if (category.equals("web")) {
+                    predicates.add(
+                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+                    );
+                }
             }
 
-            if (Objects.nonNull(request.getAdvanceFilter().getDepartment())) {
-                List<String> department = request.getAdvanceFilter().getDepartment();
-                predicates.add(builder.equal(root.get("department"), department));
+            if (Objects.nonNull(request.getDepartment()) && !request.getDepartment().isEmpty()) {
+                List<String> department = request.getDepartment();
+
+                if (category.equals("mobile")) {
+                    predicates.add(root.get("department").in(department));
+                }
             }
 
-            if (Objects.nonNull(request.getAdvanceFilter().getRole())) {
-                List<String> role = request.getAdvanceFilter().getRole();
-                predicates.add(builder.equal(root.get("role"), role));
+            if (Objects.nonNull(request.getRole()) && !request.getRole().isEmpty()) {
+                List<String> role = request.getRole();
+
+                if (category.equals("mobile")) {
+                    predicates.add(root.get("role").in(role));
+                }
             }
 
-//            if (Objects.nonNull(request.getFilterByTech())) {
-//                predicates.add(
-//                        builder.or(
-//                                builder.equal(root.get("frontEndList"), request.getFilterByTech()),
-//                                builder.equal(root.get("backendList"), request.getFilterByTech())
-//                        )
-//                );
-//            }
-
-            if (Objects.nonNull(request.getAdvanceFilter().getBusinessImpactPriority())) {
-                BusinessImpactPriority businessImpactPriority = request.getAdvanceFilter().getBusinessImpactPriority();
+            if (Objects.nonNull(request.getBusinessImpactPriority())) {
+                BusinessImpactPriority businessImpactPriority = request.getBusinessImpactPriority();
                 predicates.add(
                         builder.equal(builder.upper(root.get("businessImpactPriority").as(String.class)), businessImpactPriority.name().toUpperCase())
                 );
             }
 
-            if (Objects.nonNull(request.getAdvanceFilter().getStatus())) {
-                Status status = request.getAdvanceFilter().getStatus();
-                predicates.add(builder.equal(root.get("status").as(String.class), status.name()));
+            if (Objects.nonNull(request.getStatus()) && !request.getStatus().isEmpty()) {
+                if (category.equals("mobile")) {
+                    predicates.add(
+                            builder.in(
+                                   root.get("status")).value(request.getStatus()
+                            )
+                    );
+                } else {
+                    predicates.add(
+                            builder.like(builder.upper(root.get("status")), "%" + request.getStatus() + "%")
+                    );
+                }
             }
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
