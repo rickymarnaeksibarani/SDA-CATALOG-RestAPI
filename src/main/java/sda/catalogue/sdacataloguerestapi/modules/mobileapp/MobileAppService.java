@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -68,7 +69,7 @@ public class MobileAppService {
         String[] picDevelopers = objectMapper.readValue(mobileApp.getPicDeveloper(), new TypeReference<>() {});
         List<String> appFilePaths = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
         List<VersioningAppDto> versioningApp = objectMapper.readValue(mobileApp.getVersioningApplication(), new TypeReference<>() {});
-        String[] sdaHosting = mobileApp.getSdaHosting();
+        List<String> sdaHosting = objectMapper.readValue(mobileApp.getSdaHosting(), new TypeReference<>() {});
         List<String> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<>() {});
         List<String> sdaBackend = objectMapper.readValue(mobileApp.getSdaBackEnd(), new TypeReference<>() {});
         List<String> sdaFrontend = objectMapper.readValue(mobileApp.getSdaFrontEnd(), new TypeReference<>() {});
@@ -97,7 +98,7 @@ public class MobileAppService {
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
                 .pmoNumber(mobileApp.getPmoNumber())
-                .sdaHosting(Objects.nonNull(sdaHosting) ? List.of(sdaHosting) : null)
+                .sdaHosting(sdaHosting)
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
@@ -121,10 +122,12 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
         }
 
-        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(List.of(request.getSdaHosting()));
-        String[] hostingName = null;
+        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(request.getSdaHosting());
+        List<String> hostingName = new ArrayList<>();
         if (Objects.nonNull(sdaHosting) && !sdaHosting.isEmpty()) {
-            hostingName = sdaHosting.stream().map(SDAHostingEntity::getSdaHosting).toList().toArray(new String[0]);
+            sdaHosting.forEach(data -> {
+                hostingName.add(data.getSdaHosting());
+            });
         }
         request.setSdaHosting(hostingName);
 
@@ -139,23 +142,31 @@ public class MobileAppService {
         }
 
         // Replace request mapping function with mapping function from DB
-        List<String> mappingFunctionName;
-        mappingFunctionName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
+        List<String> mappingFunctionName = new ArrayList<>();
+        mappingFunction.forEach(data -> {
+            mappingFunctionName.add(data.getMappingFunction());
+        });
         request.setMappingFunction(mappingFunctionName);
 
         // Replace request pic developer with pic developer from DB
-        List<String> picName;
-        picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
+        List<String> picName = new ArrayList<>();
+        picDeveloper.forEach(data -> {
+            picName.add(data.getPersonalName());
+        });
         request.setPicDeveloper(picName);
 
         // Replace request front end with front end from DB
-        List<String> frontEnd;
-        frontEnd = frontEndData.stream().map(FrontEndEntity::getFrontEnd).toList();
+        List<String> frontEnd = new ArrayList<>();
+        frontEndData.forEach(data -> {
+            frontEnd.add(data.getFrontEnd());
+        });
         request.setSdaFrontEnd(frontEnd);
 
         // Replace request back end with back end from DB
-        List<String> backend;
-        backend = backendData.stream().map(BackEndEntity::getBackEnd).toList();
+        List<String> backend = new ArrayList<>();
+        backendData.forEach(data -> {
+            backend.add(data.getBackEnd());
+        });
         request.setSdaBackEnd(backend);
 
         // Documentation
@@ -177,22 +188,16 @@ public class MobileAppService {
     }
 
     @Transactional(readOnly = true)
-    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, UserFilterRequest filterRequest) {
+    public PaginationUtil<MobileAppEntity, MobileAppEntity> getAllMobileApp(Integer page, Integer perPage, String queryParam) {
         Specification<MobileAppEntity> specification = (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (Objects.nonNull(filterRequest.getSearchTerm())) {
+            if (Objects.nonNull(queryParam)) {
                 predicates.add(
                         builder.or(
-                                builder.like(builder.upper(root.get("applicationName")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
                         )
-                );
-            }
-
-            if (Objects.nonNull(filterRequest.getFilterByStatus())) {
-                predicates.add(
-                        builder.in(root.get("status")).value(filterRequest.getFilterByStatus())
                 );
             }
 
@@ -213,6 +218,7 @@ public class MobileAppService {
     @Transactional
     public MobileAppResponseDto updateMobileApp(Long id, MobileAppDto request) throws Exception {
         MobileAppEntity mobileApp = mobileAppRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+
         List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByMappingFunctionIsIn(request.getMappingFunction());
         if (mappingFunction.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
@@ -223,10 +229,12 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
         }
 
-        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(List.of(request.getSdaHosting()));
-        String[] hostingName = null;
+        List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(request.getSdaHosting());
+        List<String> hostingName = new ArrayList<>();
         if (Objects.nonNull(sdaHosting) && !sdaHosting.isEmpty()) {
-            hostingName = sdaHosting.stream().map(SDAHostingEntity::getSdaHosting).toList().toArray(new String[0]);
+            sdaHosting.forEach(data -> {
+                hostingName.add(data.getSdaHosting());
+            });
         }
         request.setSdaHosting(hostingName);
 
@@ -241,23 +249,31 @@ public class MobileAppService {
         }
 
         // Replace request mapping function with mapping function from DB
-        List<String> mappingFunctionName;
-        mappingFunctionName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
+        List<String> mappingFunctionName = new ArrayList<>();
+        mappingFunction.forEach(data -> {
+            mappingFunctionName.add(data.getMappingFunction());
+        });
         request.setMappingFunction(mappingFunctionName);
 
         // Replace request pic developer with pic developer from DB
-        List<String> picName;
-        picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
+        List<String> picName = new ArrayList<>();
+        picDeveloper.forEach(data -> {
+            picName.add(data.getPersonalName());
+        });
         request.setPicDeveloper(picName);
 
         // Replace request front end with front end from DB
-        List<String> frontEnd;
-        frontEnd = frontEndData.stream().map(FrontEndEntity::getFrontEnd).toList();
+        List<String> frontEnd = new ArrayList<>();
+        frontEndData.forEach(data -> {
+            frontEnd.add(data.getFrontEnd());
+        });
         request.setSdaFrontEnd(frontEnd);
 
         // Replace request back end with back end from DB
-        List<String> backend;
-        backend = backendData.stream().map(BackEndEntity::getBackEnd).toList();
+        List<String> backend = new ArrayList<>();
+        backendData.forEach(data -> {
+            backend.add(data.getBackEnd());
+        });
         request.setSdaBackEnd(backend);
 
         // Documentation
@@ -356,7 +372,7 @@ public class MobileAppService {
         mobileApp.setApplicationName(request.getApplicationName());
         mobileApp.setPmoNumber(request.getPmoNumber());
         mobileApp.setStatus(request.getStatus());
-        mobileApp.setSdaHosting(request.getSdaHosting());
+        mobileApp.setSdaHosting(objectMapper.writeValueAsString(request.getSdaHosting()));
         mobileApp.setMappingFunction(objectMapper.writeValueAsString(request.getMappingFunction()));
         mobileApp.setDepartment(objectMapper.writeValueAsString(request.getDepartment()));
         mobileApp.setRole(objectMapper.writeValueAsString(request.getRole()));
