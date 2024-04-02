@@ -3,6 +3,9 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -98,9 +101,9 @@ public class WebAppService extends BaseController {
                                      List<Long> webServerList,
                                      List<VersioningApplicationDTO> versioningApplicationList,
                                      List<DatabaseDTO> databaseList,
-                                     List<ApiDTO>  apiList){
+                                     List<ApiDTO> apiList) {
         try {
-            if (webAppRepository.existsByApplicationName(request.getApplicationName())){
+            if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
                 throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
             }
             //File Android Process
@@ -183,7 +186,7 @@ public class WebAppService extends BaseController {
             WebAppEntity result = webAppRepository.save(data);
 
             //Document Process
-            if (request.getDocumentUploadList() != null){
+            if (request.getDocumentUploadList() != null) {
                 documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
             }
 
@@ -201,7 +204,7 @@ public class WebAppService extends BaseController {
 
             //API Process
             List<ApiEntity> apiListData = new ArrayList<>();
-            for (ApiDTO apiId : apiList){
+            for (ApiDTO apiId : apiList) {
                 ApiEntity apiItem = new ApiEntity();
                 apiItem.setApiName(apiId.getApiName());
                 apiItem.setIpApi(apiId.getIpApi());
@@ -240,12 +243,31 @@ public class WebAppService extends BaseController {
     }
 
     //Getting data Web App with search and pagination
-    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
-        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize(), Sort.by(Sort.Order.desc("createdAt")));
-        Specification<WebAppEntity> specs = Specification.where(null);
-        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
-        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
+    @Transactional(readOnly = true)
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebApp(Integer page, Integer perPage, String queryParam) {
+        Specification<WebAppEntity> specification = (root, query, builder) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            if (Objects.nonNull(queryParam)) {
+                predicates.add(
+                        builder.or(
+                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
+                        )
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
+        PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
+        Page<WebAppEntity> webApp = webAppRepository.findAll(specification, pageRequest);
+
+        return new PaginationUtil<>(webApp, WebAppEntity.class);
+
     }
+
+
 
     //Getting data by ID
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
@@ -253,20 +275,34 @@ public class WebAppService extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
 
         List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
-
-//        log.info("sdaHostingId {}", sdaHostingId);
         List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        List<String> formattedSdaHostingList = sdaHostingList.stream()
-                .map(sdaHosting -> sdaHosting.getSdaHosting()).toList();
-//        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
-//        log.info("hostingName {}", hostingName);
-        result.setSdaHosting(formattedSdaHostingList.toString());
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode sdaHostingArray = mapper.createArrayNode();
+        for (SDAHostingEntity sdaHosting : sdaHostingList) {
+            ObjectNode hostingNode = mapper.createObjectNode();
+            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
+            hostingNode.put("uuid", sdaHosting.getUuid().toString());
+            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
+            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
+            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
+            sdaHostingArray.add(hostingNode);
+        }
+
+        result.setSdaHosting(sdaHostingArray.toString());
 
         return result;
     }
 
     //Updating data WebApp by UUID
-    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
+    public WebAppEntity updateWebAppByUuid(UUID uuid,
+                                           WebAppPostDTO request,
+                                           List<Long> picDeveloperList,
+                                           List<Long> mappingFunctionList,
+                                           List<Long> frontEndList,
+                                           List<Long> backEndList,
+                                           List<Long> webServerList,
+                                           List<VersioningApplicationDTO> versioningApplicationList,
+                                           List<DatabaseDTO> databaseList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
@@ -278,7 +314,53 @@ public class WebAppService extends BaseController {
             MultipartFile fileManifest = request.getFileManifest();
 
 
-            //SDA Hosting
+            List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
+            if (picDeveloper.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+            }
+            List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
+            if (mappingFunction.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
+            }
+            List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
+            if (frontEnd.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+            }
+            List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
+            if (backEnd.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+            }
+            List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
+            if (webServer.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
+            }
+
+            //Replace pic developer
+            List<String> picName;
+            picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
+            request.setPicDeveloper(picName);
+
+            //Replace Mapping Function
+            List<String> mappingName;
+            mappingName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
+            request.setMappingFunction(mappingName);
+
+            //Replace Front End
+            List<String> frontEND;
+            frontEND = frontEnd.stream().map(FrontEndEntity::getFrontEnd).toList();
+            request.setFrontEnd(frontEND);
+
+            //Replace Back End
+            List<String> backEND;
+            backEND = backEnd.stream().map(BackEndEntity::getBackEnd).toList();
+            request.setBackEnd(backEND);
+
+            //Replace Web Server
+            List<String> webSERVER;
+            webSERVER = webServer.stream().map(WebServerEntity::getWebServer).toList();
+            request.setWebServer(webSERVER);
+
+            //Replace SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
                 findData.setSdaHosting(findSdaHosting.toString());

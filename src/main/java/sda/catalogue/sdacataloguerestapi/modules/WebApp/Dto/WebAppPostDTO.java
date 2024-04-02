@@ -1,14 +1,15 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
@@ -83,6 +84,21 @@ public class WebAppPostDTO {
 
     @JsonProperty("sdaHosting")
     private List<Long> sdaHosting;
+
+    @JsonIgnore
+    private List<String> picDeveloper;
+
+    @JsonIgnore
+    private List<String> mappingFunction;
+
+    @JsonIgnore
+    private List<String> frontEnd;
+
+    @JsonIgnore
+    private List<String> backEnd;
+
+    @JsonIgnore
+    private List<String> webServer;
 
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;

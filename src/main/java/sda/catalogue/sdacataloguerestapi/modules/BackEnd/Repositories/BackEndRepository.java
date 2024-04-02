@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,4 +49,6 @@ public interface BackEndRepository extends JpaRepository<BackEndEntity, Long>, J
     int findByUuidAndDelete(UUID uuid);
 
     List<BackEndEntity> findByBackEndIsIn(Collection<String> name);
+
+    List<BackEndEntity> findByIdBackEndIsIn(Collection<Long> id);
 }

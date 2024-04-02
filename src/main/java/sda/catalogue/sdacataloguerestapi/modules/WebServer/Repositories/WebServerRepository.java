@@ -7,8 +7,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,4 +42,6 @@ public interface WebServerRepository extends JpaRepository<WebServerEntity, Long
     @Transactional
     @Query("DELETE FROM WebServerEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    List<WebServerEntity> findByIdWebServerIsIn(Collection<Long> id);
 }
