@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,4 +48,6 @@ public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long>,
     int findByUuidAndDelete(UUID uuid);
 
     List<FrontEndEntity> findByFrontEndIsIn(Collection<String> name);
+
+    List<FrontEndEntity> findByIdFrontEndIsIn(Collection<Long> id);
 }

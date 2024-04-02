@@ -9,8 +9,6 @@ import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntit
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Repository
 public interface MobileAppRepository extends JpaRepository<MobileAppEntity, Long>, JpaSpecificationExecutor<MobileAppEntity> {
