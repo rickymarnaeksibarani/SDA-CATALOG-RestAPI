@@ -15,6 +15,16 @@ public class WebAppRequestDto {
 
     private Integer size;
 
+    private String searchTerm;
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
+
     WebAppRequestDto() {
         if(this.getPage() == null) {
             this.page = 1;
