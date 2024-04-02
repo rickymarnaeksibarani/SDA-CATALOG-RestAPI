@@ -294,7 +294,15 @@ public class WebAppService extends BaseController {
     }
 
     //Updating data WebApp by UUID
-    public WebAppEntity updateWebAppByUuid(UUID uuid, WebAppPostDTO request, List<Long> picDeveloperList, List<Long> mappingFunctionList, List<Long> frontEndList, List<Long> backEndList, List<Long> webServerList, List<VersioningApplicationDTO> versioningApplicationList, List<DatabaseDTO> databaseList, List<ApiDTO> apiList) {
+    public WebAppEntity updateWebAppByUuid(UUID uuid,
+                                           WebAppPostDTO request,
+                                           List<Long> picDeveloperList,
+                                           List<Long> mappingFunctionList,
+                                           List<Long> frontEndList,
+                                           List<Long> backEndList,
+                                           List<Long> webServerList,
+                                           List<VersioningApplicationDTO> versioningApplicationList,
+                                           List<DatabaseDTO> databaseList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
@@ -306,7 +314,53 @@ public class WebAppService extends BaseController {
             MultipartFile fileManifest = request.getFileManifest();
 
 
-            //SDA Hosting
+            List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
+            if (picDeveloper.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+            }
+            List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
+            if (mappingFunction.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
+            }
+            List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
+            if (frontEnd.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+            }
+            List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
+            if (backEnd.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+            }
+            List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
+            if (webServer.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
+            }
+
+            //Replace pic developer
+            List<String> picName;
+            picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
+            request.setPicDeveloper(picName);
+
+            //Replace Mapping Function
+            List<String> mappingName;
+            mappingName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
+            request.setMappingFunction(mappingName);
+
+            //Replace Front End
+            List<String> frontEND;
+            frontEND = frontEnd.stream().map(FrontEndEntity::getFrontEnd).toList();
+            request.setFrontEnd(frontEND);
+
+            //Replace Back End
+            List<String> backEND;
+            backEND = backEnd.stream().map(BackEndEntity::getBackEnd).toList();
+            request.setBackEnd(backEND);
+
+            //Replace Web Server
+            List<String> webSERVER;
+            webSERVER = webServer.stream().map(WebServerEntity::getWebServer).toList();
+            request.setWebServer(webSERVER);
+
+            //Replace SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
                 findData.setSdaHosting(findSdaHosting.toString());

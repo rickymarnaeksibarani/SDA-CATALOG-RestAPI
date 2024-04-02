@@ -39,4 +39,6 @@ public interface MappingFunctionRepository extends JpaRepository<MappingFunction
     int deleteByUuid(UUID uuid);
 
     List<MappingFunctionEntity> findByMappingFunctionIsIn(Collection<String> mappingFunction);
+
+    List<MappingFunctionEntity> findByIdMappingFunctionIsIn(Collection<Long> id);
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import java.util.Collection;
@@ -53,5 +54,9 @@ public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity
     int findByUuidAndDelete(UUID uuid);
 
     List<PICDeveloperEntity> findByPersonalNameIsIn(Collection<String> name);
+
+    List<PICDeveloperEntity> findByIdPicDeveloperIsIn(Collection<Long> id);
+
+
 }
 

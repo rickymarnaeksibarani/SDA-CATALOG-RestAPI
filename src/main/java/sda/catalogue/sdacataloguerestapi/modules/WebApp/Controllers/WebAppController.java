@@ -39,7 +39,7 @@ public class WebAppController {
 
     //Create Data Web App
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
@@ -61,7 +61,7 @@ public class WebAppController {
     }
 
     //Getting Data Web App by Pagination
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
 
         try {
@@ -73,7 +73,7 @@ public class WebAppController {
     }
 
     //Getting Data Web App By ID
-    @GetMapping("/{id_webapp}")
+    @GetMapping(value = "/{id_webapp}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getWebAppById(
             @PathVariable("id_webapp")Long id_webapp
     ) throws JsonProcessingException {
@@ -86,7 +86,7 @@ public class WebAppController {
         }
     }
 
-    @GetMapping("/stats-status")
+    @GetMapping(value = "/stats-status", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStatsStatus() {
         try {
             SDAStatusStatsDTO result = webAppService.statsWebByStatus();
@@ -97,7 +97,7 @@ public class WebAppController {
         }
     }
 
-    @GetMapping("/stats-sda-hosting")
+    @GetMapping(value = "/stats-sda-hosting", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStatsSdaHosting(
             @RequestParam(name = "dataType", defaultValue = "array") String dataType
     ) {
@@ -117,7 +117,7 @@ public class WebAppController {
     }
 
     //Update Data Web App By UUID
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateWebApp(
             @PathVariable("uuid") UUID uuid,
             @Valid @ModelAttribute WebAppPostDTO request,
@@ -127,11 +127,10 @@ public class WebAppController {
             @RequestPart("backEndList") List<Long> backEndList,
             @RequestPart("webServerList") List<Long> webServerList,
             @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
-            @RequestPart("apiList") List<ApiDTO> apiList
+            @RequestPart("databaseList") List<DatabaseDTO> databaseList
     ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -139,7 +138,7 @@ public class WebAppController {
         }
     }
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteWebAppByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
