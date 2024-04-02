@@ -300,9 +300,7 @@ public class WebAppService extends BaseController {
                                            List<Long> mappingFunctionList,
                                            List<Long> frontEndList,
                                            List<Long> backEndList,
-                                           List<Long> webServerList,
-                                           List<VersioningApplicationDTO> versioningApplicationList,
-                                           List<DatabaseDTO> databaseList) {
+                                           List<Long> webServerList) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
@@ -318,21 +316,32 @@ public class WebAppService extends BaseController {
             if (picDeveloper.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
             }
+            
             List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
             if (mappingFunction.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
             }
+
             List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
             if (frontEnd.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
             }
+
             List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
             if (backEnd.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
             }
+
             List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
             if (webServer.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
+            }
+
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            if (!findSdaHosting.isEmpty()){
+                findData.setSdaHosting(findSdaHosting.toString());
+            }else {
+                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
 
             //Replace pic developer
@@ -359,14 +368,6 @@ public class WebAppService extends BaseController {
             List<String> webSERVER;
             webSERVER = webServer.stream().map(WebServerEntity::getWebServer).toList();
             request.setWebServer(webSERVER);
-
-            //Replace SDA Hosting
-            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-            if (!findSdaHosting.isEmpty()){
-                findData.setSdaHosting(findSdaHosting.toString());
-            }else {
-                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
-            }
 
             Path apkPath = null;
             Path ipaPath = null;

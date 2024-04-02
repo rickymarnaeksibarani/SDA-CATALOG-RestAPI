@@ -125,12 +125,10 @@ public class WebAppController {
             @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
             @RequestPart("frontEndList") List<Long> frontEndList,
             @RequestPart("backEndList") List<Long> backEndList,
-            @RequestPart("webServerList") List<Long> webServerList,
-            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList
+            @RequestPart("webServerList") List<Long> webServerList
     ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
