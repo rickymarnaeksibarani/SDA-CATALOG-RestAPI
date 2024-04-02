@@ -190,7 +190,7 @@ public class MobileAppService {
                 );
             }
 
-            if (Objects.nonNull(filterRequest.getFilterByStatus())) {
+            if (Objects.nonNull(filterRequest.getFilterByStatus()) && !filterRequest.getFilterByStatus().isEmpty()) {
                 predicates.add(
                         builder.in(root.get("status")).value(filterRequest.getFilterByStatus())
                 );

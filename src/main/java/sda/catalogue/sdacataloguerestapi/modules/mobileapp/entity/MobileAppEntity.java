@@ -53,7 +53,6 @@ public class MobileAppEntity {
     @Column(nullable = false, columnDefinition = "json")
     private String department;
 
-//    @Enumerated(EnumType.STRING)
     private String role;
 
     @Enumerated(EnumType.STRING)

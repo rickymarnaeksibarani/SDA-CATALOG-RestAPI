@@ -3,7 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.dashboard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -187,21 +187,26 @@ public class DashboardService {
             List<Predicate> predicates = new ArrayList<>();
 
             if (Objects.nonNull(request.getFilterByTech()) && !request.getFilterByTech().isEmpty()) {
-                log.info("byTech {}", request.getFilterByTech());
-                if (category.equals("mobile")) {
-                    predicates.add(
-                            builder.or(
-                                    root.get("sdaFrontEnd").in(request.getFilterByTech()),
-                                    root.get("sdaBackEnd").in(request.getFilterByTech())
-                            )
-                    );
-                } else if (category.equals("web")){
-                    predicates.add(
-                            builder.or(
-                                    builder.in(root.get("frontEndList").get("frontEnd")).value(request.getFilterByTech()),
-                                    builder.in(root.get("backEndList").get("backEnd")).value(request.getFilterByTech())
-                            )
-                    );
+                try {
+                    List<String> filterByTech = request.getFilterByTech();
+
+                    if (category.equals("mobile")) {
+                            predicates.add(
+                                    builder.or(
+                                        builder.like(builder.upper(root.get("sdaFrontEnd")), "%" + objectMapper.writeValueAsString(filterByTech).toUpperCase() + "%"),
+                                        builder.like(root.get("sdaBackEnd"), "%" + objectMapper.writeValueAsString(filterByTech) + "%")
+                                    )
+                            );
+                    } else if (category.equals("web")){
+                        predicates.add(
+                                builder.or(
+                                        builder.in(root.get("frontEndList").get("frontEnd")).value(filterByTech),
+                                        builder.in(root.get("backEndList").get("backEnd")).value(filterByTech)
+                                )
+                        );
+                    }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -212,17 +217,22 @@ public class DashboardService {
             }
 
             if (Objects.nonNull(request.getMappingFunction()) && !request.getMappingFunction().isEmpty()) {
-                List<String> mappingFunction = request.getMappingFunction();
-                log.info("mappingFunction {}", mappingFunction);
+                try {
+                    List<String> mappingFunction = request.getMappingFunction();
 
-                if (category.equals("mobile")) {
-                    predicates.add(
-                            builder.in(root.get("mappingFunction")).value(mappingFunction)
-                    );
-                } else if (category.equals("web")) {
-                    predicates.add(
-                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
-                    );
+                    if (category.equals("mobile")) {
+                            predicates.add(
+                                    builder.or(
+                                        builder.like(root.get("mappingFunction"), "%" + objectMapper.writeValueAsString(mappingFunction) + "%")
+                                    )
+                            );
+                    } else if (category.equals("web")) {
+                        predicates.add(
+                                builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+                        );
+                    }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -235,15 +245,22 @@ public class DashboardService {
             }
 
             if (Objects.nonNull(request.getRole()) && !request.getRole().isEmpty()) {
-                List<String> role = request.getRole();
+                try {
+                    List<String> role = request.getRole();
 
-                if (category.equals("mobile")) {
-                    predicates.add(root.get("role").in(role));
+                    if (category.equals("mobile")) {
+                            predicates.add(
+                                    builder.like(builder.upper(root.get("role")), "%" + objectMapper.writeValueAsString(role).toUpperCase() + "%")
+                            );
+                    }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
             }
 
             if (Objects.nonNull(request.getBusinessImpactPriority())) {
                 BusinessImpactPriority businessImpactPriority = request.getBusinessImpactPriority();
+
                 predicates.add(
                         builder.equal(builder.upper(root.get("businessImpactPriority").as(String.class)), businessImpactPriority.name().toUpperCase())
                 );
@@ -256,9 +273,11 @@ public class DashboardService {
                                    root.get("status")).value(request.getStatus()
                             )
                     );
-                } else {
+                } else if (category.equals("web")){
+                    String statusList = request.getStatus().stream().map(Enum::name).toList().toString();
+
                     predicates.add(
-                            builder.like(builder.upper(root.get("status")), "%" + request.getStatus() + "%")
+                            builder.in(builder.upper(root.get("status"))).value(statusList.toUpperCase())
                     );
                 }
             }
