@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
-import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
@@ -93,7 +92,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     boolean existsByApplicationName(String applicationName);
 
     Integer countAllByStatus(String status);
-
 
 //    List<Integer> countAllBySdaHostingEntityIsIn(Collection<SDAHostingEntity> name);
 }

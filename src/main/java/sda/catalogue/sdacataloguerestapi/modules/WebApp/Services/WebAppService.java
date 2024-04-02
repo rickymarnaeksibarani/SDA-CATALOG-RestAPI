@@ -3,9 +3,6 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,7 +43,6 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningA
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -102,9 +98,9 @@ public class WebAppService extends BaseController {
                                      List<Long> webServerList,
                                      List<VersioningApplicationDTO> versioningApplicationList,
                                      List<DatabaseDTO> databaseList,
-                                     List<ApiDTO> apiList) {
+                                     List<ApiDTO>  apiList){
         try {
-            if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
+            if (webAppRepository.existsByApplicationName(request.getApplicationName())){
                 throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
             }
             //File Android Process
@@ -187,7 +183,7 @@ public class WebAppService extends BaseController {
             WebAppEntity result = webAppRepository.save(data);
 
             //Document Process
-            if (request.getDocumentUploadList() != null) {
+            if (request.getDocumentUploadList() != null){
                 documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
             }
 
@@ -205,7 +201,7 @@ public class WebAppService extends BaseController {
 
             //API Process
             List<ApiEntity> apiListData = new ArrayList<>();
-            for (ApiDTO apiId : apiList) {
+            for (ApiDTO apiId : apiList){
                 ApiEntity apiItem = new ApiEntity();
                 apiItem.setApiName(apiId.getApiName());
                 apiItem.setIpApi(apiId.getIpApi());
@@ -244,29 +240,12 @@ public class WebAppService extends BaseController {
     }
 
     //Getting data Web App with search and pagination
-    @Transactional(readOnly = true)
-    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebApp(Integer page, Integer perPage, String queryParam) {
-        Specification<WebAppEntity> specification = (root, query, builder) -> {
-            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
-
-            if (Objects.nonNull(queryParam)) {
-                predicates.add(
-                        builder.or(
-                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
-                        )
-                );
-            }
-
-            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
-        };
-
-        PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
-        Page<WebAppEntity> webApp = webAppRepository.findAll(specification, pageRequest);
-
-        return new PaginationUtil<>(webApp, WebAppEntity.class);
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebAppByPagination(WebAppRequestDto searchRequest) {
+        Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize(), Sort.by(Sort.Order.desc("createdAt")));
+        Specification<WebAppEntity> specs = Specification.where(null);
+        Page<WebAppEntity> pagedResult = webAppRepository.findAll(specs, paging);
+        return new PaginationUtil<>(pagedResult, WebAppEntity.class);
     }
-
 
     //Getting data by ID
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
@@ -274,21 +253,14 @@ public class WebAppService extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
 
         List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
+
+//        log.info("sdaHostingId {}", sdaHostingId);
         List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode sdaHostingArray = mapper.createArrayNode();
-        for (SDAHostingEntity sdaHosting : sdaHostingList) {
-            ObjectNode hostingNode = mapper.createObjectNode();
-            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
-            hostingNode.put("uuid", sdaHosting.getUuid().toString());
-            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
-            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
-            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
-            sdaHostingArray.add(hostingNode);
-        }
-
-        result.setSdaHosting(sdaHostingArray.toString());
+        List<String> formattedSdaHostingList = sdaHostingList.stream()
+                .map(sdaHosting -> sdaHosting.getSdaHosting()).toList();
+//        List<String> hostingName = sdaHostingList.stream().map(data -> data.getSdaHosting()).toList();
+//        log.info("hostingName {}", hostingName);
+        result.setSdaHosting(formattedSdaHostingList.toString());
 
         return result;
     }
