@@ -19,9 +19,13 @@ import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.ApiEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Services.WebAppService;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
 
 import javax.validation.Valid;
 
@@ -63,9 +67,8 @@ public class WebAppController {
     //Getting Data Web App by Pagination
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchWebApp(WebAppRequestDto searchDTO) {
-
         try {
-            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebApp(searchDTO.getPage(), searchDTO.getSize(), searchDTO.getSearchTerm());
+            PaginationUtil<WebAppEntity, WebAppEntity> result = webAppService.getAllWebApp(searchDTO);
             return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success get data", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
@@ -125,10 +128,14 @@ public class WebAppController {
             @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
             @RequestPart("frontEndList") List<Long> frontEndList,
             @RequestPart("backEndList") List<Long> backEndList,
-            @RequestPart("webServerList") List<Long> webServerList
-    ) {
+            @RequestPart("webServerList") List<Long> webServerList,
+            @RequestPart("versioningApplicationList") List<VersioningApplicationEntity> versioningApplicationEntityList,
+            @RequestPart("databaseList") List<DatabaseEntity> databaseEntityList,
+            @RequestPart("apiList") List<ApiEntity> apiList
+
+            ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

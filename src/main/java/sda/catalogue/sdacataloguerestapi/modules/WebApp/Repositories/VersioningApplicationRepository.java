@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
+import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,4 +48,6 @@ public interface VersioningApplicationRepository extends JpaRepository<Versionin
     @Transactional
     @Query("DELETE FROM VersioningApplicationEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    List<VersioningApplicationEntity> findByIdVersioningApplicationIsIn(Collection<Long> id);
 }

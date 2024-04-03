@@ -49,35 +49,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     WebAppEntity findByUuid(UUID uuid);
 
 
-    //Updating data WebApp by UUID
-    @Modifying
-    @Transactional
-    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber, w.sapIntegration = :sapIntegration,w.categoryApp = :categoryApp, " +
-            "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
-            "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
-            "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
-            "w.fileAndroid = :fileAndroid, w.applicationSourceFe = :applicationSourceFe, " +
-            "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
-            "WHERE w.uuid = :uuid")
-    int updateByUuid(UUID uuid,
-                     String applicationName,
-                     String pmoNumber,
-                     SapIntegration sapIntegration,
-                     String categoryApp,
-                     String description,
-                     String functionApplication,
-                     String address,
-                     String businessImpactPriority,
-                     String status,
-                     String linkIOS,
-                     String linkAndroid,
-                     String fileManifest,
-                     String fileIpa,
-                     String fileAndroid,
-                     String applicationSourceFe,
-                     String applicationSourceBe,
-                     String ipDatabase);
-
     @Modifying
     @Transactional
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")

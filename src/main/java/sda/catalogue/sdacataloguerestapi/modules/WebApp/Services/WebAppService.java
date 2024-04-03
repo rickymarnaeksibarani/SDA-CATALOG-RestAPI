@@ -46,6 +46,7 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningA
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -244,23 +245,30 @@ public class WebAppService extends BaseController {
 
     //Getting data Web App with search and pagination
     @Transactional(readOnly = true)
-    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebApp(Integer page, Integer perPage, String queryParam) {
+    public PaginationUtil<WebAppEntity, WebAppEntity> getAllWebApp(WebAppRequestDto requestDto) {
         Specification<WebAppEntity> specification = (root, query, builder) -> {
-            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
 
-            if (Objects.nonNull(queryParam)) {
+            if (Objects.nonNull(requestDto.getSearchTerm())) {
                 predicates.add(
                         builder.or(
-                                builder.like(builder.upper(root.get("applicationName")), "%" + queryParam.toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + queryParam.toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("applicationName")), "%" + requestDto.getSearchTerm().toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("pmoNumber")), "%" + requestDto.getSearchTerm().toUpperCase() + "%")
                         )
+                );
+            }
+
+            if (Objects.nonNull(requestDto.getFilterByStatus()) && !requestDto.getFilterByStatus().isEmpty()) {
+                predicates.add(
+                        builder.in(root.get("status")).value(requestDto.getFilterByStatus())
                 );
             }
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 
-        PageRequest pageRequest = PageRequest.of(page - 1, perPage, Sort.by(Sort.Order.desc("createdAt")));
+
+        PageRequest pageRequest = PageRequest.of(requestDto.getPage() - 1, requestDto.getSize(), Sort.by(Sort.Order.desc("createdAt")));
         Page<WebAppEntity> webApp = webAppRepository.findAll(specification, pageRequest);
 
         return new PaginationUtil<>(webApp, WebAppEntity.class);
@@ -300,7 +308,12 @@ public class WebAppService extends BaseController {
                                            List<Long> mappingFunctionList,
                                            List<Long> frontEndList,
                                            List<Long> backEndList,
-                                           List<Long> webServerList) {
+                                           List<Long> webServerList,
+                                           List<VersioningApplicationEntity> versioningApplicationEntities,
+                                           List<DatabaseEntity> databaseEntities,
+                                           List<ApiEntity> apiEntities
+
+    ) {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
@@ -316,6 +329,7 @@ public class WebAppService extends BaseController {
             MultipartFile fileManifest = request.getFileManifest();
 
 
+            //Fetching from data master
             List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
             if (picDeveloper.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
@@ -348,30 +362,6 @@ public class WebAppService extends BaseController {
                 throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
 
-            //Replace pic developer
-            List<String> picName;
-            picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
-            request.setPicDeveloper(picName);
-
-            //Replace Mapping Function
-            List<String> mappingName;
-            mappingName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
-            request.setMappingFunction(mappingName);
-
-            //Replace Front End
-            List<String> frontEND;
-            frontEND = frontEnd.stream().map(FrontEndEntity::getFrontEnd).toList();
-            request.setFrontEnd(frontEND);
-
-            //Replace Back End
-            List<String> backEND;
-            backEND = backEnd.stream().map(BackEndEntity::getBackEnd).toList();
-            request.setBackEnd(backEND);
-
-            //Replace Web Server
-            List<String> webSERVER;
-            webSERVER = webServer.stream().map(WebServerEntity::getWebServer).toList();
-            request.setWebServer(webSERVER);
 
             Path apkPath = null;
             Path ipaPath = null;
@@ -405,26 +395,34 @@ public class WebAppService extends BaseController {
                 Files.copy(fileManifest.getInputStream(), manifestPath);
             }
 
-            webAppRepository.updateByUuid(
-                    uuid,
-                    request.getApplicationName(),
-                    request.getPmoNumber(),
-                    request.getSapIntegration(),
-                    request.getCategoryApp(),
-                    request.getDescription(),
-                    request.getFunctionApplication(),
-                    request.getAddress(),
-                    request.getBusinessImpactPriority(),
-                    request.getStatus(),
-                    request.getLinkIOS(),
-                    request.getLinkAndroid(),
-                    Objects.nonNull(manifestPath) ? manifestPath.toString() : null,
-                    ipaPath != null ? ipaPath.toString() : null,
-                    apkPath != null ?  apkPath.toString() : null,
-                    request.getApplicationSourceFe(),
-                    request.getApplicationSourceBe(),
-                    request.getIpDatabase()
-            );
+            findData.setCategoryApp(request.getCategoryApp());
+            findData.setAddress(request.getAddress());
+            findData.setApplicationName(request.getApplicationName());
+            findData.setApplicationSourceBe(request.getApplicationSourceBe());
+            findData.setApplicationSourceFe(request.getApplicationSourceFe());
+            findData.setLinkIOS(request.getLinkIOS());
+            findData.setLinkAndroid(request.getLinkAndroid());
+            findData.setFileIpa(String.valueOf(request.getFileIpa()));
+            findData.setFileAndroid(String.valueOf(request.getFileAndroid()));
+            findData.setFileManifest(String.valueOf(request.getFileManifest()));
+            findData.setDescription(request.getDescription());
+            findData.setFunctionApplication(request.getFunctionApplication());
+            findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
+            findData.setStatus(request.getStatus());
+            findData.setSapIntegration(request.getSapIntegration());
+            findData.setIpDatabase(request.getIpDatabase());
+            findData.setPmoNumber(request.getPmoNumber());
+            findData.setPicDeveloperList(picDeveloper);
+            findData.setMappingFunctionList(mappingFunction);
+            findData.setFrontEndList(frontEnd);
+            findData.setBackEndList(backEnd);
+            findData.setWebServerList(webServer);
+            findData.setVersioningApplicationList(versioningApplicationEntities);
+            findData.setDatabaseList(databaseEntities);
+            findData.setApiList(apiEntities);
+
+            webAppRepository.save(findData);
+
             return webAppRepository.findByUuid(uuid);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
