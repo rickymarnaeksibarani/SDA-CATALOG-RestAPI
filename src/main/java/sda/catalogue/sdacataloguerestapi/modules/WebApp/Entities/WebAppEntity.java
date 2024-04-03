@@ -2,17 +2,17 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
@@ -67,7 +67,8 @@ public class WebAppEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "business_impact_priority")
+//    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "business_impact_priority", nullable = false)
     private String businessImpactPriority;
 
     @Column(name = "status")
@@ -147,19 +148,23 @@ public class WebAppEntity {
     @Column(name = "sda_hosting_id", columnDefinition = "json")
     private String sdaHosting;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "webAppEntity")
     private List<DocumentUploadEntity> documentUploadList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity")
     private List<VersioningApplicationEntity> versioningApplicationList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity")
     private List<ApiEntity> apiList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity")
     private List<DatabaseEntity> databaseList;
 
-    @OneToMany(mappedBy = "webAppEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity")
     private List<FeedbackEntity> feedbackList;
 
 }
