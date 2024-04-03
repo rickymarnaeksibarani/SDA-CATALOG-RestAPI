@@ -6,14 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
-import sda.catalogue.sdacataloguerestapi.core.enums.Status;
-import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -77,4 +72,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
             GROUP BY
               hosting_id;""", nativeQuery = true)
     List<Object[]> countAllBySdaHosting();
+
+    WebAppEntity findByApplicationName(String applicationName);
 }

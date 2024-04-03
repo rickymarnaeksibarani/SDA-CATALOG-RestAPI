@@ -320,8 +320,11 @@ public class WebAppService extends BaseController {
                 throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
             }
 
-            if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
-                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+            if (!findData.getApplicationName().equals(request.getApplicationName())){
+                WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
+                if (existingApp != null && !existingApp.getUuid().equals(uuid)){
+                    throw new CustomRequestException("Application name already exist", HttpStatus.CONFLICT);
+                }
             }
 
             MultipartFile fileAndroid = request.getFileAndroid();

@@ -48,6 +48,4 @@ public interface VersioningApplicationRepository extends JpaRepository<Versionin
     @Transactional
     @Query("DELETE FROM VersioningApplicationEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
-
-    List<VersioningApplicationEntity> findByIdVersioningApplicationIsIn(Collection<Long> id);
 }
