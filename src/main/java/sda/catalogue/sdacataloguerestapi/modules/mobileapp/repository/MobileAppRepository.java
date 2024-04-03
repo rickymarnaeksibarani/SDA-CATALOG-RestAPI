@@ -2,6 +2,7 @@ package sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
@@ -15,5 +16,6 @@ public interface MobileAppRepository extends JpaRepository<MobileAppEntity, Long
 
     Integer countAllByStatus(Status status);
 
-    List<MobileAppEntity> countAllBySdaHostingIn(Collection<String> name);
+    @Query("SELECT unnest(m.sdaHosting) AS hosting, COUNT(m.id) AS total FROM MobileAppEntity m GROUP BY hosting")
+    List<Object[]> countAllBySdaHosting();
 }
