@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -337,7 +338,6 @@ public class WebAppService extends BaseController {
             if (picDeveloper.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
             }
-            
             List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
             if (mappingFunction.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
@@ -437,7 +437,11 @@ public class WebAppService extends BaseController {
     public void deleteWebAppByUuid(UUID uuid){
         try {
             webAppRepository.findByUuidAndDelete(uuid);
-        } catch (Exception e){
+        }
+        catch (DataIntegrityViolationException e){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the record. It is referenced by other record");
+        }
+        catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
    }
