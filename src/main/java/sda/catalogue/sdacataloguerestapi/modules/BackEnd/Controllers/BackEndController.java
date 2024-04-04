@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -29,7 +30,7 @@ public class BackEndController {
     @Autowired
     private BackEndService backEndService;
 
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchBackEnd(BackEndRequestDTO searchDTO) {
 
         try {
@@ -40,7 +41,7 @@ public class BackEndController {
         }
     }
 
-    @GetMapping("/{id_backend}")
+    @GetMapping(value = "/{id_backend}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getBackEndById(
             @PathVariable("id_backend") Long id_backend
     ) {
@@ -53,7 +54,7 @@ public class BackEndController {
         }
     }
 
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createBackEnd(
             @Valid @RequestBody BackEndDTO request
     ) {
@@ -66,7 +67,7 @@ public class BackEndController {
         }
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateBackEnd(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody BackEndDTO request
@@ -80,7 +81,7 @@ public class BackEndController {
         }
     }
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteBackEnd(
             @PathVariable("uuid") UUID uuid
     ) {
