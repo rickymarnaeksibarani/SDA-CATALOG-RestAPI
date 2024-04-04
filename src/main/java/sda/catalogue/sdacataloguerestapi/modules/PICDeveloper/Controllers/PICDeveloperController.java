@@ -45,7 +45,7 @@ public class PICDeveloperController {
     }
 
     //Getting data PIC Developer by UUID
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getPICDeveloperByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -59,7 +59,7 @@ public class PICDeveloperController {
     }
 
     //Creating data PIC Developer
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createPICDeveloper(
            @RequestBody @Valid PICDeveloperDTO request
     ) {
@@ -73,7 +73,7 @@ public class PICDeveloperController {
     }
 
     //Updating data PIC Developer By UUID
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updatePICDeveloper(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody PICDeveloperDTO request
@@ -88,7 +88,7 @@ public class PICDeveloperController {
     }
 
     //Deleting data PIC Developer By UUID
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deletePICDeveloperByUuid(
             @PathVariable("uuid") UUID uuid
     ) {

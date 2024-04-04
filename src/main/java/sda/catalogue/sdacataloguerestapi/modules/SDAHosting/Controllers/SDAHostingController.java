@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -32,7 +33,7 @@ public class SDAHostingController {
     private SDAHostingService sdaHostingService;
 
     //Getting data SDA Hosting with search and pagination
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchSDAHosting(SDAHostingRequestDTO searchDTO) {
 
         try {
@@ -43,7 +44,7 @@ public class SDAHostingController {
         }
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSDAHostingByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -56,7 +57,7 @@ public class SDAHostingController {
         }
     }
 
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createSDAHosting(
             @Valid @RequestBody SDAHostingDTO request
     ) {
@@ -69,7 +70,7 @@ public class SDAHostingController {
         }
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateSDAHosting(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody SDAHostingDTO request
@@ -83,7 +84,7 @@ public class SDAHostingController {
         }
     }
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteSDAHosting(
             @PathVariable("uuid") UUID uuid
     ) {
