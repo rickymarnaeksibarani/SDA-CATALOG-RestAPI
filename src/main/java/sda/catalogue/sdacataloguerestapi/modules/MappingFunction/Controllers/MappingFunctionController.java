@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Controllers;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -31,7 +32,7 @@ public class MappingFunctionController {
     private MappingFunctionService mappingFunctionService;
 
     //Getting data Mapping Function with search and pagination
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchMappingFunction(MappingFunctionRequestDTO searchDTO) {
 
         try {
@@ -43,7 +44,7 @@ public class MappingFunctionController {
     }
 
     //Getting data Mapping Function with UUID
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getMappingFunctionByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -57,7 +58,7 @@ public class MappingFunctionController {
     }
 
     //Creating data Mapping Function
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createMappingFunction(
             @Valid @RequestBody MappingFunctionDTO request
     ) {
@@ -71,7 +72,7 @@ public class MappingFunctionController {
     }
 
     //Update data Mapping Function by UUID
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateMappingFunction(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody MappingFunctionDTO request
@@ -86,7 +87,7 @@ public class MappingFunctionController {
     }
 
     //Delete data Mapping Function by UUID
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces =MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteMappingFunction(
             @PathVariable("uuid") UUID uuid
     ) {

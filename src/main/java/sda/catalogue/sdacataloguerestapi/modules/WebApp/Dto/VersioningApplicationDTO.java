@@ -27,7 +27,7 @@ public class VersioningApplicationDTO {
     @NotEmpty
     private Date releaseDate;
 
-    @NotNull
-    @NotEmpty
-    private WebAppEntity webAppEntity;
+//    @NotNull
+//    @NotEmpty
+//    private WebAppEntity webAppEntity;
 }

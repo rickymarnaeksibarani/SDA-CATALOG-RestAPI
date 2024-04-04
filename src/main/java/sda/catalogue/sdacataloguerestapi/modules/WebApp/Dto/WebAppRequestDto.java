@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Dto.DocumentUploadDTO;
 
 import java.util.List;
 
@@ -47,6 +48,5 @@ public class WebAppRequestDto {
     private String applicationSourceBe;
     private String ipDatabase;
     private Long sdaHostingEntity;
-
     private List<String> filterByStatus;
 }

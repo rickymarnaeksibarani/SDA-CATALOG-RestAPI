@@ -366,9 +366,9 @@ public class WebAppService extends BaseController {
             }
 
 
-            Path apkPath = null;
-            Path ipaPath = null;
-            Path manifestPath = null;
+            Path apkPath;
+            Path ipaPath;
+            Path manifestPath;
 
             //Apk Andorid Process
             if (fileAndroid != null) {

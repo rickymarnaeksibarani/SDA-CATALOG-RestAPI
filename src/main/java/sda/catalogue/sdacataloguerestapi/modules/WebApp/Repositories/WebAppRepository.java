@@ -52,15 +52,9 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.status = :status")
     int countByStatus(String status);
 
-//    @Query("SELECT COUNT(w) FROM WebAppEntity w WHERE w.sdaHostingEntity.sdaHosting = :sdaHosting")
-//    Long countBySdaHosting(String sdaHosting);
-
     boolean existsByApplicationName(String applicationName);
 
     Integer countAllByStatus(String status);
-
-//    @Query(value = "SELECT value AS hosting_id, COUNT(id_webapp) AS total FROM tb_webapp w CROSS JOIN json_array_elements_text(sda_hosting_id) je GROUP BY hosting_id", nativeQuery = true)
-//    List<Object[]> countAllBySdaHosting();
 
     @Query(value = """
             SELECT

@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -28,7 +29,7 @@ public class FrontEndController {
     @Autowired
     private FrontEndService frontEndService;
 
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchFrontEnd(FrontEndRequestDTO searchDTO) {
 
         try {
@@ -39,7 +40,7 @@ public class FrontEndController {
         }
     }
 
-    @GetMapping("/{id_frontend}")
+    @GetMapping(value = "/{id_frontend}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getFrontEndyById(
             @PathVariable("id_frontend") Long id_frontend
     ) {
@@ -53,7 +54,7 @@ public class FrontEndController {
     }
 
 
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createFrontEnd(
             @Valid @RequestBody FrontEndDTO request
     ) {
@@ -66,7 +67,7 @@ public class FrontEndController {
         }
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateFrontEnd(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody FrontEndDTO request
@@ -81,7 +82,7 @@ public class FrontEndController {
     }
 
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteFrontEnd(
             @PathVariable("uuid") UUID uuid
     ) {
