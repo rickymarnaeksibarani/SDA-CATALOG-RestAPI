@@ -80,7 +80,7 @@ public class DashboardService {
             Optional<SDAHostingEntity> hostingData = sdaHostingRepository.findById(Long.parseLong((String) val[0]));
 
             StatisticByHostingDto hostingStat = new StatisticByHostingDto();
-            hostingStat.setName(hostingData.get().getSdaHosting());
+            hostingStat.setName(hostingData.isPresent() ? hostingData.get().getSdaHosting() : "");
             hostingStat.setTotal((Long) val[1]);
             return hostingStat;
         }).toList();

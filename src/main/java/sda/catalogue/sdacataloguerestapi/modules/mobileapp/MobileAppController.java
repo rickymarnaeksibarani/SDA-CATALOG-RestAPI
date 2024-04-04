@@ -1,6 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,9 @@ import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,7 +106,7 @@ public class MobileAppController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponse<String> deleteById(@PathVariable Long id) throws JsonProcessingException {
+    public ApiResponse<String> deleteById(@PathVariable Long id) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         mobileAppService.deleteById(id);
         return ApiResponse.<String>builder()
                 .result("Deleted")
