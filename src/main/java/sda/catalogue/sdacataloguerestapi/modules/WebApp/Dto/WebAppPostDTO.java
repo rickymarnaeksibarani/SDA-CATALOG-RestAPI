@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
+import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
@@ -28,7 +29,7 @@ import java.util.List;
 public class WebAppPostDTO {
 
     @JsonProperty("idWebApp")
-    private long idWebApp;
+    private Long idWebApp;
 
     @JsonProperty("applicationName")
     private String applicationName;
@@ -57,8 +58,8 @@ public class WebAppPostDTO {
     @JsonProperty("businessImpactPriority")
     private String businessImpactPriority;
 
-    @JsonProperty("status")
-    private String status;
+    @Enumerated
+    private Status status;
 
 
     private String linkIOS;

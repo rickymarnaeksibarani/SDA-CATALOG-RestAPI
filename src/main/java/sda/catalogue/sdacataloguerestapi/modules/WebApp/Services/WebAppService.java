@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -86,6 +87,7 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
+
 
 
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
@@ -157,9 +159,7 @@ public class WebAppService extends BaseController {
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()) {
                 List<Long> sdaHostingId = new ArrayList<>();
-                findSdaHosting.forEach(hostingData -> {
-                    sdaHostingId.add(hostingData.getIdSDAHosting());
-                });
+                findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
                 request.setSdaHosting(sdaHostingId);
             } else {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
@@ -173,6 +173,7 @@ public class WebAppService extends BaseController {
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
+
 
             //Path File
             if (apkPath != null) {

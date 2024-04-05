@@ -43,7 +43,7 @@ public class WebAppRequestDto {
     private String functionApplication;
     private String address;
     private String businessImpactPriority;
-//    private String status;
+    private Status status;
     private String applicationSourceFe;
     private String applicationSourceBe;
     private String ipDatabase;
