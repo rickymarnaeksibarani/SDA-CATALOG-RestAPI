@@ -3,6 +3,7 @@ package sda.catalogue.sdacataloguerestapi.modules.mobileapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,22 @@ import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHost
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.*;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppRepository;
+import sda.catalogue.sdacataloguerestapi.modules.storage.StorageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 @Service
 public class MobileAppService {
+    @Autowired
+    private StorageService storageService;
     @Autowired
     private MobileAppRepository mobileAppRepository;
     @Autowired
@@ -310,7 +317,7 @@ public class MobileAppService {
     }
 
     @Transactional
-    public void deleteById(Long id) throws JsonProcessingException {
+    public void deleteById(Long id) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         if (!mobileAppRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found");
         }
@@ -332,6 +339,7 @@ public class MobileAppService {
                 }
             });
         }
+        storageService.deleteAllFileS3(docList);
 
         // Remove old files
         List appFilePath = objectMapper.readValue(data.get().getApplicationFile(), List.class);
@@ -349,6 +357,7 @@ public class MobileAppService {
             });
         }
 
+        storageService.deleteAllFileS3(appFilePath);
         mobileAppRepository.deleteById(id);
     }
 
@@ -388,11 +397,15 @@ public class MobileAppService {
 
         documents.forEach(doc -> {
             try {
-                String docFilename = time + generatedString + "_" + doc.getOriginalFilename();
-                Path docFileDestination = Files.createDirectories(Path.of(uploadpath + "/document/"));
-                doc.transferTo(Path.of(docFileDestination + "/" + docFilename));
-                documentPaths.add(docFileDestination + "/" + docFilename);
-            } catch (IOException e) {
+                String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
+//                Path docFileDestination = Files.createDirectories(Path.of(uploadpath + "/document/"));
+//                doc.transferTo(Path.of(docFileDestination + "/" + docFilename));
+//                documentPaths.add(docFileDestination + "/" + docFilename);
+
+                String filepath = LocalDate.now().getYear() + "/docs/" + docFilename;
+                ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filepath, doc);
+                documentPaths.add(objectWriteResponse.object());
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -400,7 +413,7 @@ public class MobileAppService {
         return documentPaths;
     }
 
-    private String uploadFileApp(MultipartFile file, String appFileCategory) throws IOException {
+    private String uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
         if (file == null || file.isEmpty()) return null;
 
         String filePaths = null;
@@ -411,24 +424,29 @@ public class MobileAppService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid android file");
             }
 
-            String androidFilename = time + generatedString + "_" + file.getOriginalFilename();
-            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
-            Path resolve = fileDestination.resolve(androidFilename.trim());
-            Files.copy(file.getInputStream(), resolve);
-            filePaths = String.valueOf(resolve);
+            String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
+//            Path resolve = fileDestination.resolve(androidFilename.trim());
+//            Files.copy(file.getInputStream(), resolve);
+//            filePaths = String.valueOf(resolve);
+
+            filePaths = LocalDate.now().getYear() + "/android/" + androidFilename;
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
 //            if (!Objects.equals(file.getOriginalFilename(), ".ipa")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
 
-            String ipaFilename = time + generatedString + "_" + file.getOriginalFilename();
-            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
-            Path resolve = fileDestination.resolve(ipaFilename.trim());
-            Files.copy(file.getInputStream(), resolve);
-            filePaths = String.valueOf(resolve);
+            String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
+//            Path resolve = fileDestination.resolve(ipaFilename.trim());
+//            Files.copy(file.getInputStream(), resolve);
+//            filePaths = String.valueOf(resolve);
+
+            filePaths = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
         }
 
-        return filePaths;
+        ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePaths, file);
+        return objectWriteResponse.object();
     }
 
     private String generateRandomString() {
