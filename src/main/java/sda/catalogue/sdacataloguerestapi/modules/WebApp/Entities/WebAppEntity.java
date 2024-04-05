@@ -14,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
+import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
@@ -55,6 +56,11 @@ public class WebAppEntity {
     @Column(name = "sap_integration", nullable = false)
     private SapIntegration sapIntegration;
 
+    @Column(nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+
     @Column(name = "category_app")
     private String categoryApp;
 
@@ -71,8 +77,8 @@ public class WebAppEntity {
     @Column(name = "business_impact_priority", nullable = false)
     private String businessImpactPriority;
 
-    @Column(name = "status")
-    private String status;
+//    @Column(name = "status")
+//    private String status;
 
 //    @Column(name = "role")
 //    private String role;

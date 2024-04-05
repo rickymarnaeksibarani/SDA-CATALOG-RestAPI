@@ -169,7 +169,7 @@ public class DashboardService {
             allSdaDto.setDepartment(department.get(0));
             allSdaDto.setAddress(List.of(data.getAddress()));
             allSdaDto.setName(data.getApplicationName());
-            allSdaDto.setStatus(Status.valueOf(data.getStatus().toUpperCase()));
+            allSdaDto.setStatus(Status.valueOf(String.valueOf(data.getStatus())));
             allSdaDto.setMappingFunction(mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList());
             allSdaDto.setCategory("web");
             return allSdaDto;
