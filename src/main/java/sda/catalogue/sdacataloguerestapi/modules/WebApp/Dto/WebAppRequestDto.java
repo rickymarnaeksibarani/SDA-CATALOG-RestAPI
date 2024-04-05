@@ -48,5 +48,5 @@ public class WebAppRequestDto {
     private String applicationSourceBe;
     private String ipDatabase;
     private Long sdaHostingEntity;
-    private List<String> filterByStatus;
+    private List<Status> filterByStatus;
 }

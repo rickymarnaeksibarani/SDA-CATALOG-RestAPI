@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +50,15 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepos
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
+import sda.catalogue.sdacataloguerestapi.modules.storage.StorageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 
@@ -87,13 +92,16 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private StorageService storageService;
 
 
 
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
     private static final String UPLOAD_DIR_IPA = "src/main/resources/uploads/ipa";
     private static final String UPLOAD_DIR_MANIFEST = "src/main/resources/uploads/manifest";
-
+    private final Date date = new Date();
+    private final Long time = date.getTime();
 
     //Creating data WebApp
     @Transactional
@@ -492,4 +500,76 @@ public class WebAppService extends BaseController {
         }
         return statsMap;
     }
+
+    private  String generateRandomString(){
+        Random random = new Random();
+        return random.ints(97, 122+1)
+                .limit(11)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
+    private List<String> uploadDocument(List<MultipartFile> documents){
+        if (documents == null || documents.isEmpty()) return null;
+
+        List<String> documentPaths = new ArrayList<>();
+        String generatedString = generateRandomString();
+
+        documents.forEach(doc -> {
+            try {
+                String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
+//                Path docFileDestination = Files.createDirectories(Path.of(uploadpath + "/document/"));
+//                doc.transferTo(Path.of(docFileDestination + "/" + docFilename));
+//                documentPaths.add(docFileDestination + "/" + docFilename);
+
+                String filepath = LocalDate.now().getYear() + "/docs/" + docFilename;
+                ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filepath, doc);
+                documentPaths.add(objectWriteResponse.object());
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return documentPaths;
+    }
+    private String uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
+        if (file == null || file.isEmpty()) return null;
+
+        String filePaths = null;
+        String generatedString = generateRandomString();
+
+        if (Objects.equals(appFileCategory, "apk")) {
+            if (!Objects.equals(file.getContentType(), "application/vnd.android.package-archive")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid android file");
+            }
+
+            String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
+//            Path resolve = fileDestination.resolve(androidFilename.trim());
+//            Files.copy(file.getInputStream(), resolve);
+//            filePaths = String.valueOf(resolve);
+
+            filePaths = LocalDate.now().getYear() + "/android/" + androidFilename;
+        }
+
+        if (Objects.equals(appFileCategory, "ipa")) {
+//            if (!Objects.equals(file.getOriginalFilename(), ".ipa")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
+
+            String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
+//            Path resolve = fileDestination.resolve(ipaFilename.trim());
+//            Files.copy(file.getInputStream(), resolve);
+//            filePaths = String.valueOf(resolve);
+
+            filePaths = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
+        }
+
+        ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePaths, file);
+        return objectWriteResponse.object();
+    }
+
+
+
+
+
+
 }
