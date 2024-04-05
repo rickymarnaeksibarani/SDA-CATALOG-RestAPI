@@ -5,6 +5,7 @@ import io.minio.errors.MinioException;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -12,9 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
@@ -27,11 +31,22 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class StorageServiceImpl implements StorageService {
+    @Value("${minio.url}")
+    private String endpoint;
+    @Value("${minio.port}")
+    private Integer port;
+    @Value("${minio.access_key}")
+    private String accessKey;
+    @Value("${minio.secret_key}")
+    private String secretKey;
+    @Value("${minio.bucket}")
+    private String bucket;
+
     @Override
     public MinioClient initMinioClient() {
         return MinioClient.builder()
-                .endpoint("http://172.16.41.73", 9000, false)
-                .credentials("NzuPCWpGUqoOPHgbCQJL", "YdoevporrUm3ddrytfBTXqWFT3JXVlR3DyzzwaZR")
+                .endpoint(endpoint, port, false)
+                .credentials(accessKey, secretKey)
                 .build();
     }
 
@@ -67,7 +82,7 @@ public class StorageServiceImpl implements StorageService {
             objects = path.stream().map(DeleteObject::new).collect(Collectors.toCollection(LinkedList::new));
 
             Iterable<Result<DeleteError>> results = minioClient.removeObjects(
-                    RemoveObjectsArgs.builder().bucket("sda-catalog").objects(objects).build()
+                    RemoveObjectsArgs.builder().bucket(bucket).objects(objects).build()
             );
 
             for (Result<DeleteError> result : results) {
@@ -81,20 +96,20 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public ObjectWriteResponse storeToS3(String filename, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        try(InputStream fileStream = file.getInputStream()) {
+        try(InputStream inputStream = file.getInputStream()) {
             MinioClient minioClient = initMinioClient();
 
             // Make 'sda-catalog' bucket if not exist.
-            boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("sda-catalog").build());
+            boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
 
             // Make a new bucket called 'sda-catalog'.
-            if (!exists) minioClient.makeBucket(MakeBucketArgs.builder().bucket("sda-catalog").build());
+            if (!exists) minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
 
             return minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket("sda-catalog")
+                            .bucket(bucket)
                             .object(filename.replace("\\", "/").trim())
-                            .stream(fileStream, file.getSize(), -1)
+                            .stream(inputStream, file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build()
             );
@@ -110,11 +125,23 @@ public class StorageServiceImpl implements StorageService {
             MinioClient minioClient = initMinioClient();
 
             minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket("sda-catalog")
+                    .bucket(bucket)
                     .object(path)
                     .build());
         } catch (MinioException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to delete file: " + e);
+        }
+    }
+
+    @Override
+    public InputStream getFileFromS3(String path) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        try {
+            MinioClient minioClient = initMinioClient();
+            return minioClient.getObject(
+                    GetObjectArgs.builder().bucket(bucket).object(path).build()
+            );
+        } catch (MinioException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed get file from s3: " + e);
         }
     }
 }
