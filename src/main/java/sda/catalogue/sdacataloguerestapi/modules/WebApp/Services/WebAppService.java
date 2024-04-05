@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -85,6 +87,7 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
+
 
 
     private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
@@ -156,9 +159,7 @@ public class WebAppService extends BaseController {
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()) {
                 List<Long> sdaHostingId = new ArrayList<>();
-                findSdaHosting.forEach(hostingData -> {
-                    sdaHostingId.add(hostingData.getIdSDAHosting());
-                });
+                findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
                 request.setSdaHosting(sdaHostingId);
             } else {
                 throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
@@ -172,6 +173,7 @@ public class WebAppService extends BaseController {
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
+
 
             //Path File
             if (apkPath != null) {
@@ -337,7 +339,6 @@ public class WebAppService extends BaseController {
             if (picDeveloper.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
             }
-            
             List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
             if (mappingFunction.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
@@ -437,7 +438,11 @@ public class WebAppService extends BaseController {
     public void deleteWebAppByUuid(UUID uuid){
         try {
             webAppRepository.findByUuidAndDelete(uuid);
-        } catch (Exception e){
+        }
+        catch (DataIntegrityViolationException e){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the record. It is referenced by other record");
+        }
+        catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
    }
