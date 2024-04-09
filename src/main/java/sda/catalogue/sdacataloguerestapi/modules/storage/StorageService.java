@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -21,4 +22,5 @@ public interface StorageService {
     void deleteAllFileS3(List<String> path) throws IOException, NoSuchAlgorithmException, InvalidKeyException;
     ObjectWriteResponse storeToS3(String filename, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException;
     void deleteFileS3(String path) throws IOException, NoSuchAlgorithmException, InvalidKeyException;
+    InputStream getFileFromS3(String path) throws IOException, NoSuchAlgorithmException, InvalidKeyException;
 }

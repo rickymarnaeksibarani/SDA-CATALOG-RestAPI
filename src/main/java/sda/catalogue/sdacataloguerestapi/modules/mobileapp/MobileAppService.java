@@ -293,6 +293,7 @@ public class MobileAppService {
                 }
             });
         }
+        storageService.deleteAllFileS3(docList);
 
         // Remove old files
         List appFilePath = objectMapper.readValue(mobileApp.getApplicationFile(), List.class);
@@ -312,6 +313,7 @@ public class MobileAppService {
 
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
         mobileAppRepository.saveAndFlush(payload);
+        storageService.deleteAllFileS3(appFilePath);
 
         return toMobileAppResponse(payload);
     }
