@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
@@ -32,7 +33,7 @@ public class TypeDatabaseController {
     private TypeDatabaseService typeDatabaseService;
 
     //Getting data PIC Developer with pagination
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchTypeDatabase(TypeDatabaseRequestDTO searchDTO) {
 
         try {
@@ -43,7 +44,7 @@ public class TypeDatabaseController {
         }
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTypeDatabaseByUuid(
             @PathVariable("uuid") UUID uuid
     ) {
@@ -56,7 +57,7 @@ public class TypeDatabaseController {
         }
     }
 
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createTypeDatabase(
             @Valid @RequestBody TypeDatabaseDTO request
     ) {
@@ -69,7 +70,7 @@ public class TypeDatabaseController {
         }
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateTypeDatabase(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody TypeDatabaseDTO request
@@ -83,7 +84,7 @@ public class TypeDatabaseController {
         }
     }
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteTypeDatabase(
             @PathVariable("uuid") UUID uuid
     ) {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
@@ -43,6 +44,34 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Getting data WebApp by UUID
     WebAppEntity findByUuid(UUID uuid);
 
+    //Updating data WebApp by UUID
+    @Modifying
+    @Transactional
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber, w.sapIntegration = :sapIntegration,w.categoryApp = :categoryApp, " +
+            "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
+            "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
+            "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
+            "w.fileAndroid = :fileAndroid, w.applicationSourceFe = :applicationSourceFe, " +
+            "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
+            "WHERE w.uuid = :uuid")
+    int updateByUuid(UUID uuid,
+                     String applicationName,
+                     String pmoNumber,
+                     SapIntegration sapIntegration,
+                     String categoryApp,
+                     String description,
+                     String functionApplication,
+                     String address,
+                     String businessImpactPriority,
+                     String status,
+                     String linkIOS,
+                     String linkAndroid,
+                     String fileManifest,
+                     String fileIpa,
+                     String fileAndroid,
+                     String applicationSourceFe,
+                     String applicationSourceBe,
+                     String ipDatabase);
 
     @Modifying
     @Transactional

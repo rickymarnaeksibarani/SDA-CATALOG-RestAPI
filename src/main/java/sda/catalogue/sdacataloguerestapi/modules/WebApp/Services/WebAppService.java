@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
@@ -410,8 +411,6 @@ public class WebAppService extends BaseController {
             findData.setCategoryApp(request.getCategoryApp());
             findData.setAddress(request.getAddress());
             findData.setApplicationName(request.getApplicationName());
-            findData.setApplicationSourceBe(request.getApplicationSourceBe());
-            findData.setApplicationSourceFe(request.getApplicationSourceFe());
             findData.setLinkIOS(request.getLinkIOS());
             findData.setLinkAndroid(request.getLinkAndroid());
             findData.setFileIpa(String.valueOf(request.getFileIpa()));

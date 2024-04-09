@@ -56,7 +56,7 @@ public class WebAppPostDTO {
     private String address;
 
     @JsonProperty("businessImpactPriority")
-    private String businessImpactPriority;
+    private BusinessImpactPriority businessImpactPriority;
 
     @Enumerated
     private Status status;
