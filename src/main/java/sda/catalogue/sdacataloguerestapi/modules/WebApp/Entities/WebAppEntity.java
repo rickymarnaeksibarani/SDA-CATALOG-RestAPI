@@ -73,9 +73,9 @@ public class WebAppEntity {
     @Column(name = "address")
     private String address;
 
-//    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "business_impact_priority", nullable = false)
-    private String businessImpactPriority;
+    private BusinessImpactPriority businessImpactPriority;
 
 //    @Column(name = "status")
 //    private String status;

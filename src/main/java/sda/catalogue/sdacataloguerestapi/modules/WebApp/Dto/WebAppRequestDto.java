@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
+import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Dto.DocumentUploadDTO;
@@ -42,11 +43,11 @@ public class WebAppRequestDto {
     private String description;
     private String functionApplication;
     private String address;
-    private String businessImpactPriority;
+    private BusinessImpactPriority businessImpactPriority;
     private Status status;
     private String applicationSourceFe;
     private String applicationSourceBe;
     private String ipDatabase;
     private Long sdaHostingEntity;
-    private List<String> filterByStatus;
+    private List<Status> filterByStatus;
 }
