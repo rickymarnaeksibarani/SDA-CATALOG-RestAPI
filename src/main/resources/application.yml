@@ -6,6 +6,9 @@ logging:
         web: INFO
         security: DEBUG
 spring:
+  application:
+    name: th-sdacatalog-service
+    version: 1.0.0
   frontend: "*"
   datasource:
     driver-class-name: org.postgresql.Driver
