@@ -1,14 +1,13 @@
 package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
@@ -44,6 +43,9 @@ public class SDAHostingEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "sdaHostingEntity")
+    private List<WebAppEntity> sdaHostingEntities;
 
     public class FormattedSDAHostingEntity{
         private long idSDAHosting;

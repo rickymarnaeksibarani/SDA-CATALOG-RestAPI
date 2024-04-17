@@ -292,23 +292,6 @@ public class WebAppService extends BaseController {
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
         WebAppEntity result = webAppRepository.findById(id_webapp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
-
-        List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
-        List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode sdaHostingArray = mapper.createArrayNode();
-        for (SDAHostingEntity sdaHosting : sdaHostingList) {
-            ObjectNode hostingNode = mapper.createObjectNode();
-            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
-            hostingNode.put("uuid", sdaHosting.getUuid().toString());
-            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
-            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
-            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
-            sdaHostingArray.add(hostingNode);
-        }
-
-        result.setSdaHosting(sdaHostingArray.toString());
-
         return result;
     }
 
@@ -368,9 +351,10 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
             }
 
+//            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
-                findData.setSdaHosting(findSdaHosting.toString());
+                findData.setSdaHostingEntity(findSdaHosting.get(0));
             }else {
                 throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
@@ -434,7 +418,7 @@ public class WebAppService extends BaseController {
 
             webAppRepository.save(findData);
 
-            return webAppRepository.findByUuid(uuid);
+            return webAppRepository.save(findData);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }
