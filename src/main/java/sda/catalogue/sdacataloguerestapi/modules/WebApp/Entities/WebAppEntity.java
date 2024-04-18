@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Immutable
+//@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -146,13 +147,13 @@ public class WebAppEntity {
     )
     private List<WebServerEntity> webServerList;
 
-//    @ManyToOne
-//    @JoinColumn(name = "id_sda_hosting")
-//    @JsonIgnoreProperties("sdaHostingEntities")
-//    private SDAHostingEntity sdaHostingEntity;
+    @ManyToOne
+    @JoinColumn(name = "id_sda_hosting")
+    @JsonIgnoreProperties("sdaHostingEntities")
+    private SDAHostingEntity sdaHostingEntity;
 
-    @Column(name = "sda_hosting_id", columnDefinition = "json")
-    private String sdaHosting;
+//    @Column(name = "sda_hosting_id", columnDefinition = "json")
+//    private String sdaHosting;
 
     @OneToMany(mappedBy = "webAppEntity")
     private List<DocumentUploadEntity> documentUploadList;
