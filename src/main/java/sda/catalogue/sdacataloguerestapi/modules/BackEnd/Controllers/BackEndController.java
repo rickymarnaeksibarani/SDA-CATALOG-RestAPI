@@ -86,8 +86,8 @@ public class BackEndController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            BackEndEntity result = backEndService.deleteBackend(uuid);
-            ApiResponse<BackEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data back end!", result);
+            backEndService.deleteBackend(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data back end!", "DELETED");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

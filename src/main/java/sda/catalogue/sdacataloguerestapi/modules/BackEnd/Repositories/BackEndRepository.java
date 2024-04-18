@@ -13,6 +13,7 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -29,7 +30,7 @@ public interface BackEndRepository extends JpaRepository<BackEndEntity, Long>, J
     long countBySearchTerm(String searchTerm);
 
     //Getting data Back End by UUID
-    BackEndEntity findByUuid(UUID uuid);
+    Optional<BackEndEntity> findByUuid(UUID uuid);
 
     //Updating data Back End by UUID
     @Modifying
@@ -51,4 +52,6 @@ public interface BackEndRepository extends JpaRepository<BackEndEntity, Long>, J
     List<BackEndEntity> findByBackEndIsIn(Collection<String> name);
 
     List<BackEndEntity> findByIdBackEndIsIn(Collection<Long> id);
+
+    boolean existsByBackEnd(String backEnd);
 }

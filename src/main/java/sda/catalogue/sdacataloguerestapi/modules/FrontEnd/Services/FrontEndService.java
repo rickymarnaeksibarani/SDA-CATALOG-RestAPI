@@ -47,8 +47,14 @@ public class FrontEndService {
 
     //Creating data Front end
     public FrontEndEntity createFrontEnd(FrontEndDTO request) {
+        boolean existsByFrontEnd = frontEndRepository.existsByFrontEnd(request.getFrontEnd());
+        if (existsByFrontEnd) {
+            throw new CustomRequestException("Front End already exists", HttpStatus.CONFLICT);
+        }
+
         FrontEndEntity data = new FrontEndEntity();
         data.setFrontEnd(request.getFrontEnd());
+        data.setFeStatus(request.getFeStatus());
         return frontEndRepository.save(data);
     }
 
@@ -56,24 +62,20 @@ public class FrontEndService {
     //Updating data Front end by UUID
     @Transactional
     public FrontEndEntity updateFrontEnd(UUID uuid, FrontEndDTO request) {
-        int result = frontEndRepository.findByUuidAndUpdate(uuid, request.getFrontEnd());
-        FrontEndEntity findData = frontEndRepository.findByUuid(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+        FrontEndEntity frontEnd = frontEndRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("FrontEnd does not exist", HttpStatus.NOT_FOUND));
+
+        frontEnd.setFeStatus(request.getFeStatus());
+        frontEnd.setFrontEnd(request.getFrontEnd());
+        return frontEndRepository.save(frontEnd);
     }
 
     //Deleting data Front end by UUID
     @Transactional
-    public FrontEndEntity deleteFrontEnd(UUID uuid) {
-        FrontEndEntity findData = frontEndRepository.findByUuid(uuid);
-        int result = frontEndRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deleteFrontEnd(UUID uuid) {
+        FrontEndEntity findData = frontEndRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("FrontEnd does not exist", HttpStatus.NOT_FOUND));
+
+        frontEndRepository.delete(findData);
     }
 }
