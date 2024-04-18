@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -27,7 +28,7 @@ public interface TypeDatabaseRepository extends JpaRepository<TypeDatabaseEntity
     long countBySearchTerm(String searchTerm);
 
     //Getting data Type Database by UUID
-    TypeDatabaseEntity findByUuid(UUID uuid);
+    Optional<TypeDatabaseEntity> findByUuid(UUID uuid);
 
     //Updating data Type Database by UUID
     @Modifying
@@ -42,4 +43,6 @@ public interface TypeDatabaseRepository extends JpaRepository<TypeDatabaseEntity
     @Transactional
     @Query("DELETE FROM TypeDatabaseEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
+
+    boolean existsByTypeDatabase(String dbName);
 }

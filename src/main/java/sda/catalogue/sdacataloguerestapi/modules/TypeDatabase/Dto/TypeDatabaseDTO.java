@@ -1,13 +1,9 @@
 package sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.validator.constraints.NotEmpty;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
 
 import java.time.LocalDateTime;
@@ -25,6 +21,9 @@ public class TypeDatabaseDTO {
 
     @JsonProperty("typeDatabase")
     private String typeDatabase;
+
+    @NotNull
+    private MasterDataStatus dbStatus;
 
     @JsonProperty("createdAt")
     private LocalDateTime createdAt;

@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,6 +33,9 @@ public class WebServerEntity {
 
     @Column(name = "web_server")
     private String webServer;
+
+//    @Column(name = "web_service_status", nullable = false)
+//    private MasterDataStatus webServiceStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")

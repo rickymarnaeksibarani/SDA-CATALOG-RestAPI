@@ -1,23 +1,15 @@
 package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.validator.constraints.NotEmpty;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 public class FrontEndDTO {
-
     @JsonProperty("idFrontend")
     private long idFrontEnd;
 
@@ -26,6 +18,9 @@ public class FrontEndDTO {
 
     @JsonProperty("frontEnd")
     private String frontEnd;
+
+    @NotNull
+    private MasterDataStatus feStatus;
 
     @JsonProperty("createdAt")
     private LocalDateTime createdAt;
