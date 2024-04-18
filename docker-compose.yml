@@ -1,20 +1,19 @@
-version: '3.8'
+version: "3.8"
 
 services:
   sda-catalog-rest-api:
-    image: sda-catalogue:1.0
+    image: microservice/sda-catalogue:latest
     container_name: sda-catalog-rest-api
     restart: always
     ports:
-      - "8016:8080"
+      - "8017:8080"
     networks:
-      - sda-catalogue-network
+      - microservice_global_network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/sda_catalog
+      SPRING_DATASOURCE_URL: jdbc:postgresql://172.16.41.107:5151/sda_catalog
       SPRING_DATASOURCE_USERNAME: sda_catalog
       SPRING_DATASOURCE_PASSWORD: sd4_c4t4l0g
-      SPRING_PROFILES_ACTIVE: "docker"
+      SPRING_PROFILES_ACTIVE: dev
 
 networks:
-  sda-catalog-network:
-    driver: bridge
+  microservice_global_network:
