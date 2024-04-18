@@ -89,8 +89,8 @@ public class TypeDatabaseController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            TypeDatabaseEntity result = typeDatabaseService.deleteTypeDatabase(uuid);
-            ApiResponse<TypeDatabaseEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data type database!", result);
+            typeDatabaseService.deleteTypeDatabase(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data type database!", "DELETED");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

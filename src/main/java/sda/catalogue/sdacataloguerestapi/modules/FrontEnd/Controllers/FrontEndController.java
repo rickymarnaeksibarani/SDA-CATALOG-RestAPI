@@ -87,8 +87,8 @@ public class FrontEndController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            FrontEndEntity result = frontEndService.deleteFrontEnd(uuid);
-            ApiResponse<FrontEndEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data front end!", result);
+            frontEndService.deleteFrontEnd(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data front end!", "DELETED");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

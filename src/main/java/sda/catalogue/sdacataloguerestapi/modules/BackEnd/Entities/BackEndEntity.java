@@ -6,12 +6,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -29,6 +29,10 @@ public class BackEndEntity {
 
     @Column(name = "back_end")
     private String backEnd;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "be_status", nullable = false)
+    private MasterDataStatus beStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")

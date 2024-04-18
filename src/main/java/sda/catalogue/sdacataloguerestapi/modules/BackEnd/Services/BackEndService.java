@@ -1,6 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services;
 
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,21 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import org.springframework.transaction.annotation.Transactional;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
-import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Dto.FrontEndDTO;
-import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,43 +34,42 @@ public class BackEndService {
 
     //Getting data Back end by ID
     public BackEndEntity getBackEndById(Long id_backend) {
-        BackEndEntity result = backendRepository.findById(id_backend).orElse(null);
-        if (result == null) {
-            throw new CustomRequestException("ID " + id_backend + " not found", HttpStatus.NOT_FOUND);
-        }
-        return result;
+        return backendRepository.findById(id_backend)
+                .orElseThrow(() -> new CustomRequestException("Backend not found", HttpStatus.NOT_FOUND));
     }
+
+    @Transactional
     //Creating data Back end
     public BackEndEntity createBackend(BackEndDTO request) {
+        boolean existsByBackEnd = backendRepository.existsByBackEnd(request.getBackEnd());
+
+        if (existsByBackEnd) {
+            throw new CustomRequestException("BackEnd already exists", HttpStatus.CONFLICT);
+        }
+
         BackEndEntity data = new BackEndEntity();
         data.setBackEnd(request.getBackEnd());
+        data.setBeStatus(request.getBeStatus());
         return backendRepository.save(data);
     }
 
     //Updating data Back end by UUID
     @Transactional
     public BackEndEntity updateBackend(UUID uuid, BackEndDTO request) {
-        int result = backendRepository.findByUuidAndUpdate(
-                uuid,
-                request.getBackEnd()
-        );
-        BackEndEntity findData = backendRepository.findByUuid(uuid);
-        if (result > 0) {
-            return backendRepository.findByUuid(uuid);
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+        BackEndEntity backEndEntity = backendRepository.findByUuid(uuid).
+                orElseThrow(() -> new CustomRequestException("Backend not found", HttpStatus.NOT_FOUND));
+
+        backEndEntity.setBeStatus(request.getBeStatus());
+        backEndEntity.setBackEnd(request.getBackEnd());
+        return backendRepository.save(backEndEntity);
     }
 
     //Deleting data Back end by UUID
     @Transactional
-    public BackEndEntity deleteBackend(UUID uuid) {
-        BackEndEntity findData = backendRepository.findByUuid(uuid);
-        int result = backendRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deleteBackend(UUID uuid) {
+        BackEndEntity backEndEntity = backendRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("ID " + uuid + " not found", HttpStatus.NOT_FOUND));
+
+        backendRepository.delete(backEndEntity);
     }
 }

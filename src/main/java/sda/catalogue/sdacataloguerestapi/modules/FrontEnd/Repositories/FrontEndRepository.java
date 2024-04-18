@@ -12,6 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.Mappin
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -28,7 +29,7 @@ public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long>,
     long countBySearchTerm(String searchTerm);
 
     //Getting data Front End by UUID
-    FrontEndEntity findByUuid(UUID uuid);
+    Optional<FrontEndEntity> findByUuid(UUID uuid);
 
     //Updating data Front End by UUID
     @Modifying
@@ -50,4 +51,6 @@ public interface FrontEndRepository extends JpaRepository<FrontEndEntity, Long>,
     List<FrontEndEntity> findByFrontEndIsIn(Collection<String> name);
 
     List<FrontEndEntity> findByIdFrontEndIsIn(Collection<Long> id);
+
+    boolean existsByFrontEnd(String frontEnd);
 }

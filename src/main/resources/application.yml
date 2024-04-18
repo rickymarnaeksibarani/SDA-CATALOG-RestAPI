@@ -1,62 +1,66 @@
-  logging:
-    level:
-      org:
-        hibernate: INFO
-        springframework:
-          web: INFO
-          security: DEBUG
-  spring:
-    frontend: "*"
-    datasource:
-      driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://localhost:5432/db_sda_catalog?stringtype=unspecified
-#      url: jdbc:postgresql://172.16.41.107:5151/sda_catalog?stringtype=unspecified
-      username: sda_catalog
-      password: sd4_c4t4l0g
-#      username: user
-#      password: password
-    devtools:
-      add-properties: true
-    jpa:
-      database-platform: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  level:
+    org:
+      hibernate: INFO
+      springframework:
+        web: INFO
+        security: DEBUG
+spring:
+  application:
+    name: th-sdacatalog-service
+    version: 1.0.0
+  frontend: "*"
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    # url: jdbc:postgresql://localhost:5432/db_sda_catalog?stringtype=unspecified
+    url: jdbc:postgresql://172.16.41.107:5151/sda_catalog?stringtype=unspecified
+    username: sda_catalog
+    password: sd4_c4t4l0g
+  #      username: user
+  #      password: password
+  devtools:
+    add-properties: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+      # ddl-auto: create-drop
+    properties:
       hibernate:
-        ddl-auto: create
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-          format_sql: true
-          id:
-            uuid:
-              generator: org.hibernate.id.UUIDGenerator
-          jdbc:
-            lob:
-              non_contextual_creation: true
-          jpa:
-            show-sql: true
-          connection:
-            datasource:
-              log-statement: true
-    mvc:
-      validation: true
-    servlet:
-      multipart:
-        max-file-size: 500MB
-        max-request-size: 500MB
-    security:
-      oauth2:
-        client:
-          provider:
-            keycloak:
-              issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog
-          registration:
-            keycloak:
-              client-id: sda-catalog-web
-        resourceserver:
-          jwt:
-            jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog/protocol/openid-connect/certs
-  minio:
-    url: http://172.16.41.73
-    port: 9000
-    access_key: NzuPCWpGUqoOPHgbCQJL
-    secret_key: YdoevporrUm3ddrytfBTXqWFT3JXVlR3DyzzwaZR
-    bucket: "sda-catalog"
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        id:
+          uuid:
+            generator: org.hibernate.id.UUIDGenerator
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        jpa:
+          show-sql: true
+        connection:
+          datasource:
+            log-statement: true
+  mvc:
+    validation: true
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog
+        registration:
+          keycloak:
+            client-id: sda-catalog-web
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog/protocol/openid-connect/certs
+minio:
+  url: http://172.16.41.73
+  port: 9000
+  access_key: NzuPCWpGUqoOPHgbCQJL
+  secret_key: YdoevporrUm3ddrytfBTXqWFT3JXVlR3DyzzwaZR
+  bucket: "sda-catalog"
