@@ -44,12 +44,12 @@ public class SDAHostingController {
         }
     }
 
-    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSDAHostingByUuid(
-            @PathVariable("uuid") UUID uuid
+    @GetMapping(value = "/{id_sda_hosting}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getSDAHostingById(
+            @PathVariable("id_sda_hosting") Long id_sda_hosting
     ) {
         try {
-            SDAHostingEntity result = sdaHostingService.getSDAHostingByUuid(uuid);
+            SDAHostingEntity result = sdaHostingService.getSDAHostingById(id_sda_hosting);
             ApiResponse<SDAHostingEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data sda hosting!!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -89,8 +89,8 @@ public class SDAHostingController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            SDAHostingEntity result = sdaHostingService.deleteSDAHosting(uuid);
-            ApiResponse<SDAHostingEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data sda hosting!", result);
+            sdaHostingService.deleteSDAHosting(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data", "DELETED");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

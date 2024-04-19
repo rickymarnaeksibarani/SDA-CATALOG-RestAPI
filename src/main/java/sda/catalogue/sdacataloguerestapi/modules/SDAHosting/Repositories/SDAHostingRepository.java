@@ -11,12 +11,14 @@ import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingE
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Long>, JpaSpecificationExecutor<SDAHostingEntity> {
     @Query("SELECT w FROM SDAHostingEntity w " +
             "WHERE LOWER(w.sdaHosting) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "   OR LOWER(w.sdaHostingEntities) LIKE LOWER(CONCAT('%', :searchTerm, '%') ) " +
             "ORDER BY w.updatedAt DESC")
     List<SDAHostingEntity> findBySearchTerm(String searchTerm, Pageable pageable);
 
@@ -25,7 +27,7 @@ public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Lo
             "WHERE LOWER(w.sdaHosting) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     long countBySearchTerm(String searchTerm);
 
-    SDAHostingEntity findByUuid(UUID uuid);
+    Optional<SDAHostingEntity> findByUuid(UUID uuid);
 
     @Modifying
     @Transactional
@@ -45,4 +47,6 @@ public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Lo
     List<SDAHostingEntity> findByIdSDAHostingIsIn(List<Long> id);
 
     List<SDAHostingEntity> findBySdaHostingIsIn(Collection<String> name);
+
+    boolean existsBySdaHosting(String sdaHosting);
 }

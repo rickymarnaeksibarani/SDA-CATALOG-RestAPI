@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
@@ -36,6 +37,10 @@ public class SDAHostingEntity {
 
     @Column(name = "sda_hosting")
     private String sdaHosting;
+
+    @Column(name = "sdaHosting_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MasterDataStatus sdaHostingStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")
