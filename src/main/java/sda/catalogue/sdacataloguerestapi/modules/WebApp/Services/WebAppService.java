@@ -184,23 +184,36 @@ public class WebAppService extends BaseController {
             data.setWebServerList(webServerData);
 
 
-            //Path File
-            if (apkPath != null) {
-                data.setFileAndroid(String.valueOf(apkPath));
-            }
-            if (ipaPath != null) {
-                data.setFileIpa(String.valueOf(ipaPath));
-            }
-            if (manifestPath != null) {
-                data.setFileManifest(String.valueOf(manifestPath));
-            }
+//            //Path File
+//            if (apkPath != null) {
+//                data.setFileAndroid(String.valueOf(apkPath));
+//            }
+//            if (ipaPath != null) {
+//                data.setFileIpa(String.valueOf(ipaPath));
+//            }
+//            if (manifestPath != null) {
+//                data.setFileManifest(String.valueOf(manifestPath));
+//            }
+
+            //App fie Process
+            String ipa = uploadFileApp(request.getFileIpa(), "ipa");
+            String android = uploadFileApp(request.getFileAndroid(), "android");
+            String manifest = uploadFileApp(request.getFileManifest(), "manifest");
+
+            List<String> filePaths = new ArrayList<>();
+            filePaths.add(ipa);
+            filePaths.add(android);
+            filePaths.add(manifest);
+
+            //Documentation process
+            List<String> documentPaths = uploadDocument(request.getDocumentation());
 
             WebAppEntity result = webAppRepository.save(data);
 
-            //Document Process
-            if (request.getDocumentUploadList() != null) {
-                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
-            }
+//            //Document Process
+//            if (request.getDocumentUploadList() != null) {
+//                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+//            }
 
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
@@ -251,6 +264,8 @@ public class WebAppService extends BaseController {
             return result;
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -45,12 +45,12 @@ public class PICDeveloperController {
     }
 
     //Getting data PIC Developer by UUID
-    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getPICDeveloperByUuid(
-            @PathVariable("uuid") UUID uuid
+    @GetMapping(value = "/{id_pic_developer}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getPicDeveloperById(
+            @PathVariable("id_pic_developer") Long id_pic_developer
     ) {
         try {
-            PICDeveloperEntity result = picDeveloperService.getPICDeveloperByUUID(uuid);
+            PICDeveloperEntity result = picDeveloperService.getPICDeveloperByUUID(id_pic_developer);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -93,9 +93,9 @@ public class PICDeveloperController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            PICDeveloperEntity result = picDeveloperService.deletePICDeveloperByUuid(uuid);
-            ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success deleted data pic developer!", result);
-            return new ResponseEntity<>(response, response.getStatus());
+            picDeveloperService.deletePICDeveloper(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data back end!", "DELETED");
+           return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }

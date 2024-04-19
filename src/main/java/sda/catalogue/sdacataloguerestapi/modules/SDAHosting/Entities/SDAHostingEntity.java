@@ -45,6 +45,9 @@ public class SDAHostingEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "sdaHostingEntity")
+    private List<WebAppEntity> sdaHostingEntities;
+
     public class FormattedSDAHostingEntity{
         private long idSDAHosting;
         private String sdaHosting;

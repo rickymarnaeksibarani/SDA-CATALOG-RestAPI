@@ -5,15 +5,13 @@ logging:
       springframework:
         web: INFO
         security: DEBUG
+
 spring:
-  application:
-    name: th-sdacatalog-service
-    version: 1.0.0
   frontend: "*"
   datasource:
     driver-class-name: org.postgresql.Driver
-    # url: jdbc:postgresql://localhost:5432/db_sda_catalog?stringtype=unspecified
-    url: jdbc:postgresql://172.16.41.107:5151/sda_catalog?stringtype=unspecified
+    url: jdbc:postgresql://localhost:5432/db_sda_catalog?stringtype=unspecified
+    #      url: jdbc:postgresql://172.16.41.107:5151/sda_catalog?stringtype=unspecified
     username: sda_catalog
     password: sd4_c4t4l0g
   #      username: user
@@ -23,8 +21,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
-      # ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
