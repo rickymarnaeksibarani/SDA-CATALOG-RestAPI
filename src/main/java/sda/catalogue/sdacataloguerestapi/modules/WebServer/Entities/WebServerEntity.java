@@ -34,8 +34,8 @@ public class WebServerEntity {
     @Column(name = "web_server")
     private String webServer;
 
-//    @Column(name = "web_service_status", nullable = false)
-//    private MasterDataStatus webServiceStatus;
+    @Column(name = "web_server_status", nullable = false)
+    private MasterDataStatus webServerStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")
