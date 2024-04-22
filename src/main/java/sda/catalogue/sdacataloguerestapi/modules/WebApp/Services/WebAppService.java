@@ -215,7 +215,7 @@ public class WebAppService extends BaseController {
             filePaths.add(android);
             filePaths.add(manifest);
 
-//            //Documentation process
+            //Documentation process
             List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
@@ -271,7 +271,7 @@ public class WebAppService extends BaseController {
                     databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
                     databaseListData.add(databaseItem);
                 } else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Database with ID : " + databaseId.getIdTypeDatabase() + " not found");
+                    throw new CustomRequestException("Database with ID : " + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
                 }
             }
 

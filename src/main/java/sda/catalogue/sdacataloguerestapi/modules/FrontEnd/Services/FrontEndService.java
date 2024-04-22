@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
@@ -53,7 +54,7 @@ public class FrontEndService {
     public FrontEndEntity getFrontEndById(Long id_frontend) {
         FrontEndEntity result = frontEndRepository.findById(id_frontend).orElse(null);
         if (result == null) {
-            throw new CustomRequestException("ID" + id_frontend + " not found", HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ID" + id_frontend + " not found");
         }
         return result;
     }
@@ -62,7 +63,7 @@ public class FrontEndService {
     public FrontEndEntity createFrontEnd(FrontEndDTO request) {
         boolean existsByFrontEnd = frontEndRepository.existsByFrontEnd(request.getFrontEnd());
         if (existsByFrontEnd) {
-            throw new CustomRequestException("Front End already exists", HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Front End already exists");
         }
 
         FrontEndEntity data = new FrontEndEntity();
@@ -76,7 +77,7 @@ public class FrontEndService {
     @Transactional
     public FrontEndEntity updateFrontEnd(UUID uuid, FrontEndDTO request) {
         FrontEndEntity frontEnd = frontEndRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("FrontEnd does not exist", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "FrontEnd does not exist"));
 
         frontEnd.setFeStatus(request.getFeStatus());
         frontEnd.setFrontEnd(request.getFrontEnd());
@@ -87,7 +88,7 @@ public class FrontEndService {
     @Transactional
     public void deleteFrontEnd(UUID uuid) {
         FrontEndEntity findData = frontEndRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("FrontEnd does not exist", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "FrontEnd does not exist"));
 
         frontEndRepository.delete(findData);
     }
