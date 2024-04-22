@@ -1,7 +1,10 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -169,7 +172,7 @@ public class WebAppService extends BaseController {
                 findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
                 request.setSdaHosting(sdaHostingId);
             } else {
-                throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"SDA Hosting with ID : " + request.getSdaHosting() + " not found");
             }
 
             //WebApp Process
@@ -220,11 +223,6 @@ public class WebAppService extends BaseController {
 
             WebAppEntity result = webAppRepository.save(data);
 
-            //Document Process
-//            if (request.getDocumentUploadList() != null) {
-//                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
-//            }
-
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
             for (VersioningApplicationDTO versioningApplicationId : versioningApplicationList) {
@@ -264,7 +262,7 @@ public class WebAppService extends BaseController {
                     databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
                     databaseListData.add(databaseItem);
                 } else {
-                    throw new CustomRequestException("Database with ID : " + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Database with ID : " + databaseId.getIdTypeDatabase() + " not found");
                 }
             }
 
@@ -273,7 +271,7 @@ public class WebAppService extends BaseController {
             versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
         } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -336,13 +334,13 @@ public class WebAppService extends BaseController {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
-                throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
             }
 
             if (!findData.getApplicationName().equals(request.getApplicationName())){
                 WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
                 if (existingApp != null && !existingApp.getUuid().equals(uuid)){
-                    throw new CustomRequestException("Application name already exist", HttpStatus.CONFLICT);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,"Application name already exist");
                 }
             }
 
@@ -381,7 +379,7 @@ public class WebAppService extends BaseController {
             if (!findSdaHosting.isEmpty()){
                 findData.setSdaHostingEntity(findSdaHosting.get(0));
             }else {
-                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
 
 
@@ -445,7 +443,7 @@ public class WebAppService extends BaseController {
 
             return webAppRepository.save(findData);
         } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
     }
 
