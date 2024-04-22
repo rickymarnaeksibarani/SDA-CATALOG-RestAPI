@@ -10,8 +10,12 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
+import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
+import java.awt.font.TextHitInfo;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,8 +38,9 @@ public class SDAHostingEntity {
     @Column(name = "sda_hosting")
     private String sdaHosting;
 
-//    @Column(name = "hosting_status", nullable = false)
-//    private MasterDataStatus hostingStatus;
+    @Column(name = "sdaHosting_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MasterDataStatus sdaHostingStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -44,6 +49,9 @@ public class SDAHostingEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "sdaHostingEntity")
+    private List<WebAppEntity> sdaHostingEntities;
 
     public class FormattedSDAHostingEntity{
         private long idSDAHosting;

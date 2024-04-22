@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,6 +36,10 @@ public class PICDeveloperEntity {
 
     @Column(name = "personal_name")
     private String personalName;
+
+    @Column(name = "picDeveloper_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MasterDataStatus picDeveloperStatus;
 
     @CreationTimestamp
     @Column(name = "created_at")

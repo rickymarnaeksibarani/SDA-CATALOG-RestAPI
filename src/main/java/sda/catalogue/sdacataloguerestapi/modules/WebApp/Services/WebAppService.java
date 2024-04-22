@@ -1,10 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
@@ -117,7 +115,7 @@ public class WebAppService extends BaseController {
                                      List<ApiDTO> apiList) {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
-                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
             }
             //File Android Process
             Path apkPath = null;
@@ -184,23 +182,48 @@ public class WebAppService extends BaseController {
             data.setWebServerList(webServerData);
 
 
-            //Path File
-            if (apkPath != null) {
-                data.setFileAndroid(String.valueOf(apkPath));
+//            //Path File
+//            if (apkPath != null) {
+//                data.setFileAndroid(String.valueOf(apkPath));
+//            }
+//            if (ipaPath != null) {
+//                data.setFileIpa(String.valueOf(ipaPath));
+//            }
+//            if (manifestPath != null) {
+//                data.setFileManifest(String.valueOf(manifestPath));
+//            }
+
+            //App fie Process
+            String ipa = uploadFileApp(request.getFileIpa(), "ipa");
+            String android = uploadFileApp(request.getFileAndroid(), "android");
+            String manifest = uploadFileApp(request.getFileManifest(), "manifest");
+
+            List<String> filePaths = new ArrayList<>();
+            filePaths.add(ipa);
+            filePaths.add(android);
+            filePaths.add(manifest);
+
+//            //Documentation process
+            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+
+            if (documentPaths != null){
+                documentPaths.stream().forEach(path -> {
+                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                    documentUploadEntity.setPath(path);
+                    documentUploadEntity.setWebAppEntity(data);
+                    documentUploadEntities.add(documentUploadEntity);
+                });
             }
-            if (ipaPath != null) {
-                data.setFileIpa(String.valueOf(ipaPath));
-            }
-            if (manifestPath != null) {
-                data.setFileManifest(String.valueOf(manifestPath));
-            }
+            log.info("doc = {}",documentUploadEntities);
+            data.setDocumentUploadList(documentUploadEntities);
 
             WebAppEntity result = webAppRepository.save(data);
 
             //Document Process
-            if (request.getDocumentUploadList() != null) {
-                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
-            }
+//            if (request.getDocumentUploadList() != null) {
+//                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
+//            }
 
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
@@ -251,6 +274,8 @@ public class WebAppService extends BaseController {
             return result;
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -292,23 +317,6 @@ public class WebAppService extends BaseController {
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
         WebAppEntity result = webAppRepository.findById(id_webapp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
-
-        List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
-        List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode sdaHostingArray = mapper.createArrayNode();
-        for (SDAHostingEntity sdaHosting : sdaHostingList) {
-            ObjectNode hostingNode = mapper.createObjectNode();
-            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
-            hostingNode.put("uuid", sdaHosting.getUuid().toString());
-            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
-            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
-            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
-            sdaHostingArray.add(hostingNode);
-        }
-
-        result.setSdaHosting(sdaHostingArray.toString());
-
         return result;
     }
 
@@ -368,9 +376,10 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
             }
 
+//            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
-                findData.setSdaHosting(findSdaHosting.toString());
+                findData.setSdaHostingEntity(findSdaHosting.get(0));
             }else {
                 throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
             }
@@ -434,7 +443,7 @@ public class WebAppService extends BaseController {
 
             webAppRepository.save(findData);
 
-            return webAppRepository.findByUuid(uuid);
+            return webAppRepository.save(findData);
         } catch (IOException e) {
             throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }
@@ -452,7 +461,7 @@ public class WebAppService extends BaseController {
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
-   }
+    }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {

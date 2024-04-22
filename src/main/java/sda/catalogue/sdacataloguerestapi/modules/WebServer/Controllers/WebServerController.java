@@ -42,12 +42,12 @@ public class WebServerController {
         }
     }
 
-    @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBackendByUuid(
-            @PathVariable("uuid") UUID uuid
+    @GetMapping(value = "/{id_web_server}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getWebServerById(
+            @PathVariable("id_web_server")Long id_web_server
     ) {
         try {
-            WebServerEntity result = webServerService.getWebServerByUuid(uuid);
+            WebServerEntity result = webServerService.getWebServerById(id_web_server);
             ApiResponse<WebServerEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data web server!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -56,7 +56,7 @@ public class WebServerController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createBackEnd(
+    public ResponseEntity<?> createWebServer(
             @Valid @RequestBody WebServerDTO request
     ) {
         try {
@@ -69,7 +69,7 @@ public class WebServerController {
     }
 
     @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateBackEnd(
+    public ResponseEntity<?> updateWebServer(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody WebServerDTO request
     ) {
@@ -87,8 +87,8 @@ public class WebServerController {
             @PathVariable("uuid") UUID uuid
     ) {
         try {
-            WebServerEntity result = webServerService.deleteWebServer(uuid);
-            ApiResponse<WebServerEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data web server!", result);
+            webServerService.deleteWebServer(uuid);
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data", "DELETED");
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());

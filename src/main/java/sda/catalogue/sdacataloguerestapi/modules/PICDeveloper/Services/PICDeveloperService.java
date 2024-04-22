@@ -37,49 +37,46 @@ public class PICDeveloperService {
         return new PaginationUtil<>(pagedResult, PICDeveloperEntity.class);
     }
 
-    //Getting data PIC Developer by UUID
-    public PICDeveloperEntity getPICDeveloperByUUID(UUID uuid) {
-        PICDeveloperEntity result = pICDeveloperRepository.findByUuid(uuid);
-        if (result == null) {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+    //Getting data PIC Developer by ID
+    public PICDeveloperEntity getPICDeveloperByUUID(Long id_pic_developer) {
+        PICDeveloperEntity result = pICDeveloperRepository.findById(id_pic_developer).orElse(null);
+        if (result == null){
+            throw new CustomRequestException("ID" + id_pic_developer + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
 
     //Creating data PIC Developer
     public PICDeveloperEntity createPICDeveloper(PICDeveloperDTO request) {
+        boolean existsByPicDeveloper = pICDeveloperRepository.existsByPICDeveloper(request.getPersonalName());
+        if (existsByPicDeveloper){
+            throw new CustomRequestException("PIC Developer already exists", HttpStatus.CONFLICT);
+        }
+
         PICDeveloperEntity data = new PICDeveloperEntity();
         data.setPersonalName(request.getPersonalName());
         data.setPersonalNumber(request.getPersonalNumber());
+        data.setPicDeveloperStatus(request.getPicDeveloperStatus());
         return pICDeveloperRepository.save(data);
     }
 
     //Updating data PIC Developer By UUID
     @Transactional
     public PICDeveloperEntity updatePICDeveloper(UUID uuid, PICDeveloperDTO request) {
-        int result = pICDeveloperRepository.findByUuidAndUpdate(
-                uuid,
-                request.getPersonalName(),
-                request.getPersonalNumber()
-        );
-        if (result > 0) {
-            return pICDeveloperRepository.findByUuid(uuid);
-        } else {
-            throw new CustomRequestException("uuid " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+        PICDeveloperEntity picDeveloper = pICDeveloperRepository.findByUuid(uuid)
+                .orElseThrow(()-> new CustomRequestException("PIC Developer does not exists", HttpStatus.CONFLICT));
+        picDeveloper.setPicDeveloperStatus(request.getPicDeveloperStatus());
+        picDeveloper.setPersonalNumber(request.getPersonalNumber());
+        picDeveloper.setPersonalName(request.getPersonalName());
+        return pICDeveloperRepository.save(picDeveloper);
     }
 
 
     //Deleting data PIC Developer By UUID
     @Transactional
-    public PICDeveloperEntity deletePICDeveloperByUuid(UUID uuid) {
-        PICDeveloperEntity findData = pICDeveloperRepository.findByUuid(uuid);
-        int result = pICDeveloperRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deletePICDeveloper(UUID uuid){
+        PICDeveloperEntity findData = pICDeveloperRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("PIC Developer does not exist", HttpStatus.NOT_FOUND));
+        pICDeveloperRepository.delete(findData);
     }
-
 }
