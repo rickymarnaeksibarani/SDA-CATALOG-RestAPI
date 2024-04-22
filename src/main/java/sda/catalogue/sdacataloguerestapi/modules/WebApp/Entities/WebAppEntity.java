@@ -158,12 +158,13 @@ public class WebAppEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_sda_hosting")
-    @JsonIgnoreProperties("sdaHostingEntities")
+    @JsonIgnoreProperties("sdaHostingEntity")
     private SDAHostingEntity sdaHostingEntity;
 
 //    @Column(name = "sda_hosting_id", columnDefinition = "json")
 //    private String sdaHosting;
 
+    @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity")
     private List<DocumentUploadEntity> documentUploadList;
 

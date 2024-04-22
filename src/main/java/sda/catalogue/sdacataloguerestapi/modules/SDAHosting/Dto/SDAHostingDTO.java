@@ -30,7 +30,6 @@ public class SDAHostingDTO {
     @JsonProperty("sdaHosting")
     private String sdaHosting;
 
-    @NotNull
     private MasterDataStatus sdaHostingStatus;
 
     @JsonProperty("createdAt")

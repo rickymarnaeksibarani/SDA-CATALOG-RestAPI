@@ -38,7 +38,7 @@ public class SDAHostingEntity {
     @Column(name = "sda_hosting")
     private String sdaHosting;
 
-    @Column(name = "sdaHosting_status", nullable = false)
+    @Column(name = "sdaHosting_status")
     @Enumerated(EnumType.STRING)
     private MasterDataStatus sdaHostingStatus;
 
