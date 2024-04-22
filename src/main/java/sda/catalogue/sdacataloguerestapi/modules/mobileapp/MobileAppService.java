@@ -342,8 +342,9 @@ public class MobileAppService {
                     }
                 }
             });
+
+            storageService.deleteAllFileS3(docList);
         }
-        storageService.deleteAllFileS3(docList);
 
         // Remove old files
         List appFilePath = objectMapper.readValue(data.get().getApplicationFile(), List.class);

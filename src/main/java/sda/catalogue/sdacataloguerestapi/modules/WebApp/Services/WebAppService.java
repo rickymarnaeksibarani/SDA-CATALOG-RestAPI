@@ -1,10 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
@@ -117,7 +115,7 @@ public class WebAppService extends BaseController {
                                      List<ApiDTO> apiList) {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
-                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
             }
             //File Android Process
             Path apkPath = null;
@@ -205,12 +203,24 @@ public class WebAppService extends BaseController {
             filePaths.add(android);
             filePaths.add(manifest);
 
-            //Documentation process
-            List<String> documentPaths = uploadDocument(request.getDocumentation());
+//            //Documentation process
+            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+
+            if (documentPaths != null){
+                documentPaths.stream().forEach(path -> {
+                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                    documentUploadEntity.setPath(path);
+                    documentUploadEntity.setWebAppEntity(data);
+                    documentUploadEntities.add(documentUploadEntity);
+                });
+            }
+            log.info("doc = {}",documentUploadEntities);
+            data.setDocumentUploadList(documentUploadEntities);
 
             WebAppEntity result = webAppRepository.save(data);
 
-//            //Document Process
+            //Document Process
 //            if (request.getDocumentUploadList() != null) {
 //                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
 //            }
@@ -451,7 +461,7 @@ public class WebAppService extends BaseController {
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
-   }
+    }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {
