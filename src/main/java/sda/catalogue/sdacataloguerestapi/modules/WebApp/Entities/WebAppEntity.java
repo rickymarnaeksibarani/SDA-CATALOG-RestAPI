@@ -21,6 +21,7 @@ import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.Documen
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
@@ -114,6 +115,14 @@ public class WebAppEntity {
             inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
     )
     private List<PICDeveloperEntity> picDeveloperList;
+
+    @ManyToMany
+    @JoinTable(
+            name = "webapp_pic_analyst",
+            joinColumns = @JoinColumn(name = "id_webapp"),
+            inverseJoinColumns = @JoinColumn(name = "id_pic_analyst")
+    )
+    private List<PICAnalystEntity> picAnalystList;
 
     @ManyToMany
     @JoinTable(

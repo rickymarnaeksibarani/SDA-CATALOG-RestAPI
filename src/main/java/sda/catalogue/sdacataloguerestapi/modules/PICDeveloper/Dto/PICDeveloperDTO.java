@@ -31,9 +31,6 @@ public class PICDeveloperDTO {
     @JsonProperty("personalName")
     private String personalName;
 
-    @NotNull
-    private MasterDataStatus picDeveloperStatus;
-
     @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 

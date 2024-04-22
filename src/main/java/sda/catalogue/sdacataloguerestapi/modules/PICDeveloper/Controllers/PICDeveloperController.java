@@ -94,7 +94,7 @@ public class PICDeveloperController {
     ) {
         try {
             picDeveloperService.deletePICDeveloper(uuid);
-            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data back end!", "DELETED");
+            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data pic developer!", "DELETED");
            return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
