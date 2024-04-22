@@ -56,7 +56,6 @@ public class PICDeveloperService {
         PICDeveloperEntity data = new PICDeveloperEntity();
         data.setPersonalName(request.getPersonalName());
         data.setPersonalNumber(request.getPersonalNumber());
-        data.setPicDeveloperStatus(request.getPicDeveloperStatus());
         return pICDeveloperRepository.save(data);
     }
 
@@ -65,7 +64,6 @@ public class PICDeveloperService {
     public PICDeveloperEntity updatePICDeveloper(UUID uuid, PICDeveloperDTO request) {
         PICDeveloperEntity picDeveloper = pICDeveloperRepository.findByUuid(uuid)
                 .orElseThrow(()-> new CustomRequestException("PIC Developer does not exists", HttpStatus.CONFLICT));
-        picDeveloper.setPicDeveloperStatus(request.getPicDeveloperStatus());
         picDeveloper.setPersonalNumber(request.getPersonalNumber());
         picDeveloper.setPersonalName(request.getPersonalName());
         return pICDeveloperRepository.save(picDeveloper);

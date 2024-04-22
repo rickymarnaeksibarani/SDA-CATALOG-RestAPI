@@ -37,10 +37,6 @@ public class PICDeveloperEntity {
     @Column(name = "personal_name")
     private String personalName;
 
-    @Column(name = "picDeveloper_status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MasterDataStatus picDeveloperStatus;
-
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
