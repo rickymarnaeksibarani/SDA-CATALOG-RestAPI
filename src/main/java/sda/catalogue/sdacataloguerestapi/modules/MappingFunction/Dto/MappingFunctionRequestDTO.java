@@ -13,6 +13,7 @@ public class MappingFunctionRequestDTO {
     private Integer page;
 
     private Integer size;
+    private String  searchTerm;
 
     MappingFunctionRequestDTO() {
         if(this.getPage() == null) {

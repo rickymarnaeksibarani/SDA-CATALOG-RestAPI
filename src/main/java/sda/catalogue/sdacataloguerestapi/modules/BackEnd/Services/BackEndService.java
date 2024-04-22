@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.BackEnd.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Dto.BackEndRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,9 +29,20 @@ public class BackEndService {
 
     //Getting data Backend with pagination
     public PaginationUtil<BackEndEntity, BackEndEntity> getAllBackendByPagination(BackEndRequestDTO searchRequest) {
+        Specification<BackEndEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.like(builder.upper(root.get("backEnd")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<BackEndEntity> specs = Specification.where(null);
-        Page<BackEndEntity> pagedResult = backendRepository.findAll(specs, paging);
+        Page<BackEndEntity> pagedResult = backendRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, BackEndEntity.class);
     }
 

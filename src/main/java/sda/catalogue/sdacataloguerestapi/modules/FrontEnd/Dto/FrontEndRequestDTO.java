@@ -10,6 +10,8 @@ import java.util.UUID;
 public class FrontEndRequestDTO {
     private Integer page;
     private Integer size;
+    private String searchTerm;
+
     FrontEndRequestDTO() {
         if(this.getPage() == null) {
             this.page = 1;

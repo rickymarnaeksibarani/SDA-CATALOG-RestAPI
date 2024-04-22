@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +42,20 @@ public class MappingFunctionService {
 
     //Getting data Mapping Function with search and pagination
     public PaginationUtil<MappingFunctionEntity, MappingFunctionEntity> getAllMappingFunctionByPagination(MappingFunctionRequestDTO searchRequest) {
+        Specification<MappingFunctionEntity> spec =  (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.like(builder.upper(root.get("mappingFunction")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<MappingFunctionEntity> specs = Specification.where(null);
-        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(specs, paging);
+        Page<MappingFunctionEntity> pagedResult = mappingFunctionRepository.findAll(spec, paging);
         return new PaginationUtil<>(pagedResult, MappingFunctionEntity.class);
     }
 

@@ -7,6 +7,7 @@ public class PICDeveloperRequestDTO {
     private Integer page;
 
     private Integer size;
+    private String searchTerm;
 
     PICDeveloperRequestDTO() {
         if(this.getPage() == null) {

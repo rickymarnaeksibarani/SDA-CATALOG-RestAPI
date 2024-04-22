@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebServer.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerRequestD
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,9 +32,20 @@ public class WebServerService {
 
     //Getting data Web Server with search and pagination
     public PaginationUtil<WebServerEntity, WebServerEntity> getAllWebServerByPagination(WebServerRequestDTO searchRequest) {
+        Specification<WebServerEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.like(builder.upper(root.get("webServer")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<WebServerEntity> specs = Specification.where(null);
-        Page<WebServerEntity> pagedResult = webServerRepository.findAll(specs, paging);
+        Page<WebServerEntity> pagedResult = webServerRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, WebServerEntity.class);
     }
 
