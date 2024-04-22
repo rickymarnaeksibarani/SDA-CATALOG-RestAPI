@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDe
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,9 +33,23 @@ public class PICDeveloperService {
 
     //Getting data PIC Developer with search and pagination
     public PaginationUtil<PICDeveloperEntity, PICDeveloperEntity> getAllPICDeveloperByPagination(PICDeveloperRequestDTO searchRequest) {
+        Specification<PICDeveloperEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.or(
+                            builder.like(builder.upper(root.get("personalName")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%"),
+                            builder.like(builder.upper(root.get("personalNumber")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                        )
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<PICDeveloperEntity> specs = Specification.where(null);
-        Page<PICDeveloperEntity> pagedResult = pICDeveloperRepository.findAll(specs, paging);
+        Page<PICDeveloperEntity> pagedResult = pICDeveloperRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, PICDeveloperEntity.class);
     }
 

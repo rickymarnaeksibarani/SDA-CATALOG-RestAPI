@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,11 +12,13 @@ import org.springframework.stereotype.Service;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Dto.SDAHostingRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +31,20 @@ public class SDAHostingService {
 
     //Getting data PIC Developer with search and pagination
     public PaginationUtil<SDAHostingEntity, SDAHostingEntity> getAllSDAHostingByPagination(SDAHostingRequestDTO searchRequest) {
+        Specification<SDAHostingEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.like(builder.upper(root.get("sdaHosting")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage()-1, searchRequest.getSize());
-        Specification<SDAHostingEntity> specs = Specification.where(null);
-        Page<SDAHostingEntity> pagedResult = sdaHostingRepository.findAll(specs, paging);
+        Page<SDAHostingEntity> pagedResult = sdaHostingRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, SDAHostingEntity.class);
     }
 
