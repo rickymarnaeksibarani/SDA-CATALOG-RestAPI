@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class BaseController {
             if (findData.isPresent()) {
                 dataList.add(mapper.apply(findData.get()));
             } else {
-                throw new CustomRequestException(entityName + " with ID :" + entityId + " not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, entityName + " with ID :" + entityId + " not found");
             }
         }
         return dataList;

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
@@ -41,7 +42,7 @@ public class PICDeveloperService {
     public PICDeveloperEntity getPICDeveloperByUUID(Long id_pic_developer) {
         PICDeveloperEntity result = pICDeveloperRepository.findById(id_pic_developer).orElse(null);
         if (result == null){
-            throw new CustomRequestException("ID" + id_pic_developer + " not found", HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"ID" + id_pic_developer + " not found");
         }
         return result;
     }
@@ -50,7 +51,7 @@ public class PICDeveloperService {
     public PICDeveloperEntity createPICDeveloper(PICDeveloperDTO request) {
         boolean existsByPicDeveloper = pICDeveloperRepository.existsByPICDeveloper(request.getPersonalName());
         if (existsByPicDeveloper){
-            throw new CustomRequestException("PIC Developer already exists", HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "PIC Developer already exists");
         }
 
         PICDeveloperEntity data = new PICDeveloperEntity();
@@ -63,7 +64,7 @@ public class PICDeveloperService {
     @Transactional
     public PICDeveloperEntity updatePICDeveloper(UUID uuid, PICDeveloperDTO request) {
         PICDeveloperEntity picDeveloper = pICDeveloperRepository.findByUuid(uuid)
-                .orElseThrow(()-> new CustomRequestException("PIC Developer does not exists", HttpStatus.CONFLICT));
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.CONFLICT, "PIC Developer does not exists"));
         picDeveloper.setPersonalNumber(request.getPersonalNumber());
         picDeveloper.setPersonalName(request.getPersonalName());
         return pICDeveloperRepository.save(picDeveloper);
@@ -74,7 +75,7 @@ public class PICDeveloperService {
     @Transactional
     public void deletePICDeveloper(UUID uuid){
         PICDeveloperEntity findData = pICDeveloperRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("PIC Developer does not exist", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer does not exist"));
         pICDeveloperRepository.delete(findData);
     }
 }
