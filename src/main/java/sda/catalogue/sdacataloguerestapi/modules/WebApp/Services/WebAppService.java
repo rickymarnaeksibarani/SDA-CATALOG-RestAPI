@@ -28,11 +28,14 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -72,6 +75,8 @@ public class WebAppService extends BaseController {
     @Autowired
     private PICDeveloperRepository picDeveloperRepository;
     @Autowired
+    private PICAnalystRepository picAnalystRepository;
+    @Autowired
     private MappingFunctionRepository mappingFunctionRepository;
     @Autowired
     private FrontEndRepository frontEndRepository;
@@ -108,6 +113,7 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request,
                                      List<Long> picDeveloperList,
+                                     List<Long> picAnalystList,
                                      List<Long> mappingFunctionList,
                                      List<Long> frontEndList,
                                      List<Long> backEndList,
@@ -117,7 +123,7 @@ public class WebAppService extends BaseController {
                                      List<ApiDTO> apiList) {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
-                throw new CustomRequestException("Application name already exists", HttpStatus.CONFLICT);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
             }
             //File Android Process
             Path apkPath = null;
@@ -152,6 +158,9 @@ public class WebAppService extends BaseController {
             //PIC Developer Process
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
 
+            //PIC Analyst Process
+            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
+
             //Mapping Function Process
             List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunctionList, mappingFunctionRepository, Function.identity(), "Mapping Function");
 
@@ -171,36 +180,57 @@ public class WebAppService extends BaseController {
                 findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
                 request.setSdaHosting(sdaHostingId);
             } else {
-                throw new CustomRequestException("SDA Hosting with ID : " + request.getSdaHosting() + " not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"SDA Hosting with ID : " + request.getSdaHosting() + " not found");
             }
 
             //WebApp Process
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
 
             data.setPicDeveloperList(picDeveloperData);
+            data.setPicAnalystList(picAnalystData);
             data.setMappingFunctionList(mappingFunctionData);
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
 
 
-            //Path File
-            if (apkPath != null) {
-                data.setFileAndroid(String.valueOf(apkPath));
+//            //Path File
+//            if (apkPath != null) {
+//                data.setFileAndroid(String.valueOf(apkPath));
+//            }
+//            if (ipaPath != null) {
+//                data.setFileIpa(String.valueOf(ipaPath));
+//            }
+//            if (manifestPath != null) {
+//                data.setFileManifest(String.valueOf(manifestPath));
+//            }
+
+            //App fie Process
+            String ipa = uploadFileApp(request.getFileIpa(), "ipa");
+            String android = uploadFileApp(request.getFileAndroid(), "android");
+            String manifest = uploadFileApp(request.getFileManifest(), "manifest");
+
+            List<String> filePaths = new ArrayList<>();
+            filePaths.add(ipa);
+            filePaths.add(android);
+            filePaths.add(manifest);
+
+//            //Documentation process
+            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+
+            if (documentPaths != null){
+                documentPaths.stream().forEach(path -> {
+                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                    documentUploadEntity.setPath(path);
+                    documentUploadEntity.setWebAppEntity(data);
+                    documentUploadEntities.add(documentUploadEntity);
+                });
             }
-            if (ipaPath != null) {
-                data.setFileIpa(String.valueOf(ipaPath));
-            }
-            if (manifestPath != null) {
-                data.setFileManifest(String.valueOf(manifestPath));
-            }
+            log.info("doc = {}",documentUploadEntities);
+            data.setDocumentUploadList(documentUploadEntities);
 
             WebAppEntity result = webAppRepository.save(data);
-
-            //Document Process
-            if (request.getDocumentUploadList() != null) {
-                documentUploadService.createDocumentUpload(request.getDocumentUploadList(), result.getIdWebapp());
-            }
 
             //Versioning Application Process
             List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
@@ -241,7 +271,7 @@ public class WebAppService extends BaseController {
                     databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
                     databaseListData.add(databaseItem);
                 } else {
-                    throw new CustomRequestException("Database with ID : " + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Database with ID : " + databaseId.getIdTypeDatabase() + " not found");
                 }
             }
 
@@ -250,7 +280,9 @@ public class WebAppService extends BaseController {
             versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
         } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -292,23 +324,6 @@ public class WebAppService extends BaseController {
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
         WebAppEntity result = webAppRepository.findById(id_webapp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
-
-        List<Long> sdaHostingId = objectMapper.readValue(result.getSdaHosting(), new TypeReference<>() {});
-        List<SDAHostingEntity> sdaHostingList = sdaHostingRepository.findByIdSDAHostingIsIn(sdaHostingId);
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode sdaHostingArray = mapper.createArrayNode();
-        for (SDAHostingEntity sdaHosting : sdaHostingList) {
-            ObjectNode hostingNode = mapper.createObjectNode();
-            hostingNode.put("idSdaHosting", sdaHosting.getIdSDAHosting());
-            hostingNode.put("uuid", sdaHosting.getUuid().toString());
-            hostingNode.put("sdaHosting", sdaHosting.getSdaHosting());
-            hostingNode.put("createdAt", sdaHosting.getCreatedAt().toString());
-            hostingNode.put("updatedAt", sdaHosting.getUpdatedAt().toString());
-            sdaHostingArray.add(hostingNode);
-        }
-
-        result.setSdaHosting(sdaHostingArray.toString());
-
         return result;
     }
 
@@ -316,6 +331,7 @@ public class WebAppService extends BaseController {
     public WebAppEntity updateWebAppByUuid(UUID uuid,
                                            WebAppPostDTO request,
                                            List<Long> picDeveloperList,
+                                           List<Long> picAnalystList,
                                            List<Long> mappingFunctionList,
                                            List<Long> frontEndList,
                                            List<Long> backEndList,
@@ -328,13 +344,13 @@ public class WebAppService extends BaseController {
         try {
             WebAppEntity findData = webAppRepository.findByUuid(uuid);
             if (findData == null) {
-                throw new CustomRequestException("WebApp with UUID : " + uuid + " not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
             }
 
             if (!findData.getApplicationName().equals(request.getApplicationName())){
                 WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
                 if (existingApp != null && !existingApp.getUuid().equals(uuid)){
-                    throw new CustomRequestException("Application name already exist", HttpStatus.CONFLICT);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,"Application name already exist");
                 }
             }
 
@@ -348,6 +364,12 @@ public class WebAppService extends BaseController {
             if (picDeveloper.isEmpty()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
             }
+
+            List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
+            if (picAnalyst.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
+            }
+
             List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
             if (mappingFunction.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
@@ -368,11 +390,12 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
             }
 
+//            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()){
-                findData.setSdaHosting(findSdaHosting.toString());
+                findData.setSdaHostingEntity(findSdaHosting.get(0));
             }else {
-                throw new CustomRequestException("sda hosting with IDs not found", HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
 
 
@@ -424,6 +447,7 @@ public class WebAppService extends BaseController {
             findData.setIpDatabase(request.getIpDatabase());
             findData.setPmoNumber(request.getPmoNumber());
             findData.setPicDeveloperList(picDeveloper);
+            findData.setPicAnalystList(picAnalyst);
             findData.setMappingFunctionList(mappingFunction);
             findData.setFrontEndList(frontEnd);
             findData.setBackEndList(backEnd);
@@ -434,9 +458,9 @@ public class WebAppService extends BaseController {
 
             webAppRepository.save(findData);
 
-            return webAppRepository.findByUuid(uuid);
+            return webAppRepository.save(findData);
         } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         }
     }
 
@@ -452,7 +476,7 @@ public class WebAppService extends BaseController {
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
-   }
+    }
 
     private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
         try {

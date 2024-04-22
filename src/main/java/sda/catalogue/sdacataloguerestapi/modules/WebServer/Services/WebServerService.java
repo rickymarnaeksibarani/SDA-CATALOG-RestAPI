@@ -49,35 +49,38 @@ public class WebServerService {
         return new PaginationUtil<>(pagedResult, WebServerEntity.class);
     }
 
-    public WebServerEntity getWebServerByUuid(UUID uuid) {
-        return webServerRepository.findByUuid(uuid);
+    public WebServerEntity getWebServerById(Long id_web_server) {
+        WebServerEntity result = webServerRepository.findById(id_web_server).orElse(null);
+        if (result == null) {
+            throw new CustomRequestException("ID " + id_web_server + "not found", HttpStatus.NOT_FOUND);
+        }
+        return result;
     }
 
     public WebServerEntity createWebServer(WebServerDTO request) {
+        boolean existsByWebServer = webServerRepository.existsByWebServer(request.getWebServer());
+        if (existsByWebServer){
+            throw new CustomRequestException("Web Server already exists", HttpStatus.CONFLICT);
+        }
         WebServerEntity data = new WebServerEntity();
+        data.setWebServerStatus(request.getWebServerStatus());
         data.setWebServer(request.getWebServer());
         return webServerRepository.save(data);
     }
 
     @Transactional
     public WebServerEntity updateWebServer(UUID uuid, WebServerDTO request) {
-        int result = webServerRepository.findByUuidAndUpdate(uuid, request.getWebServer());
-        WebServerEntity findData = webServerRepository.findByUuid(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+        WebServerEntity webServer = webServerRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("WEB Server does not exists", HttpStatus.CONFLICT));
+        webServer.setWebServer(request.getWebServer());
+        webServer.setWebServerStatus(request.getWebServerStatus());
+        return webServerRepository.save(webServer);
     }
 
     @Transactional
-    public WebServerEntity deleteWebServer(UUID uuid) {
-        WebServerEntity findData = webServerRepository.findByUuid(uuid);
-        int result = webServerRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deleteWebServer(UUID uuid) {
+        WebServerEntity findData = webServerRepository.findByUuid(uuid)
+                .orElseThrow(() -> new CustomRequestException("Web Server does not exist", HttpStatus.NOT_FOUND));
+        webServerRepository.delete(findData);
     }
 }

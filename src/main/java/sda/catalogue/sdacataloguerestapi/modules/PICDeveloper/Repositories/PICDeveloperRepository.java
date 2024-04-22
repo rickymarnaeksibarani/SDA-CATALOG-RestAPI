@@ -12,6 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -32,7 +33,7 @@ public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity
     long countBySearchTerm(String searchTerm);
 
     //Getting data PIC Developer by UUID
-    PICDeveloperEntity findByUuid(UUID uuid);
+    Optional<PICDeveloperEntity> findByUuid(UUID uuid);
 
     //Updating data PIC Developer by UUID
     @Modifying
@@ -56,6 +57,10 @@ public interface PICDeveloperRepository extends JpaRepository<PICDeveloperEntity
     List<PICDeveloperEntity> findByPersonalNameIsIn(Collection<String> name);
 
     List<PICDeveloperEntity> findByIdPicDeveloperIsIn(Collection<Long> id);
+
+    default boolean existsByPICDeveloper(String picDeveloper) {
+        return false;
+    }
 
 
 }

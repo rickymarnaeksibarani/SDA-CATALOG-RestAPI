@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.Documen
 import sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities.FeedbackEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
@@ -29,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Immutable
+//@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -116,6 +118,14 @@ public class WebAppEntity {
 
     @ManyToMany
     @JoinTable(
+            name = "webapp_pic_analyst",
+            joinColumns = @JoinColumn(name = "id_webapp"),
+            inverseJoinColumns = @JoinColumn(name = "id_pic_analyst")
+    )
+    private List<PICAnalystEntity> picAnalystList;
+
+    @ManyToMany
+    @JoinTable(
             name = "webapp_mapping_function",
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_mapping_function")
@@ -146,13 +156,13 @@ public class WebAppEntity {
     )
     private List<WebServerEntity> webServerList;
 
-//    @ManyToOne
-//    @JoinColumn(name = "id_sda_hosting")
-//    @JsonIgnoreProperties("sdaHostingEntities")
-//    private SDAHostingEntity sdaHostingEntity;
+    @ManyToOne
+    @JoinColumn(name = "id_sda_hosting")
+    @JsonIgnoreProperties("sdaHostingEntities")
+    private SDAHostingEntity sdaHostingEntity;
 
-    @Column(name = "sda_hosting_id", columnDefinition = "json")
-    private String sdaHosting;
+//    @Column(name = "sda_hosting_id", columnDefinition = "json")
+//    private String sdaHosting;
 
     @OneToMany(mappedBy = "webAppEntity")
     private List<DocumentUploadEntity> documentUploadList;

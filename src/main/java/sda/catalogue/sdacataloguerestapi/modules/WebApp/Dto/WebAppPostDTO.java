@@ -92,6 +92,9 @@ public class WebAppPostDTO {
     private List<String> picDeveloper;
 
     @JsonIgnore
+    private List<String> picAnalyst;
+
+    @JsonIgnore
     private List<String> mappingFunction;
 
     @JsonIgnore

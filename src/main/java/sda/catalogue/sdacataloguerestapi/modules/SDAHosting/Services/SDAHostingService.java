@@ -49,38 +49,39 @@ public class SDAHostingService {
     }
 
 
-    public SDAHostingEntity getSDAHostingByUuid(UUID uuid) {
-        SDAHostingEntity result = sdaHostingRepository.findByUuid(uuid);
+    public SDAHostingEntity getSDAHostingById(Long id_sda_hosting) {
+        SDAHostingEntity result = sdaHostingRepository.findById(id_sda_hosting).orElse(null);
         if (result == null) {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
+            throw new CustomRequestException("ID " + id_sda_hosting + " not found", HttpStatus.NOT_FOUND);
         }
         return result;
     }
 
     public SDAHostingEntity createSDAHosting(SDAHostingDTO request) {
+        boolean existsBySdaHosting = sdaHostingRepository.existsBySdaHosting(request.getSdaHosting());
+        if (existsBySdaHosting){
+            throw new CustomRequestException("SDA Hosting already exists", HttpStatus.CONFLICT);
+        }
         SDAHostingEntity data = new SDAHostingEntity();
+        data.setSdaHostingStatus(request.getSdaHostingStatus());
         data.setSdaHosting(request.getSdaHosting());
+        data.setSdaHostingEntities(request.getSdaHostingEntities());
         return sdaHostingRepository.save(data);
     }
 
     @Transactional
     public SDAHostingEntity updateSDAHosting(UUID uuid, SDAHostingDTO request) {
-        int result = sdaHostingRepository.findByUuidAndUpdate(uuid, request.getSdaHosting());
-        if (result > 0) {
-            return sdaHostingRepository.findByUuid(uuid);
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+        SDAHostingEntity sdaHosting = sdaHostingRepository.findByUuid(uuid)
+                .orElseThrow(()-> new CustomRequestException("PIC Developer does not exists", HttpStatus.CONFLICT));
+        sdaHosting.setSdaHosting(request.getSdaHosting());
+        sdaHosting.setSdaHostingStatus(request.getSdaHostingStatus());
+        sdaHosting.setSdaHostingEntities(request.getSdaHostingEntities());
+        return sdaHostingRepository.save(sdaHosting);
     }
 
     @Transactional
-    public SDAHostingEntity deleteSDAHosting(UUID uuid) {
-        SDAHostingEntity findData = sdaHostingRepository.findByUuid(uuid);
-        int result = sdaHostingRepository.findByUuidAndDelete(uuid);
-        if (result > 0) {
-            return findData;
-        } else {
-            throw new CustomRequestException("UUID " + uuid + " not found", HttpStatus.NOT_FOUND);
-        }
+    public void deleteSDAHosting(UUID uuid) {
+        SDAHostingEntity findData = sdaHostingRepository.findByUuid(uuid).orElseThrow(()->new CustomRequestException("SDA Hosting does not exist", HttpStatus.NOT_FOUND));
+        sdaHostingRepository.delete(findData);
     }
 }

@@ -12,6 +12,7 @@ import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEnt
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -26,7 +27,7 @@ public interface WebServerRepository extends JpaRepository<WebServerEntity, Long
             "WHERE LOWER(w.webServer) LIKE LOWER(CONCAT('%', :searchTerm,'%'))")
     long countBySearchTerm(String searchTerm);
 
-    WebServerEntity findByUuid(UUID uuid);
+    Optional <WebServerEntity> findByUuid(UUID uuid);
 
     @Modifying
     @Transactional
@@ -44,4 +45,6 @@ public interface WebServerRepository extends JpaRepository<WebServerEntity, Long
     int findByUuidAndDelete(UUID uuid);
 
     List<WebServerEntity> findByIdWebServerIsIn(Collection<Long> id);
+
+    boolean existsByWebServer(String webServer);
 }
