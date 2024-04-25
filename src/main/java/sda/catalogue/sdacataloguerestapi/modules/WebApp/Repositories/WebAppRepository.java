@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
+import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.List;
@@ -83,7 +84,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
 
     boolean existsByApplicationName(String applicationName);
 
-    Integer countAllByStatus(String status);
+    Integer countAllByStatus(Status status);
 
     @Query(value = """
             SELECT
