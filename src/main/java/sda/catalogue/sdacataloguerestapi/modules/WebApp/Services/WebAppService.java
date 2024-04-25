@@ -173,15 +173,13 @@ public class WebAppService extends BaseController {
             //Web Server Process
             List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
 
-            //SDA Hosting
-            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-            if (!findSdaHosting.isEmpty()) {
-                List<Long> sdaHostingId = new ArrayList<>();
-                findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
-                request.setSdaHosting(sdaHostingId);
-            } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"SDA Hosting with ID : " + request.getSdaHosting() + " not found");
-            }
+//            if (!findSdaHosting.isEmpty()) {
+//                List<Long> sdaHostingId = new ArrayList<>();
+//                findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
+//                request.setSdaHosting(sdaHostingId);
+//            } else {
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"SDA Hosting with ID : " + request.getSdaHosting() + " not found");
+//            }
 
             //WebApp Process
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
@@ -192,6 +190,16 @@ public class WebAppService extends BaseController {
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
             data.setWebServerList(webServerData);
+
+            //SDA Hosting
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+
+            if (!findSdaHosting.isEmpty()){
+                findSdaHosting.stream().forEach(data::setSdaHostingEntity);
+            }else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
+            }
+            log.info("findData {}", data.getSdaHostingEntity());
 
 
 //            //Path File
@@ -227,7 +235,6 @@ public class WebAppService extends BaseController {
                     documentUploadEntities.add(documentUploadEntity);
                 });
             }
-            log.info("doc = {}",documentUploadEntities);
             data.setDocumentUploadList(documentUploadEntities);
 
             WebAppEntity result = webAppRepository.save(data);
@@ -390,14 +397,14 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
             }
 
-//            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            log.info("sdaHosting = {}", findSdaHosting);
             if (!findSdaHosting.isEmpty()){
-                findData.setSdaHostingEntity(findSdaHosting.get(0));
+                findSdaHosting.stream().forEach(findData::setSdaHostingEntity);
             }else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
-
+            log.info("findData {}", findData.getSdaHostingEntity());
 
             Path apkPath;
             Path ipaPath;

@@ -2,6 +2,7 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+//import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 
@@ -42,7 +44,7 @@ public class WebAppEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_webapp")
-    private long idWebapp;
+    private Long idWebapp;
 
     @UuidGenerator
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -158,28 +160,35 @@ public class WebAppEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_sda_hosting")
-    @JsonIgnoreProperties("sdaHostingEntities")
+    @JsonManagedReference
+    @JsonIgnoreProperties("sdaHostingEntity")
     private SDAHostingEntity sdaHostingEntity;
 
 //    @Column(name = "sda_hosting_id", columnDefinition = "json")
 //    private String sdaHosting;
 
+    @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity")
+    @JsonManagedReference
     private List<DocumentUploadEntity> documentUploadList;
 
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity")
+    @JsonManagedReference
     private List<VersioningApplicationEntity> versioningApplicationList;
 
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity")
+    @JsonManagedReference
     private List<ApiEntity> apiList;
 
     @Cascade(CascadeType.ALL)
+    @JsonManagedReference
     @OneToMany(mappedBy = "webAppEntity")
     private List<DatabaseEntity> databaseList;
 
     @Cascade(CascadeType.ALL)
+    @JsonManagedReference
     @OneToMany(mappedBy = "webAppEntity")
     private List<FeedbackEntity> feedbackList;
 

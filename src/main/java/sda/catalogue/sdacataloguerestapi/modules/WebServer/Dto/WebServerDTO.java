@@ -30,7 +30,6 @@ public class WebServerDTO {
     @JsonProperty("webServer")
     private String webServer;
 
-    @NotNull
     private MasterDataStatus webServerStatus;
 
     @JsonProperty("createdAt")

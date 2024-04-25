@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -46,8 +47,8 @@ public class DatabaseEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonBackReference
     @JoinColumn(name = "id_webapp")
-    @JsonIgnore
     private WebAppEntity webAppEntity;
 
     @ManyToOne

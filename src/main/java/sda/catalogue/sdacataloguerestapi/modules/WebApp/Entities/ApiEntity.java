@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -54,6 +55,6 @@ public class ApiEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_webapp")
-    @JsonIgnore
+    @JsonBackReference
     private WebAppEntity webAppEntity;
 }
