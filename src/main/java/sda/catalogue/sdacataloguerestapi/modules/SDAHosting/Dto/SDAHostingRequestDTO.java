@@ -12,6 +12,8 @@ import java.util.UUID;
 public class SDAHostingRequestDTO {
     private Integer page;
     private Integer size;
+    private String searchTerm;
+
     SDAHostingRequestDTO() {
         if(this.getPage() == null) {
             this.page = 1;

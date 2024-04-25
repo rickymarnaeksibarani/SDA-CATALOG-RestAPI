@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Services;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndR
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,9 +33,20 @@ public class FrontEndService {
 
     //Getting data Front end with pagination
     public PaginationUtil<FrontEndEntity, FrontEndEntity> getAllFrontendByPagination(FrontEndRequestDTO searchRequest) {
+        Specification<FrontEndEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.like(builder.upper(root.get("frontEnd")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<FrontEndEntity> specs = Specification.where(null);
-        Page<FrontEndEntity> pagedResult = frontEndRepository.findAll(specs, paging);
+        Page<FrontEndEntity> pagedResult = frontEndRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, FrontEndEntity.class);
     }
 

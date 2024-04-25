@@ -11,6 +11,7 @@ public class BackEndRequestDTO {
     private Integer page;
 
     private Integer size;
+    private String searchTerm;
 
     BackEndRequestDTO() {
         if(this.getPage() == null) {

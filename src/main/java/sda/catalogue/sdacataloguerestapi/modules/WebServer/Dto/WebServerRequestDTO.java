@@ -11,6 +11,8 @@ import java.util.UUID;
 public class WebServerRequestDTO {
     private Integer page;
     private Integer size;
+    private String searchTerm;
+
     WebServerRequestDTO(){
         if (this.getPage() == null){
             this.page= 1;

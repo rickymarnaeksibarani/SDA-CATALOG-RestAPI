@@ -13,6 +13,7 @@ public class TypeDatabaseRequestDTO {
     private Integer page;
 
     private Integer size;
+    private String searchTerm;
 
     TypeDatabaseRequestDTO() {
         if(this.getPage() == null) {
