@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -43,18 +44,18 @@ public class DashboardService {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Transactional(readOnly = true)
+    @Cacheable("statsByStatus")
     public StatisticStatusResponseDto statisticSdaByStatus() {
         Integer active = mobileAppRepository.countAllByStatus(Status.ACTIVE);
         Integer inactive = mobileAppRepository.countAllByStatus(Status.INACTIVE);
         Integer underConstruction = mobileAppRepository.countAllByStatus(Status.UNDER_CONSTRUCTION);
         Integer underReview = mobileAppRepository.countAllByStatus(Status.UNDER_REVIEW);
 
-        active += webAppRepository.countAllByStatus("Active");
-        inactive += webAppRepository.countAllByStatus("Inactive");
-        underConstruction += webAppRepository.countAllByStatus("Under Construction");
-        underReview += webAppRepository.countAllByStatus("Under Review");
+        active += webAppRepository.countAllByStatus(Status.ACTIVE);
+        inactive += webAppRepository.countAllByStatus(Status.INACTIVE);
+        underConstruction += webAppRepository.countAllByStatus(Status.UNDER_CONSTRUCTION);
+        underReview += webAppRepository.countAllByStatus(Status.UNDER_REVIEW);
 
         return StatisticStatusResponseDto.builder()
                 .underConstruction(underConstruction)
@@ -65,6 +66,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("statsByHosting")
     public List<StatisticByHostingDto> statisticByHosting() {
         List<Object[]> mobileAppStats = mobileAppRepository.countAllBySdaHosting();
         List<Object[]> webAppStats = webAppRepository.countAllBySdaHosting();
@@ -111,6 +113,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("allSdaData")
     public Page<ListAllSdaDto> getAllSdaData(PagingRequest pagingRequest) {
         String order = Objects.nonNull(pagingRequest.getOrder()) ? pagingRequest.getOrder() : "DESC";
         String orderBy = Objects.nonNull(pagingRequest.getOrderBy()) ? pagingRequest.getOrderBy() : "createdAt";
