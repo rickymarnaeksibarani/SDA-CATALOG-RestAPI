@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,6 @@ public class VersioningApplicationEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_webapp")
-    @JsonIgnore
+    @JsonBackReference
     private WebAppEntity webAppEntity;
 }

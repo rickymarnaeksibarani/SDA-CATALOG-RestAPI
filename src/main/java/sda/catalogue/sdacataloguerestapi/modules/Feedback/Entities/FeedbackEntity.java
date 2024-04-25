@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ import java.util.UUID;
         private List<CommentEntity> commentEntityList;
 
         @ManyToOne
+        @JsonBackReference
         @JoinColumn(name = "id_webapp")
-        @JsonIgnore
         private WebAppEntity webAppEntity;
     }

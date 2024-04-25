@@ -65,7 +65,6 @@ public class SDAHostingService {
         SDAHostingEntity data = new SDAHostingEntity();
         data.setSdaHostingStatus(request.getSdaHostingStatus());
         data.setSdaHosting(request.getSdaHosting());
-        data.setSdaHostingEntities(request.getSdaHostingEntities());
         return sdaHostingRepository.save(data);
     }
 
@@ -75,7 +74,6 @@ public class SDAHostingService {
                 .orElseThrow(()-> new CustomRequestException("PIC Developer does not exists", HttpStatus.CONFLICT));
         sdaHosting.setSdaHosting(request.getSdaHosting());
         sdaHosting.setSdaHostingStatus(request.getSdaHostingStatus());
-        sdaHosting.setSdaHostingEntities(request.getSdaHostingEntities());
         return sdaHostingRepository.save(sdaHosting);
     }
 

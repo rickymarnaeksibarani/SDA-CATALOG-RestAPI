@@ -17,8 +17,7 @@ import java.util.UUID;
 @Repository
 public interface SDAHostingRepository extends JpaRepository<SDAHostingEntity, Long>, JpaSpecificationExecutor<SDAHostingEntity> {
     @Query("SELECT w FROM SDAHostingEntity w " +
-            "WHERE LOWER(w.sdaHosting) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "   OR LOWER(w.sdaHostingEntities) LIKE LOWER(CONCAT('%', :searchTerm, '%') ) " +
+            "WHERE LOWER(w.sdaHosting) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "+
             "ORDER BY w.updatedAt DESC")
     List<SDAHostingEntity> findBySearchTerm(String searchTerm, Pageable pageable);
 

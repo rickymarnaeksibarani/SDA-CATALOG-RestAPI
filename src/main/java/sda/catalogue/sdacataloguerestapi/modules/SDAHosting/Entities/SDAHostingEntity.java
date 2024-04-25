@@ -1,5 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,8 +52,10 @@ public class SDAHostingEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "sdaHostingEntity")
-    private List<WebAppEntity> sdaHostingEntities;
+    @ManyToOne
+    @JoinColumn(name = "id_webapp")
+    @JsonBackReference
+    private WebAppEntity webAppEntity;
 
     public class FormattedSDAHostingEntity{
         private long idSDAHosting;
