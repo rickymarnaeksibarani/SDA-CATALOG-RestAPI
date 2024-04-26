@@ -280,20 +280,19 @@ public class MobileAppService {
 
         // Remove old documents
         List docList = objectMapper.readValue(mobileApp.getDocumentation(), List.class);
-        if (Objects.nonNull(docList)) {
+        if (Objects.nonNull(docList) && !docList.isEmpty()) {
             docList.forEach(docPath -> {
                 if (Objects.nonNull(docPath)) {
-                    Path path = Paths.get((String) docPath);
+//                    Path path = Paths.get((String) docPath);
 
                     try {
-                        Files.deleteIfExists(path);
-                    } catch (IOException e) {
+                        storageService.deleteAllFileS3(docList);
+//                        Files.deleteIfExists(path);
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
-
-            storageService.deleteAllFileS3(docList);
         }
 
         // Remove old files
@@ -301,17 +300,16 @@ public class MobileAppService {
         if (appFilePath != null) {
             appFilePath.forEach(path -> {
                 if (Objects.nonNull(path)) {
-                    Path filepath = Paths.get((String) path);
+//                    Path filepath = Paths.get((String) path);
 
                     try {
-                        Files.deleteIfExists(filepath);
-                    } catch (IOException e) {
+                        storageService.deleteAllFileS3(appFilePath);
+//                        Files.deleteIfExists(filepath);
+                    } catch (NoSuchAlgorithmException | InvalidKeyException | IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
-
-            storageService.deleteAllFileS3(appFilePath);
         }
 
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
@@ -333,17 +331,16 @@ public class MobileAppService {
         if (Objects.nonNull(docList)) {
             docList.forEach(docPath -> {
                 if (Objects.nonNull(docPath)) {
-                    Path path = Paths.get((String) docPath);
+//                    Path path = Paths.get((String) docPath);
 
                     try {
-                        Files.deleteIfExists(path);
-                    } catch (IOException e) {
+                        storageService.deleteAllFileS3(docList);
+//                        Files.deleteIfExists(path);
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
-
-            storageService.deleteAllFileS3(docList);
         }
 
         // Remove old files
@@ -351,18 +348,18 @@ public class MobileAppService {
         if (appFilePath != null) {
             appFilePath.forEach(path -> {
                 if (Objects.nonNull(path)) {
-                    Path filepath = Paths.get((String) path);
+//                    Path filepath = Paths.get((String) path);
 
                     try {
-                        Files.deleteIfExists(filepath);
-                    } catch (IOException e) {
+                        storageService.deleteAllFileS3(appFilePath);
+//                        Files.deleteIfExists(filepath);
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
         }
 
-        storageService.deleteAllFileS3(appFilePath);
         mobileAppRepository.deleteById(id);
     }
 
@@ -395,7 +392,7 @@ public class MobileAppService {
     }
 
     private List<String> uploadDocument(List<MultipartFile> documents) {
-        if (documents == null || documents.isEmpty()) return null;
+        if (documents == null || documents.isEmpty()) return Collections.emptyList();
 
         List<String> documentPaths = new ArrayList<>();
         String generatedString = generateRandomString();

@@ -6,16 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

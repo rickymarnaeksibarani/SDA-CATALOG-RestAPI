@@ -1,8 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ForeignKey;
@@ -12,13 +10,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
