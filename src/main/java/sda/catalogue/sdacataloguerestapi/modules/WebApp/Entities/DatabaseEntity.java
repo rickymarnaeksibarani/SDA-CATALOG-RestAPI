@@ -42,10 +42,10 @@ public class DatabaseEntity {
     @Column(name = "password")
     private String dbPassword;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
-    @JoinColumn(name = "id_webapp")
+    @JoinColumn(foreignKey = @ForeignKey(name = "id_webapp"))
     private WebAppEntity webAppEntity;
 
     @ManyToOne
