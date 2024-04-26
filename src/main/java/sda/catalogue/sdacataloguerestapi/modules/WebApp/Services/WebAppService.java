@@ -34,8 +34,8 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
-import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
-import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
+//import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
+//import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -74,8 +74,8 @@ public class WebAppService extends BaseController {
     private WebAppRepository webAppRepository;
     @Autowired
     private PICDeveloperRepository picDeveloperRepository;
-    @Autowired
-    private PICAnalystRepository picAnalystRepository;
+//    @Autowired
+//    private PICAnalystRepository picAnalystRepository;
     @Autowired
     private MappingFunctionRepository mappingFunctionRepository;
     @Autowired
@@ -113,7 +113,7 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request,
                                      List<Long> picDeveloperList,
-                                     List<Long> picAnalystList,
+//                                     List<Long> picAnalystList,
                                      List<Long> mappingFunctionList,
                                      List<Long> frontEndList,
                                      List<Long> backEndList,
@@ -159,7 +159,7 @@ public class WebAppService extends BaseController {
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
 
             //PIC Analyst Process
-            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
+//            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
 
             //Mapping Function Process
             List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunctionList, mappingFunctionRepository, Function.identity(), "Mapping Function");
@@ -185,7 +185,7 @@ public class WebAppService extends BaseController {
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
 
             data.setPicDeveloperList(picDeveloperData);
-            data.setPicAnalystList(picAnalystData);
+//            data.setPicAnalystList(picAnalystData);
             data.setMappingFunctionList(mappingFunctionData);
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
@@ -338,7 +338,7 @@ public class WebAppService extends BaseController {
     public WebAppEntity updateWebAppByUuid(UUID uuid,
                                            WebAppPostDTO request,
                                            List<Long> picDeveloperList,
-                                           List<Long> picAnalystList,
+//                                           List<Long> picAnalystList,
                                            List<Long> mappingFunctionList,
                                            List<Long> frontEndList,
                                            List<Long> backEndList,
@@ -372,10 +372,10 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
             }
 
-            List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
-            if (picAnalyst.isEmpty()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
-            }
+//            List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
+//            if (picAnalyst.isEmpty()){
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
+//            }
 
             List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
             if (mappingFunction.isEmpty()) {
@@ -454,7 +454,7 @@ public class WebAppService extends BaseController {
             findData.setIpDatabase(request.getIpDatabase());
             findData.setPmoNumber(request.getPmoNumber());
             findData.setPicDeveloperList(picDeveloper);
-            findData.setPicAnalystList(picAnalyst);
+//            findData.setPicAnalystList(picAnalyst);
             findData.setMappingFunctionList(mappingFunction);
             findData.setFrontEndList(frontEnd);
             findData.setBackEndList(backEnd);
