@@ -18,8 +18,8 @@ import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
-import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
-import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
+//import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
+//import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.ListAllSdaDto;
@@ -39,13 +39,13 @@ public class DashboardService {
     private MobileAppRepository mobileAppRepository;
     @Autowired
     private WebAppRepository webAppRepository;
-    @Autowired
-    private SDAHostingRepository sdaHostingRepository;
+//    @Autowired
+//    private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
-    @Cacheable("statsByStatus")
+    @Cacheable(value = "statsByStatus")
     public StatisticStatusResponseDto statisticSdaByStatus() {
         Integer active = mobileAppRepository.countAllByStatus(Status.ACTIVE);
         Integer inactive = mobileAppRepository.countAllByStatus(Status.INACTIVE);
@@ -79,10 +79,10 @@ public class DashboardService {
         }).toList();
 
         List<StatisticByHostingDto> webAppStatData = webAppStats.stream().map(val -> {
-            Optional<SDAHostingEntity> hostingData = sdaHostingRepository.findById(Long.parseLong((String) val[0]));
+//            Optional<SDAHostingEntity> hostingData = sdaHostingRepository.findById((Long) val[0]);
 
             StatisticByHostingDto hostingStat = new StatisticByHostingDto();
-            hostingStat.setName(hostingData.isPresent() ? hostingData.get().getSdaHosting() : "");
+            hostingStat.setName((String) val[0]);
             hostingStat.setTotal((Long) val[1]);
             return hostingStat;
         }).toList();
@@ -113,7 +113,6 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("allSdaData")
     public Page<ListAllSdaDto> getAllSdaData(PagingRequest pagingRequest) {
         String order = Objects.nonNull(pagingRequest.getOrder()) ? pagingRequest.getOrder() : "DESC";
         String orderBy = Objects.nonNull(pagingRequest.getOrderBy()) ? pagingRequest.getOrderBy() : "createdAt";
