@@ -88,13 +88,13 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
 
     @Query(value = """
             SELECT
-              value AS hosting_id,
-              COUNT(id_webapp) as total
+              hosting.sda_hosting AS name,
+              COUNT(webapp.id_sda_hosting)
             FROM
-              tb_webapp w
-              CROSS JOIN json_array_elements_text(sda_hosting_id) je
+              tb_sda_hosting hosting
+              INNER JOIN tb_webapp webapp ON hosting.id_sda_hosting = webapp.id_sda_hosting
             GROUP BY
-              hosting_id;""", nativeQuery = true)
+              name;""", nativeQuery = true)
     List<Object[]> countAllBySdaHosting();
 
     WebAppEntity findByApplicationName(String applicationName);
