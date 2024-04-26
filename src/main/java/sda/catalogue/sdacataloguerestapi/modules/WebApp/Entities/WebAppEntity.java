@@ -168,28 +168,33 @@ public class WebAppEntity {
 //    private String sdaHosting;
 
     @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "webAppEntity")
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<DocumentUploadEntity> documentUploadList;
 
     @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "webAppEntity")
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<VersioningApplicationEntity> versioningApplicationList;
 
     @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "webAppEntity")
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<ApiEntity> apiList;
 
     @Cascade(CascadeType.ALL)
     @JsonManagedReference
-    @OneToMany(mappedBy = "webAppEntity")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     private List<DatabaseEntity> databaseList;
 
     @Cascade(CascadeType.ALL)
     @JsonManagedReference
-    @OneToMany(mappedBy = "webAppEntity")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     private List<FeedbackEntity> feedbackList;
 
 }
