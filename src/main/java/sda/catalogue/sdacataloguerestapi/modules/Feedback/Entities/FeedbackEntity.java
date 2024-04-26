@@ -54,8 +54,8 @@ import java.util.UUID;
         @OneToMany(mappedBy = "feedBackEntity", cascade = CascadeType.ALL)
         private List<CommentEntity> commentEntityList;
 
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
         @JsonBackReference
-        @JoinColumn(name = "id_webapp")
+        @JoinColumn(foreignKey = @ForeignKey(name = "id_webapp"))
         private WebAppEntity webAppEntity;
     }

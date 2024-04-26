@@ -44,8 +44,8 @@ public class DocumentUploadEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "id_webapp")
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
+    @JoinColumn(foreignKey = @ForeignKey(name = "id_webapp"))
     @JsonBackReference
     private WebAppEntity webAppEntity;
 }
