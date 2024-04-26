@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-//@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

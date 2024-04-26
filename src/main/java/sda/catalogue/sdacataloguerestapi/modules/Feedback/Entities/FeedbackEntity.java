@@ -1,14 +1,12 @@
 package sda.catalogue.sdacataloguerestapi.modules.Feedback.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
@@ -18,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Immutable
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
