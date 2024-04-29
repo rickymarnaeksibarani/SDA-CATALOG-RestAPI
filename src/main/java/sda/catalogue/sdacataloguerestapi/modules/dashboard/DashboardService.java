@@ -45,7 +45,7 @@ public class DashboardService {
     private ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "statsByStatus")
+//    @Cacheable(value = "statsByStatus")
     public StatisticStatusResponseDto statisticSdaByStatus() {
         Integer active = mobileAppRepository.countAllByStatus(Status.ACTIVE);
         Integer inactive = mobileAppRepository.countAllByStatus(Status.INACTIVE);
@@ -66,7 +66,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("statsByHosting")
+//    @Cacheable("statsByHosting")
     public List<StatisticByHostingDto> statisticByHosting() {
         List<Object[]> mobileAppStats = mobileAppRepository.countAllBySdaHosting();
         List<Object[]> webAppStats = webAppRepository.countAllBySdaHosting();
