@@ -34,7 +34,6 @@ import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppR
 import sda.catalogue.sdacataloguerestapi.modules.storage.StorageService;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
@@ -169,12 +168,12 @@ public class MobileAppService {
         List<String> documentPaths = uploadDocument(request.getDocumentation());
 
         // App file
-        String ipa = uploadFileApp(request.getIpaFile(), "ipa");
-        String apk = uploadFileApp(request.getAndroidFile(), "apk");
+        List<String> ipa = uploadFileApp(request.getIpaFile(), "ipa");
+        List<String> apk = uploadFileApp(request.getAndroidFile(), "apk");
 
         List<String> filePaths = new ArrayList<>();
-        filePaths.add(ipa);
-        filePaths.add(apk);
+        filePaths.addAll(ipa);
+        filePaths.addAll(apk);
 
         MobileAppEntity mobileApp = new MobileAppEntity();
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
@@ -267,49 +266,27 @@ public class MobileAppService {
         backend = backendData.stream().map(BackEndEntity::getBackEnd).toList();
         request.setSdaBackEnd(backend);
 
-        // Documentation
+        // Upload new Documentation
         List<String> documentPaths = uploadDocument(request.getDocumentation());
 
-        // App file
-        String ipa = uploadFileApp(request.getIpaFile(), "ipa");
-        String apk = uploadFileApp(request.getAndroidFile(), "apk");
-
-        List<String> filePaths = new ArrayList<>();
-        filePaths.add(ipa);
-        filePaths.add(apk);
-
-        // Remove old documents
-        List docList = objectMapper.readValue(mobileApp.getDocumentation(), List.class);
+        // Get old documents and remove
+        List<String> docList = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<>() {});
         if (Objects.nonNull(docList) && !docList.isEmpty()) {
-            docList.forEach(docPath -> {
-                if (Objects.nonNull(docPath)) {
-//                    Path path = Paths.get((String) docPath);
-
-                    try {
-                        storageService.deleteAllFileS3(docList);
-//                        Files.deleteIfExists(path);
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+            storageService.deleteAllFileS3(docList);
         }
 
-        // Remove old files
-        List appFilePath = objectMapper.readValue(mobileApp.getApplicationFile(), List.class);
-        if (appFilePath != null) {
-            appFilePath.forEach(path -> {
-                if (Objects.nonNull(path)) {
-//                    Path filepath = Paths.get((String) path);
+        // Upload new App file
+        List<String> ipa = uploadFileApp(request.getIpaFile(), "ipa");
+        List<String> apk = uploadFileApp(request.getAndroidFile(), "apk");
 
-                    try {
-                        storageService.deleteAllFileS3(appFilePath);
-//                        Files.deleteIfExists(filepath);
-                    } catch (NoSuchAlgorithmException | InvalidKeyException | IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+        List<String> filePaths = new ArrayList<>();
+        filePaths.addAll(ipa);
+        filePaths.addAll(apk);
+
+        // Get Old files from DB and remove
+        List<String> appFilePath = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
+        if (appFilePath != null && !appFilePath.isEmpty()) {
+            storageService.deleteAllFileS3(appFilePath);
         }
 
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
@@ -327,37 +304,15 @@ public class MobileAppService {
         Optional<MobileAppEntity> data = mobileAppRepository.findById(id);
 
         // Remove old documents
-        List docList = objectMapper.readValue(data.get().getDocumentation(), List.class);
-        if (Objects.nonNull(docList)) {
-            docList.forEach(docPath -> {
-                if (Objects.nonNull(docPath)) {
-//                    Path path = Paths.get((String) docPath);
-
-                    try {
-                        storageService.deleteAllFileS3(docList);
-//                        Files.deleteIfExists(path);
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+        List<String> docList = objectMapper.readValue(data.get().getDocumentation(), new TypeReference<>() {});
+        if (Objects.nonNull(docList) && !docList.isEmpty()) {
+            storageService.deleteAllFileS3(docList);
         }
 
         // Remove old files
-        List appFilePath = objectMapper.readValue(data.get().getApplicationFile(), List.class);
-        if (appFilePath != null) {
-            appFilePath.forEach(path -> {
-                if (Objects.nonNull(path)) {
-//                    Path filepath = Paths.get((String) path);
-
-                    try {
-                        storageService.deleteAllFileS3(appFilePath);
-//                        Files.deleteIfExists(filepath);
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+        List<String> appFilePath = objectMapper.readValue(data.get().getApplicationFile(), new TypeReference<>() {});
+        if (appFilePath != null && !appFilePath.isEmpty()) {
+            storageService.deleteAllFileS3(appFilePath);
         }
 
         mobileAppRepository.deleteById(id);
@@ -398,11 +353,12 @@ public class MobileAppService {
         String generatedString = generateRandomString();
 
         documents.forEach(doc -> {
+            if (!Objects.equals(doc.getContentType(), "application/pdf")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document must be pdf file");
+            }
+
             try {
                 String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
-//                Path docFileDestination = Files.createDirectories(Path.of(uploadpath + "/document/"));
-//                doc.transferTo(Path.of(docFileDestination + "/" + docFilename));
-//                documentPaths.add(docFileDestination + "/" + docFilename);
 
                 String filepath = LocalDate.now().getYear() + "/docs/" + docFilename;
                 ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filepath, doc);
@@ -415,10 +371,10 @@ public class MobileAppService {
         return documentPaths;
     }
 
-    private String uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
-        if (file == null || file.isEmpty()) return null;
+    private List<String> uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
+        if (file == null || file.isEmpty()) return Collections.emptyList();
 
-        String filePaths = null;
+        List<String> filePaths = new ArrayList<>();
         String generatedString = generateRandomString();
 
         if (Objects.equals(appFileCategory, "apk")) {
@@ -427,28 +383,22 @@ public class MobileAppService {
             }
 
             String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
-//            Path resolve = fileDestination.resolve(androidFilename.trim());
-//            Files.copy(file.getInputStream(), resolve);
-//            filePaths = String.valueOf(resolve);
 
-            filePaths = LocalDate.now().getYear() + "/android/" + androidFilename;
+            String filePath = LocalDate.now().getYear() + "/android/" + androidFilename;
+            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
+            filePaths.add(objectWriteResponse.object());
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
-//            if (!Objects.equals(file.getOriginalFilename(), ".ipa")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
+            if (!Objects.equals(file.getContentType(), "application/octet-stream")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
 
             String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
-//            Path resolve = fileDestination.resolve(ipaFilename.trim());
-//            Files.copy(file.getInputStream(), resolve);
-//            filePaths = String.valueOf(resolve);
-
-            filePaths = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
+            String filePath = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
+            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
+            filePaths.add(objectWriteResponse.object());
         }
 
-        ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePaths, file);
-        return objectWriteResponse.object();
+        return filePaths;
     }
 
     private String generateRandomString() {

@@ -74,27 +74,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void deleteAllFileS3(List<String> path) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        try {
-            MinioClient minioClient = initMinioClient();
-
-            LinkedList<DeleteObject> objects;
-            objects = path.stream().map(DeleteObject::new).collect(Collectors.toCollection(LinkedList::new));
-
-            Iterable<Result<DeleteError>> results = minioClient.removeObjects(
-                    RemoveObjectsArgs.builder().bucket(bucket).objects(objects).build()
-            );
-
-            for (Result<DeleteError> result : results) {
-                DeleteError error = result.get();
-                log.error("Error in deleting object " + error.objectName() + "; " + error.message());
-            }
-        } catch (MinioException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to delete: " + e);
-        }
-    }
-
-    @Override
     public ObjectWriteResponse storeToS3(String filename, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         try(InputStream inputStream = file.getInputStream()) {
             MinioClient minioClient = initMinioClient();
@@ -116,6 +95,27 @@ public class StorageServiceImpl implements StorageService {
 
         } catch (MinioException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed upload file to S3: " + e);
+        }
+    }
+
+    @Override
+    public void deleteAllFileS3(List<String> path) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        try {
+            MinioClient minioClient = initMinioClient();
+
+            LinkedList<DeleteObject> objects;
+            objects = path.stream().map(DeleteObject::new).collect(Collectors.toCollection(LinkedList::new));
+
+            Iterable<Result<DeleteError>> results = minioClient.removeObjects(
+                    RemoveObjectsArgs.builder().bucket(bucket).objects(objects).build()
+            );
+
+            for (Result<DeleteError> result : results) {
+                DeleteError error = result.get();
+                log.error("Error in deleting object {}; {}", error.objectName(), error.message());
+            }
+        } catch (MinioException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to delete: " + e);
         }
     }
 
