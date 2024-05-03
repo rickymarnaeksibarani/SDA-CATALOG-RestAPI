@@ -127,27 +127,23 @@ public class DashboardService {
         Page<WebAppEntity> allWebApps = webAppRepository.findAll(specification(pagingRequest, "web"), pageRequest);
 
         List<ListAllSdaDto> mobileAppList = allMobileApps.getContent().stream().map(data -> {
-            List<String> mappingFunction;
+            List<MappingFunctionEntity> mappingFunctions = data.getMappingFunctions();
             List<String> role;
             ApplicationUrlDto address;
-            List<String> department;
 
             try {
-                mappingFunction = objectMapper.readValue(data.getMappingFunction(), new TypeReference<>() {});
                 role = objectMapper.readValue(data.getRole(), new TypeReference<>() {});
                 address = objectMapper.readValue(data.getApplicationUrl(), ApplicationUrlDto.class);
-                department = objectMapper.readValue(data.getDepartment(), new TypeReference<>() {});
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
 
             ListAllSdaDto allSdaDto = new ListAllSdaDto();
             allSdaDto.setId(data.getId());
-            allSdaDto.setMappingFunction(mappingFunction);
+            allSdaDto.setMappingFunction(mappingFunctions);
             allSdaDto.setRole(role);
             allSdaDto.setAddress(List.of(address.getAppstoreUrl(), address.getPlaystoreUrl()));
             allSdaDto.setStatus(data.getStatus());
-            allSdaDto.setDepartment(department);
             allSdaDto.setName(data.getApplicationName());
             allSdaDto.setCategory("mobile");
             return allSdaDto;
@@ -172,7 +168,7 @@ public class DashboardService {
             allSdaDto.setAddress(List.of(data.getAddress()));
             allSdaDto.setName(data.getApplicationName());
             allSdaDto.setStatus(Status.valueOf(String.valueOf(data.getStatus())));
-            allSdaDto.setMappingFunction(mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList());
+            allSdaDto.setMappingFunction(mappingFunction);
             allSdaDto.setCategory("web");
             return allSdaDto;
         }).toList();
@@ -189,26 +185,22 @@ public class DashboardService {
             List<Predicate> predicates = new ArrayList<>();
 
             if (Objects.nonNull(request.getFilterByTech()) && !request.getFilterByTech().isEmpty()) {
-                try {
-                    List<String> filterByTech = request.getFilterByTech();
+                List<String> filterByTech = request.getFilterByTech();
 
-                    if (category.equals("mobile")) {
-                            predicates.add(
-                                    builder.or(
-                                        builder.like(builder.upper(root.get("sdaFrontEnd")), "%" + objectMapper.writeValueAsString(filterByTech).toUpperCase() + "%"),
-                                        builder.like(root.get("sdaBackEnd"), "%" + objectMapper.writeValueAsString(filterByTech) + "%")
-                                    )
-                            );
-                    } else if (category.equals("web")){
+                if (category.equals("mobile")) {
                         predicates.add(
                                 builder.or(
-                                        builder.in(root.get("frontEndList").get("frontEnd")).value(filterByTech),
-                                        builder.in(root.get("backEndList").get("backEnd")).value(filterByTech)
+                                    builder.in(root.get("frontEnds").get("frontEnd")).value(filterByTech),
+                                    builder.in(root.get("backEnds").get("backEnd")).value(filterByTech)
                                 )
                         );
-                    }
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                } else if (category.equals("web")) {
+                    predicates.add(
+                            builder.or(
+                                    builder.in(root.get("frontEndList").get("frontEnd")).value(filterByTech),
+                                    builder.in(root.get("backEndList").get("backEnd")).value(filterByTech)
+                            )
+                    );
                 }
             }
 
@@ -219,22 +211,16 @@ public class DashboardService {
             }
 
             if (Objects.nonNull(request.getMappingFunction()) && !request.getMappingFunction().isEmpty()) {
-                try {
-                    List<String> mappingFunction = request.getMappingFunction();
+                List<String> mappingFunction = request.getMappingFunction();
 
-                    if (category.equals("mobile")) {
-                            predicates.add(
-                                    builder.or(
-                                        builder.like(root.get("mappingFunction"), "%" + objectMapper.writeValueAsString(mappingFunction) + "%")
-                                    )
-                            );
-                    } else if (category.equals("web")) {
+                if (category.equals("mobile")) {
                         predicates.add(
-                                builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+                                builder.in(root.get("mappingFunctions").get("mappingFunction")).value(mappingFunction)
                         );
-                    }
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                } else if (category.equals("web")) {
+                    predicates.add(
+                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+                    );
                 }
             }
 
@@ -242,7 +228,13 @@ public class DashboardService {
                 List<String> department = request.getDepartment();
 
                 if (category.equals("mobile")) {
-                    predicates.add(root.get("department").in(department));
+                    predicates.add(
+                            builder.in(root.get("mappingFunctions").get("dinasEntityList").get("dinas")).value(department)
+                    );
+                } else if (category.equals("web")) {
+                    predicates.add(
+                            builder.in(root.get("mappingFunctionList").get("dinasEntityList").get("dinas")).value(department)
+                    );
                 }
             }
 
@@ -269,19 +261,9 @@ public class DashboardService {
             }
 
             if (Objects.nonNull(request.getStatus()) && !request.getStatus().isEmpty()) {
-                if (category.equals("mobile")) {
-                    predicates.add(
-                            builder.in(
-                                   root.get("status")).value(request.getStatus()
-                            )
-                    );
-                } else if (category.equals("web")){
-                    String statusList = request.getStatus().stream().map(Enum::name).toList().toString();
-
-                    predicates.add(
-                            builder.in(builder.upper(root.get("status"))).value(statusList.toUpperCase())
-                    );
-                }
+                predicates.add(
+                        builder.in(root.get("status")).value(request.getStatus())
+                );
             }
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();

@@ -1,17 +1,21 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity;
 
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
+import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
+import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
+import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -36,31 +40,11 @@ public class MobileAppEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-//    @ManyToOne()
-//    @JoinColumn(name = "sda_hosting_id", referencedColumnName = "id_sda_hosting")
-//    private SDAHostingEntity sdaHosting;
-
-    @Column(columnDefinition = "text[]")
-    @Type(StringArrayType.class)
-    private String[] sdaHosting;
-
-//    @ManyToOne
-//    @JoinColumn(name = "mapping_function_id", referencedColumnName = "id_mapping_function")
-//    private MappingFunctionEntity mappingFunction;
-
-    private String mappingFunction;
-
-    @Column(nullable = false, columnDefinition = "json")
-    private String department;
-
     private String role;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "business_impact_priority", nullable = false)
     private BusinessImpactPriority businessImpactPriority;
-
-    @Column(name = "pic_developer", nullable = false, columnDefinition = "json")
-    private String picDeveloper;
 
     @Column(nullable = false, columnDefinition = "text")
     private String description;
@@ -78,12 +62,6 @@ public class MobileAppEntity {
 
     @Column(name = "application_file_path", columnDefinition = "json")
     private String applicationFile;
-
-    @Column(name = "sda_front_end", nullable = false)
-    private String sdaFrontEnd;
-
-    @Column(name = "sda_back_end", nullable = false)
-    private String sdaBackEnd;
 
     @Column(name = "web_server", nullable = false)
     private String webServer;
@@ -114,4 +92,44 @@ public class MobileAppEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+            name = "mapping_functions",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_mapping_function")
+    )
+    private List<MappingFunctionEntity> mappingFunctions;
+
+    @ManyToMany
+    @JoinTable(
+            name = "pic_developers",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
+    )
+    private List<PICDeveloperEntity> picDevelopers;
+
+    @ManyToMany
+    @JoinTable(
+            name = "front_ends",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_frontend")
+    )
+    private List<FrontEndEntity> frontEnds;
+
+    @ManyToMany
+    @JoinTable(
+            name = "back_ends",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_backend")
+    )
+    private List<BackEndEntity> backEnds;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "sda_hosting_list",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_sda_hosting")
+    )
+    private List<SDAHostingEntity> sdaHostingList;
 }

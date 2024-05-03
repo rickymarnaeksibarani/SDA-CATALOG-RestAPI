@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_pic_developer")
+@Table(name = "master_pic_developer")
 public class PICDeveloperEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

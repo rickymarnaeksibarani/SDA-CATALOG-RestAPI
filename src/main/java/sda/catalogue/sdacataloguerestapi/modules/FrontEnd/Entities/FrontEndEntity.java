@@ -19,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_frontend")
+@Table(name = "master_frontend")
 public class FrontEndEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

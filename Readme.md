@@ -24,6 +24,9 @@ Install dependency
 run spring boot
 > mvn spring-boot:run
 
+run with seeder
+> mvn clean spring-boot:run -D spring-boot.run.arguments=--seeder=mapping,backend,frontend,picDev,sdaHosting,typeOfDb,webservice
+
 ------
 
 ### 4. Database Configuration

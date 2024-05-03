@@ -16,6 +16,14 @@ public interface MobileAppRepository extends JpaRepository<MobileAppEntity, Long
 
     Integer countAllByStatus(Status status);
 
-    @Query("SELECT unnest(m.sdaHosting) AS hosting, COUNT(m.id) AS total FROM MobileAppEntity m GROUP BY hosting")
+    @Query(value = """
+            SELECT
+              hosting.sda_hosting AS name,
+              COUNT(hosting_list.mobileapp_id)
+            FROM
+              master_sda_hosting hosting
+              INNER JOIN sda_hosting_list hosting_list ON hosting.id_sda_hosting = hosting_list.id_sda_hosting
+            GROUP BY
+              name;""", nativeQuery = true)
     List<Object[]> countAllBySdaHosting();
 }

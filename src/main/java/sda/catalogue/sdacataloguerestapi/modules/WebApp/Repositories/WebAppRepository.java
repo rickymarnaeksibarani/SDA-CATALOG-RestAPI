@@ -91,7 +91,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
               hosting.sda_hosting AS name,
               COUNT(webapp.id_sda_hosting)
             FROM
-              tb_sda_hosting hosting
+              master_sda_hosting hosting
               INNER JOIN tb_webapp webapp ON hosting.id_sda_hosting = webapp.id_sda_hosting
             GROUP BY
               name;""", nativeQuery = true)
