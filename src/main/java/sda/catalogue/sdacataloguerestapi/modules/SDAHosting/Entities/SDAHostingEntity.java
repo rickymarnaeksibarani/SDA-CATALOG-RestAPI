@@ -2,13 +2,12 @@ package sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
 import sda.catalogue.sdacataloguerestapi.core.enums.MasterDataStatus;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
@@ -20,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_sda_hosting")
+@Table(name = "master_sda_hosting")
 public class SDAHostingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

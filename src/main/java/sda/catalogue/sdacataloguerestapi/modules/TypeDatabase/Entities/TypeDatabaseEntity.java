@@ -20,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_type_database")
+@Table(name = "master_type_database")
 public class TypeDatabaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

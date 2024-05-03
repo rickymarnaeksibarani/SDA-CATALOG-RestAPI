@@ -69,15 +69,9 @@ public class MobileAppService {
         List<DbListDto> dbList = objectMapper.readValue(mobileApp.getApplicationDatabaseList(), new TypeReference<>() {});
         ApplicationUrlDto applicationUrl = objectMapper.readValue(mobileApp.getApplicationUrl(), new TypeReference<>() {});
         List<Role> roles = objectMapper.readValue(mobileApp.getRole(), new TypeReference<>() {});
-        String[] departments = objectMapper.readValue(mobileApp.getDepartment(), new TypeReference<>() {});
-        String[] mappingFunctions = objectMapper.readValue(mobileApp.getMappingFunction(), new TypeReference<>() {});
-        String[] picDevelopers = objectMapper.readValue(mobileApp.getPicDeveloper(), new TypeReference<>() {});
         List<String> appFilePaths = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
         List<VersioningAppDto> versioningApp = objectMapper.readValue(mobileApp.getVersioningApplication(), new TypeReference<>() {});
-        String[] sdaHosting = mobileApp.getSdaHosting();
         List<String> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<>() {});
-        List<String> sdaBackend = objectMapper.readValue(mobileApp.getSdaBackEnd(), new TypeReference<>() {});
-        List<String> sdaFrontend = objectMapper.readValue(mobileApp.getSdaFrontEnd(), new TypeReference<>() {});
 
         return MobileAppResponseDto.builder()
                 .applicationSourceFrontEnd(mobileApp.getApplicationSourceFrontEnd())
@@ -85,8 +79,8 @@ public class MobileAppService {
                 .databaseIp(mobileApp.getDatabaseIp())
                 .createdAt(mobileApp.getCreatedAt())
                 .updatedAt(mobileApp.getUpdatedAt())
-                .sdaBackEnd(sdaBackend)
-                .sdaFrontEnd(sdaFrontend)
+                .sdaBackEnds(mobileApp.getBackEnds())
+                .sdaFrontEnds(mobileApp.getFrontEnds())
                 .webServer(mobileApp.getWebServer())
                 .applicationApiList(appApiList)
                 .applicationDatabaseList(dbList)
@@ -95,15 +89,14 @@ public class MobileAppService {
                 .applicationUrl(applicationUrl)
                 .role(roles)
                 .description(mobileApp.getDescription())
-                .department(departments)
-                .mappingFunction(mappingFunctions)
-                .picDeveloper(picDevelopers)
+                .mappingFunctions(mobileApp.getMappingFunctions())
+                .picDevelopers(mobileApp.getPicDevelopers())
                 .status(mobileApp.getStatus())
                 .id(mobileApp.getId())
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
                 .pmoNumber(mobileApp.getPmoNumber())
-                .sdaHosting(Objects.nonNull(sdaHosting) ? List.of(sdaHosting) : null)
+                .sdaHostingList(mobileApp.getSdaHostingList())
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
@@ -144,26 +137,6 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
 
-        // Replace request mapping function with mapping function from DB
-        List<String> mappingFunctionName;
-        mappingFunctionName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
-        request.setMappingFunction(mappingFunctionName);
-
-        // Replace request pic developer with pic developer from DB
-        List<String> picName;
-        picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
-        request.setPicDeveloper(picName);
-
-        // Replace request front end with front end from DB
-        List<String> frontEnd;
-        frontEnd = frontEndData.stream().map(FrontEndEntity::getFrontEnd).toList();
-        request.setSdaFrontEnd(frontEnd);
-
-        // Replace request back end with back end from DB
-        List<String> backend;
-        backend = backendData.stream().map(BackEndEntity::getBackEnd).toList();
-        request.setSdaBackEnd(backend);
-
         // Documentation
         List<String> documentPaths = uploadDocument(request.getDocumentation());
 
@@ -177,6 +150,11 @@ public class MobileAppService {
 
         MobileAppEntity mobileApp = new MobileAppEntity();
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
+        payload.setMappingFunctions(mappingFunction);
+        payload.setPicDevelopers(picDeveloper);
+        payload.setFrontEnds(frontEndData);
+        payload.setBackEnds(backendData);
+        payload.setSdaHostingList(sdaHosting);
         mobileAppRepository.save(payload);
 
         return toMobileAppResponse(payload);
@@ -230,11 +208,6 @@ public class MobileAppService {
         }
 
         List<SDAHostingEntity> sdaHosting = sdaHostingRepository.findBySdaHostingIsIn(List.of(request.getSdaHosting()));
-        String[] hostingName = null;
-        if (Objects.nonNull(sdaHosting) && !sdaHosting.isEmpty()) {
-            hostingName = sdaHosting.stream().map(SDAHostingEntity::getSdaHosting).toList().toArray(new String[0]);
-        }
-        request.setSdaHosting(hostingName);
 
         List<FrontEndEntity> frontEndData = frontEndRepository.findByFrontEndIsIn(request.getSdaFrontEnd());
         if (frontEndData.isEmpty()) {
@@ -245,26 +218,6 @@ public class MobileAppService {
         if (backendData.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
-
-        // Replace request mapping function with mapping function from DB
-        List<String> mappingFunctionName;
-        mappingFunctionName = mappingFunction.stream().map(MappingFunctionEntity::getMappingFunction).toList();
-        request.setMappingFunction(mappingFunctionName);
-
-        // Replace request pic developer with pic developer from DB
-        List<String> picName;
-        picName = picDeveloper.stream().map(PICDeveloperEntity::getPersonalName).toList();
-        request.setPicDeveloper(picName);
-
-        // Replace request front end with front end from DB
-        List<String> frontEnd;
-        frontEnd = frontEndData.stream().map(FrontEndEntity::getFrontEnd).toList();
-        request.setSdaFrontEnd(frontEnd);
-
-        // Replace request back end with back end from DB
-        List<String> backend;
-        backend = backendData.stream().map(BackEndEntity::getBackEnd).toList();
-        request.setSdaBackEnd(backend);
 
         // Upload new Documentation
         List<String> documentPaths = uploadDocument(request.getDocumentation());
@@ -290,6 +243,11 @@ public class MobileAppService {
         }
 
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documentPaths, filePaths);
+        payload.setMappingFunctions(mappingFunction);
+        payload.setPicDevelopers(picDeveloper);
+        payload.setFrontEnds(frontEndData);
+        payload.setBackEnds(backendData);
+        payload.setSdaHostingList(sdaHosting);
         mobileAppRepository.saveAndFlush(payload);
 
         return toMobileAppResponse(payload);
@@ -322,20 +280,14 @@ public class MobileAppService {
         mobileApp.setApplicationName(request.getApplicationName());
         mobileApp.setPmoNumber(request.getPmoNumber());
         mobileApp.setStatus(request.getStatus());
-        mobileApp.setSdaHosting(request.getSdaHosting());
-        mobileApp.setMappingFunction(objectMapper.writeValueAsString(request.getMappingFunction()));
-        mobileApp.setDepartment(objectMapper.writeValueAsString(request.getDepartment()));
         mobileApp.setRole(objectMapper.writeValueAsString(request.getRole()));
         mobileApp.setBusinessImpactPriority(request.getBusinessImpactPriority());
-        mobileApp.setPicDeveloper(objectMapper.writeValueAsString(request.getPicDeveloper()));
         mobileApp.setDescription(request.getDescription());
         mobileApp.setApplicationFunction(request.getApplicationFunction());
         mobileApp.setDocumentation(objectMapper.writeValueAsString(documentPaths));
         mobileApp.setVersioningApplication(objectMapper.writeValueAsString(request.getVersioningApplication()));
         mobileApp.setApplicationUrl(objectMapper.writeValueAsString(request.getApplicationUrl()));
         mobileApp.setApplicationFile(objectMapper.writeValueAsString(filePaths));
-        mobileApp.setSdaFrontEnd(objectMapper.writeValueAsString(request.getSdaFrontEnd()));
-        mobileApp.setSdaBackEnd(objectMapper.writeValueAsString(request.getSdaBackEnd()));
         mobileApp.setWebServer(request.getWebServer());
         mobileApp.setSapIntegration(request.getSapIntegration());
         mobileApp.setApplicationSourceFrontEnd(request.getApplicationSourceFrontEnd());

@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_web_server")
+@Table(name = "master_web_server")
 public class WebServerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

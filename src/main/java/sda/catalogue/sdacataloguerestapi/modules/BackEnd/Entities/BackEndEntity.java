@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "tb_backend")
+@Table(name = "master_backend")
 public class BackEndEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

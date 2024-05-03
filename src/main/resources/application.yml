@@ -24,9 +24,9 @@ spring:
     add-properties: true
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-      #    hibernate:
+#    hibernate:
       #      ddl-auto: update
-    # ddl-auto: create-drop
+#      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
