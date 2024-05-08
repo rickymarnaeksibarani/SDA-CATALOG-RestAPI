@@ -54,13 +54,13 @@ public class MobileAppEntity {
 
     private String documentation;
 
-    @Column(name = "versioning_application", nullable = false, columnDefinition = "json")
+    @Column(name = "versioning_application", nullable = false, columnDefinition = "text")
     private String versioningApplication;
 
-    @Column(name = "application_url", columnDefinition = "json")
+    @Column(name = "application_url", columnDefinition = "text")
     private String applicationUrl;
 
-    @Column(name = "application_file_path", columnDefinition = "json")
+    @Column(name = "application_file_path", columnDefinition = "text")
     private String applicationFile;
 
     @Column(name = "web_server", nullable = false)
@@ -79,10 +79,10 @@ public class MobileAppEntity {
     @Column(name = "database_ip", nullable = false)
     private String databaseIp;
 
-    @Column(name = "application_api_list", columnDefinition = "json")
+    @Column(name = "application_api_list", columnDefinition = "text")
     private String applicationApiList;
 
-    @Column(name = "application_database_list", columnDefinition = "json")
+    @Column(name = "application_database_list", columnDefinition = "text")
     private String applicationDatabaseList;
 
     @CreatedDate
