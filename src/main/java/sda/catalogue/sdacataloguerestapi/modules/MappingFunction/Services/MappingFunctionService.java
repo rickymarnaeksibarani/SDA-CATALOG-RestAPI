@@ -1,7 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Services;
 
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import org.springframework.transaction.annotation.Transactional;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
@@ -20,16 +19,10 @@ import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasE
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.DinasRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -75,24 +68,22 @@ public class MappingFunctionService {
     public MappingFunctionEntity createMappingFunction(MappingFunctionDTO request) {
         MappingFunctionEntity data = new MappingFunctionEntity();
         data.setMappingFunction(request.getMappingFunction());
-        MappingFunctionEntity mappingFunctionProcess = mappingFunctionRepository.save(data);
 
         if (request.getDinasList() != null) {
-            List<DinasEntity> dinasList = new ArrayList<>();
-            for (DinasDTO dataDinas : request.getDinasList()) {
-                if (dataDinas.getDinas() != null) {
-                    DinasEntity dinasItem = new DinasEntity();
-                    dinasItem.setMappingFunctionEntity(mappingFunctionProcess);
-                    dinasItem.setDinas(dataDinas.getDinas());
-                    dinasList.add(dinasItem);
-                }
-            }
+            List<DinasEntity> dinasList = request.getDinasList().stream().map(item -> {
+                DinasEntity dept = new DinasEntity();
+                dept.setMappingFunctionEntity(data);
+                dept.setDinas(item.getDinas());
+                return dept;
+            }).toList();
+
             dinasRepository.saveAll(dinasList);
             data.setDinasEntityList(dinasList);
         } else {
             data.setDinasEntityList(null);
         }
-        return mappingFunctionProcess;
+
+        return mappingFunctionRepository.save(data);
     }
 
     @Transactional
