@@ -438,7 +438,6 @@ public class WebAppService extends BaseController {
                 Files.copy(fileManifest.getInputStream(), manifestPath);
             }
 
-            findData.setCategoryApp(request.getCategoryApp());
             findData.setAddress(request.getAddress());
             findData.setApplicationName(request.getApplicationName());
             findData.setLinkIOS(request.getLinkIOS());

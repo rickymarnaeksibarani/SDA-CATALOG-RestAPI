@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
-import sda.catalogue.sdacataloguerestapi.core.enums.Role;
-import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
-import sda.catalogue.sdacataloguerestapi.core.enums.Status;
+import sda.catalogue.sdacataloguerestapi.core.enums.*;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
@@ -46,6 +43,7 @@ public class MobileAppResponseDto {
     private String databaseIp;
     private List<AppApiListDto> applicationApiList;
     private List<DbListDto> applicationDatabaseList;
+    private AppCategory appCategory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

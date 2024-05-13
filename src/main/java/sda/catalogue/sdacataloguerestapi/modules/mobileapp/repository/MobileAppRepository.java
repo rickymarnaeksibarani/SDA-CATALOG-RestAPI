@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
-import java.util.Collection;
 import java.util.List;
 
 @Repository

@@ -48,7 +48,7 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     //Updating data WebApp by UUID
     @Modifying
     @Transactional
-    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber, w.sapIntegration = :sapIntegration,w.categoryApp = :categoryApp, " +
+    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.pmoNumber = :pmoNumber, w.sapIntegration = :sapIntegration,w.appCategory = :categoryApp, " +
             "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
             "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
             "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +

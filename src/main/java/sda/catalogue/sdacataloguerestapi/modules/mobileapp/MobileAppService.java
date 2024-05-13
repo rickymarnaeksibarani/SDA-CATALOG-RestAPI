@@ -100,6 +100,7 @@ public class MobileAppService {
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
+                .appCategory(mobileApp.getAppCategory())
                 .build();
     }
 
