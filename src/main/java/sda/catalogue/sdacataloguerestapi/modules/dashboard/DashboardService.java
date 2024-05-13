@@ -157,11 +157,13 @@ public class DashboardService {
 
                 if (category.equals("mobile")) {
                         predicates.add(
-                                builder.in(root.get("mappingFunctions").get("mappingFunction")).value(mappingFunction)
+                                builder.in(root.get("mappingFunction")).value(mappingFunction)
+//                                builder.in(root.get("mappingFunctions").get("mappingFunction")).value(mappingFunction)
                         );
                 } else if (category.equals("web")) {
                     predicates.add(
-                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+                            builder.in(root.get("mappingFunction")).value(mappingFunction)
+//                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
                     );
                 }
             }
