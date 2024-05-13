@@ -26,13 +26,6 @@ public class WebAppRequestDto {
 
     private String searchTerm;
 
-//    public String getSearchTerm() {
-//        return searchTerm;
-//    }
-//
-//    public void setSearchTerm(String searchTerm) {
-//        this.searchTerm = searchTerm;
-//    }
 
     private long idWebApp;
     private String applicationName;

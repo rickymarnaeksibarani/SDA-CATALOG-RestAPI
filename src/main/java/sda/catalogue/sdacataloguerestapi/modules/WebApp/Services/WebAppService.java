@@ -173,14 +173,6 @@ public class WebAppService extends BaseController {
             //Web Server Process
             List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
 
-//            if (!findSdaHosting.isEmpty()) {
-//                List<Long> sdaHostingId = new ArrayList<>();
-//                findSdaHosting.forEach(hostingData -> sdaHostingId.add(hostingData.getIdSDAHosting()));
-//                request.setSdaHosting(sdaHostingId);
-//            } else {
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"SDA Hosting with ID : " + request.getSdaHosting() + " not found");
-//            }
-
             //WebApp Process
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
 
@@ -199,19 +191,7 @@ public class WebAppService extends BaseController {
             }else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
-            log.info("findData {}", data.getSdaHostingEntity());
 
-
-//            //Path File
-//            if (apkPath != null) {
-//                data.setFileAndroid(String.valueOf(apkPath));
-//            }
-//            if (ipaPath != null) {
-//                data.setFileIpa(String.valueOf(ipaPath));
-//            }
-//            if (manifestPath != null) {
-//                data.setFileManifest(String.valueOf(manifestPath));
-//            }
 
             //App fie Process
             String ipa = uploadFileApp(request.getFileIpa(), "ipa");
@@ -398,13 +378,11 @@ public class WebAppService extends BaseController {
             }
 
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-            log.info("sdaHosting = {}", findSdaHosting);
             if (!findSdaHosting.isEmpty()){
                 findSdaHosting.stream().forEach(findData::setSdaHostingEntity);
             }else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
-            log.info("findData {}", findData.getSdaHostingEntity());
 
             Path apkPath;
             Path ipaPath;
@@ -547,9 +525,6 @@ public class WebAppService extends BaseController {
         documents.forEach(doc -> {
             try {
                 String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
-//                Path docFileDestination = Files.createDirectories(Path.of(uploadpath + "/document/"));
-//                doc.transferTo(Path.of(docFileDestination + "/" + docFilename));
-//                documentPaths.add(docFileDestination + "/" + docFilename);
 
                 String filepath = LocalDate.now().getYear() + "/docs/" + docFilename;
                 ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filepath, doc);
@@ -572,22 +547,12 @@ public class WebAppService extends BaseController {
             }
 
             String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/apk/"));
-//            Path resolve = fileDestination.resolve(androidFilename.trim());
-//            Files.copy(file.getInputStream(), resolve);
-//            filePaths = String.valueOf(resolve);
 
             filePaths = LocalDate.now().getYear() + "/android/" + androidFilename;
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
-//            if (!Objects.equals(file.getOriginalFilename(), ".ipa")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
-
             String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-//            Path fileDestination = Files.createDirectories(Path.of(uploadpath + "/ipa/"));
-//            Path resolve = fileDestination.resolve(ipaFilename.trim());
-//            Files.copy(file.getInputStream(), resolve);
-//            filePaths = String.valueOf(resolve);
 
             filePaths = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
         }
