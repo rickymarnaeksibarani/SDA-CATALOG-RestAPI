@@ -2,7 +2,6 @@ package sda.catalogue.sdacataloguerestapi.modules.dashboard.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 import sda.catalogue.sdacataloguerestapi.core.enums.AppCategory;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
@@ -12,10 +11,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-//@Table(name = "all_sda_view")
 @Subselect("SELECT * FROM all_sda_view")
 public class DashboardEntity {
     @Id
+    private Long id;
+
     private Long appId;
 
     @Column(name = "mapping_function")
