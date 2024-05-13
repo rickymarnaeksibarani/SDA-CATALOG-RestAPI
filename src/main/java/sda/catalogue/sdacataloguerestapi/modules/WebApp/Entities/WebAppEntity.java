@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import sda.catalogue.sdacataloguerestapi.core.enums.AppCategory;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
@@ -61,9 +62,9 @@ public class WebAppEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-
-    @Column(name = "category_app")
-    private String categoryApp;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "app_category", nullable = false)
+    private AppCategory appCategory = AppCategory.WEB;
 
     @Column(name = "description")
     private String description;

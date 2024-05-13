@@ -1,14 +1,11 @@
 package sda.catalogue.sdacataloguerestapi.modules.dashboard;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,18 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
-import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.DinasEntity;
-import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 //import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 //import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
-import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.ListAllSdaDto;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.PagingRequest;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticByHostingDto;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticStatusResponseDto;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.ApplicationUrlDto;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
+import sda.catalogue.sdacataloguerestapi.modules.dashboard.entity.DashboardEntity;
+import sda.catalogue.sdacataloguerestapi.modules.dashboard.repository.AllSdaRepository;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppRepository;
 
 import java.util.*;
@@ -43,6 +37,8 @@ public class DashboardService {
 //    private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private AllSdaRepository sdaRepository;
 
     @Transactional(readOnly = true)
 //    @Cacheable(value = "statsByStatus")
@@ -113,71 +109,17 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ListAllSdaDto> getAllSdaData(PagingRequest pagingRequest) {
+    public PaginationUtil<DashboardEntity, DashboardEntity> getAllSdaData(PagingRequest pagingRequest) {
         String order = Objects.nonNull(pagingRequest.getOrder()) ? pagingRequest.getOrder() : "DESC";
         String orderBy = Objects.nonNull(pagingRequest.getOrderBy()) ? pagingRequest.getOrderBy() : "createdAt";
         Integer size = pagingRequest.getSize();
         Integer page = pagingRequest.getPage();
-        size = (int) (size % 2 == 0 ? (double) (size / 2) : size / 2);
 
         Sort.Order newOrder = Objects.equals(order, "ASC") ? Sort.Order.asc(orderBy) : Sort.Order.desc(orderBy);
-
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(newOrder));
-        Page<MobileAppEntity> allMobileApps = mobileAppRepository.findAll(specification(pagingRequest, "mobile"), pageRequest);
-        Page<WebAppEntity> allWebApps = webAppRepository.findAll(specification(pagingRequest, "web"), pageRequest);
+        Page<DashboardEntity> allSda = sdaRepository.findAll(specification(pagingRequest, "web"), pageRequest);
 
-        List<ListAllSdaDto> mobileAppList = allMobileApps.getContent().stream().map(data -> {
-            List<MappingFunctionEntity> mappingFunctions = data.getMappingFunctions();
-            List<String> role;
-            ApplicationUrlDto address;
-
-            try {
-                role = objectMapper.readValue(data.getRole(), new TypeReference<>() {});
-                address = objectMapper.readValue(data.getApplicationUrl(), ApplicationUrlDto.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            ListAllSdaDto allSdaDto = new ListAllSdaDto();
-            allSdaDto.setId(data.getId());
-            allSdaDto.setMappingFunction(mappingFunctions);
-            allSdaDto.setRole(role);
-            allSdaDto.setAddress(List.of(address.getAppstoreUrl(), address.getPlaystoreUrl()));
-            allSdaDto.setStatus(data.getStatus());
-            allSdaDto.setName(data.getApplicationName());
-            allSdaDto.setCategory("mobile");
-            return allSdaDto;
-        }).toList();
-
-        List<ListAllSdaDto> webAppList = allWebApps.getContent().stream().map(data -> {
-            List<MappingFunctionEntity> mappingFunction = data.getMappingFunctionList().stream().toList();
-            List<List<DinasEntity>> departmentList = mappingFunction.stream()
-                    .map(MappingFunctionEntity::getDinasEntityList)
-                    .toList();
-            List<List<String>> department = departmentList
-                    .stream()
-                    .map(item -> item.stream()
-                            .map(DinasEntity::getDinas)
-                            .toList())
-                    .toList();
-
-            ListAllSdaDto allSdaDto = new ListAllSdaDto();
-            allSdaDto.setId(data.getIdWebapp());
-            allSdaDto.setRole(null);
-            allSdaDto.setDepartment(department.get(0));
-            allSdaDto.setAddress(List.of(data.getAddress()));
-            allSdaDto.setName(data.getApplicationName());
-            allSdaDto.setStatus(Status.valueOf(String.valueOf(data.getStatus())));
-            allSdaDto.setMappingFunction(mappingFunction);
-            allSdaDto.setCategory("web");
-            return allSdaDto;
-        }).toList();
-
-        List<ListAllSdaDto> listAllSda = new ArrayList<>();
-        listAllSda.addAll(mobileAppList);
-        listAllSda.addAll(webAppList);
-
-        return new PageImpl<>(listAllSda, pageRequest, allMobileApps.getTotalElements() + allWebApps.getTotalElements());
+        return new PaginationUtil<>(allSda, DashboardEntity.class);
     }
 
     private <T> Specification<T> specification(PagingRequest request, String category) {
@@ -256,7 +198,7 @@ public class DashboardService {
                 BusinessImpactPriority businessImpactPriority = request.getBusinessImpactPriority();
 
                 predicates.add(
-                        builder.equal(builder.upper(root.get("businessImpactPriority").as(String.class)), businessImpactPriority.name().toUpperCase())
+                        builder.equal(builder.upper(root.get("businessImpactPriority")), businessImpactPriority.name().toUpperCase())
                 );
             }
 

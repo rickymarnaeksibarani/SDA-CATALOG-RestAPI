@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import sda.catalogue.sdacataloguerestapi.core.enums.AppCategory;
 import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
@@ -84,6 +85,10 @@ public class MobileAppEntity {
 
     @Column(name = "application_database_list", columnDefinition = "text")
     private String applicationDatabaseList;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "app_category", nullable = false)
+    private AppCategory appCategory = AppCategory.MOBILE;
 
     @CreatedDate
     @Column(name = "created_at")
