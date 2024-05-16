@@ -33,8 +33,6 @@ public class DashboardService {
     private MobileAppRepository mobileAppRepository;
     @Autowired
     private WebAppRepository webAppRepository;
-//    @Autowired
-//    private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired

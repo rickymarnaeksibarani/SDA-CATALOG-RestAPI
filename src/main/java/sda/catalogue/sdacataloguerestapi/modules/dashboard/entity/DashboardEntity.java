@@ -18,11 +18,6 @@ public class DashboardEntity {
 
     private Long appId;
 
-    @Column(name = "mapping_function")
-    private String mappingFunction;
-
-    private Long mappingFunctionId;
-
     @Column(name = "application_url")
     private String applicationUrl;
 
@@ -43,10 +38,15 @@ public class DashboardEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-//    @Column(name = "dinas")
-//    private String dinas;
+    @Column(name = "mapping_func_list")
+    private String mappingFunctionList;
 
-    private String front_end;
+    @Column(name = "dept_list")
+    private String deptList;
 
-    private String back_end;
+    @Column(name = "fe_list")
+    private String feList;
+
+    @Column(name = "be_list")
+    private String beList;
 }
