@@ -1,13 +1,13 @@
 package sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,7 +42,4 @@ public class MappingFunctionEntity {
 
     @OneToMany(mappedBy = "mappingFunctionEntity", cascade = CascadeType.ALL)
     private List<DinasEntity> dinasEntityList;
-
-//    @OneToMany(mappedBy = "mappingFunction")
-//    private List<MobileAppEntity> mobileApp;
 }

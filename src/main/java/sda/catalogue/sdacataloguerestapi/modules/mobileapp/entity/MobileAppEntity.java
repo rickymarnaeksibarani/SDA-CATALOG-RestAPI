@@ -130,7 +130,7 @@ public class MobileAppEntity {
     )
     private List<BackEndEntity> backEnds;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "sda_hosting_list",
             joinColumns = @JoinColumn(name = "mobileapp_id"),
