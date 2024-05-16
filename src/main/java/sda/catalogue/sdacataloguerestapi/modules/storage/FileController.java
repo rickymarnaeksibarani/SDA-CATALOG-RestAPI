@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 @RestController
 @RequestMapping("api/v1/files")
-@CrossOrigin("${spring.frontend}")
+// @CrossOrigin("${spring.frontend}")
 public class FileController {
     @Autowired
     private StorageService storageService;
