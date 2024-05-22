@@ -151,17 +151,15 @@ public class DashboardService {
             }
 
             if (Objects.nonNull(request.getMappingFunction()) && !request.getMappingFunction().isEmpty()) {
-                List<String> mappingFunction = request.getMappingFunction();
+                List<String> mappingFunctionList = request.getMappingFunction();
+                Expression<String> jsonColumn = root.get("mappingFunctionList").as(String.class);
 
-                if (category.equals("mobile")) {
-                        predicates.add(
-                                builder.in(root.get("mappingFunction")).value(mappingFunction)
-//                                builder.in(root.get("mappingFunctions").get("mappingFunction")).value(mappingFunction)
-                        );
-                } else if (category.equals("web")) {
+                for (String mappingFunction : mappingFunctionList) {
                     predicates.add(
-                            builder.in(root.get("mappingFunction")).value(mappingFunction)
-//                            builder.in(root.get("mappingFunctionList").get("mappingFunction")).value(mappingFunction)
+//                            builder.and(
+//                                    builder.like(jsonColumn, "%" + mappingFunctionList + "%"),
+                                    builder.like(jsonColumn, "%" + mappingFunction + "%")
+//                            )
                     );
                 }
             }

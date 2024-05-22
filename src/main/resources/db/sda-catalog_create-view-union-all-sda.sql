@@ -3,7 +3,6 @@ DROP VIEW IF EXISTS all_sda_view;
 -- CREATE VIEW
 CREATE VIEW all_sda_view AS SELECT
     ROW_NUMBER() OVER () AS id,
---               *
     x.app_id,
     x.application_url,
     x.status,
@@ -11,10 +10,10 @@ CREATE VIEW all_sda_view AS SELECT
     x.business_impact_priority,
     x.app_category,
     x.created_at,
-    json_agg(x.mapping_function) AS mapping_func_list,
-    json_agg(x.depts) AS dept_list,
-    json_agg(x.fe_list) AS fe_list,
-    json_agg(x.be_list) AS be_list
+    jsonb_agg(x.mapping_function) AS mapping_func_list,
+    jsonb_agg(x.depts) AS dept_list,
+    jsonb_agg(x.fe_list) AS fe_list,
+    jsonb_agg(x.be_list) AS be_list
 FROM (
     SELECT
         mobileapp.id AS app_id,
@@ -27,13 +26,13 @@ FROM (
         mobileapp.created_at,
         mappings.mapping_function,
         cast(depts as jsonb) AS depts,
-        json_agg(fe_list) AS fe_list,
-        json_agg(be_list) AS be_list
+        jsonb_agg(fe_list) AS fe_list,
+        jsonb_agg(be_list) AS be_list
     FROM
         tb_mobileapp mobileapp
             LEFT JOIN mapping_functions mf ON mobileapp.id = mf.mobileapp_id
             LEFT JOIN (
-            SELECT m_mf.id_mapping_function, m_mf.mapping_function, json_agg(depts.*) AS depts
+            SELECT m_mf.id_mapping_function, m_mf.mapping_function, jsonb_agg(depts.*) AS depts
             FROM tb_mapping_function m_mf
                      LEFT JOIN (SELECT dept.id_dinas, dept.id_mapping_function AS mapping_function_id, dept.dinas
                                 FROM tb_dinas_mapping_function dept
@@ -65,13 +64,13 @@ FROM (
         webapp.created_at,
         mappings.mapping_function,
         cast(depts as jsonb) AS depts,
-        json_agg(fe_list) AS fe_list,
-        json_agg(be_list) AS be_list
+        jsonb_agg(fe_list) AS fe_list,
+        jsonb_agg(be_list) AS be_list
     FROM
         tb_webapp webapp
             LEFT JOIN webapp_mapping_function mf ON webapp.id_webapp = mf.id_webapp
             LEFT JOIN (
-            SELECT m_mf.id_mapping_function, m_mf.mapping_function, json_agg(depts.*) AS depts
+            SELECT m_mf.id_mapping_function, m_mf.mapping_function, jsonb_agg(depts.*) AS depts
             FROM tb_mapping_function m_mf
                      LEFT JOIN (SELECT dept.id_dinas, dept.id_mapping_function AS mapping_function_id, dept.dinas
                                 FROM tb_dinas_mapping_function dept
