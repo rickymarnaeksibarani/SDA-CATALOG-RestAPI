@@ -222,21 +222,12 @@ public class MobileAppService {
 
         // Get old documents and remove
         List<ApplicationFileDto> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<ArrayList<ApplicationFileDto>>() {});
-        log.info("docs {}", docs);
         List<String> docPathList = docs.stream().map(ApplicationFileDto::getPath).toList();
-//        List<String> oldFilename = docList.stream().map(StringUtils::getFilename).toList();
         List<String> oldDocsName = docs.stream().map(ApplicationFileDto::getFilename).toList();
-
-        if (request.getDocumentation() != null) {
-            log.info("newFilename {}, oldFilename {},", request.getDocumentation().stream().map(MultipartFile::getOriginalFilename).toList(), oldDocsName);
-            log.info("isEquals {}", Objects.equals(request.getDocumentation().stream().map(MultipartFile::getOriginalFilename).toList(), oldDocsName));
-            log.info("tes {}", (request.getDocumentation() != null && !Objects.equals(request.getDocumentation().stream().map(MultipartFile::getOriginalFilename).toList(), oldDocsName)));
-        }
 
         boolean isNewDocNameAndOldDocNameEqual = request.getDocumentation() != null && Objects.equals(request.getDocumentation().stream().map(MultipartFile::getOriginalFilename).toList(), oldDocsName);
 
         if (!docPathList.isEmpty() && !isNewDocNameAndOldDocNameEqual) {
-            log.info("delete file executed");
             storageService.deleteAllFileS3(docPathList);
         }
 
@@ -244,26 +235,27 @@ public class MobileAppService {
         List<ApplicationFileDto> documentPaths = isNewDocNameAndOldDocNameEqual ? docs : new ArrayList<>();
 
         if (!isNewDocNameAndOldDocNameEqual) {
-            log.info("upload document executed");
             documentPaths = uploadDocument(request.getDocumentation());
         }
 
         // Get Old files from DB and remove
         List<ApplicationFileDto> appFiles = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<ArrayList<ApplicationFileDto>>() {});
-        List<String> appFilePath = appFiles.stream().map(ApplicationFileDto::getPath).toList();
-        if (!appFilePath.isEmpty()) {
-            storageService.deleteAllFileS3(appFilePath);
+        List<String> oldAppFilePaths = appFiles.stream().map(ApplicationFileDto::getPath).toList();
+        List<String> oldFilesName = appFiles.stream().map(ApplicationFileDto::getFilename).toList();
+
+        if (!oldAppFilePaths.isEmpty()) {
+            storageService.deleteAllFileS3(oldAppFilePaths);
         }
 
         // Upload new ipa file
         List<ApplicationFileDto> ipa = new ArrayList<>();
-        if (request.getIpaFile() != null && !appFilePath.equals(request.getIpaFile().getOriginalFilename())) {
+        if (request.getIpaFile() != null && !Objects.equals(request.getIpaFile().getOriginalFilename(), oldFilesName.toString())) {
             ipa = uploadFileApp(request.getIpaFile(), "ipa");
         }
 
         // Upload new apk file
         List<ApplicationFileDto> apk = new ArrayList<>();
-        if (request.getAndroidFile() != null && appFilePath.equals(request.getAndroidFile().getOriginalFilename())) {
+        if (request.getAndroidFile() != null && !Objects.equals(request.getAndroidFile().getOriginalFilename(), oldFilesName.toString())) {
             apk = uploadFileApp(request.getAndroidFile(), "apk");
         }
 
@@ -333,9 +325,9 @@ public class MobileAppService {
         String generatedString = generateRandomString();
 
         documents.forEach(doc -> {
-//            if (!Objects.equals(doc.getContentType(), "application/pdf")) {
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document must be pdf file");
-//            }
+            if (!Objects.equals(doc.getContentType(), "application/pdf")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document must be pdf file");
+            }
 
             try {
                 String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
@@ -350,7 +342,6 @@ public class MobileAppService {
                 applicationFileDto.setMimeType(doc.getContentType());
                 documentPaths.add(applicationFileDto);
 
-//                documentPaths.add(objectWriteResponse.object());
             } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
                 throw new RuntimeException(e);
             }
@@ -381,8 +372,6 @@ public class MobileAppService {
             applicationFileDto.setMimeType(file.getContentType());
             applicationFileDto.setPath(objectWriteResponse.object());
             appFiles.add(applicationFileDto);
-
-//            filePaths.add(objectWriteResponse.object());
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
@@ -397,8 +386,6 @@ public class MobileAppService {
             applicationFileDto.setMimeType(file.getContentType());
             applicationFileDto.setPath(objectWriteResponse.object());
             appFiles.add(applicationFileDto);
-
-//            filePaths.add(objectWriteResponse.object());
         }
 
         return appFiles;
