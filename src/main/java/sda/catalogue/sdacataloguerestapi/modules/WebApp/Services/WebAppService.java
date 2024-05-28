@@ -289,8 +289,6 @@ public class WebAppService extends BaseController {
             });
         }
 
-        log.info("documentation {}", documentUploadEntities.stream().map(DocumentUploadEntity::getPath).toList());
-
         //Fetching from data master
         List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
         if (picDeveloper.isEmpty()){
