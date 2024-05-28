@@ -53,6 +53,7 @@ public class MobileAppEntity {
     @Column(name = "application_function", nullable = false)
     private String applicationFunction;
 
+    @Column(columnDefinition = "text")
     private String documentation;
 
     @Column(name = "versioning_application", nullable = false, columnDefinition = "text")

@@ -1,9 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.storage;
 
-import io.minio.GetObjectResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -29,10 +27,22 @@ public class FileController {
         String filename = StringUtils.getFilename(path);
         byte[] bytes = fileFromS3.readAllBytes();
 
+        String contentType = null;
+
+        if (filename.contains(".pdf")) {
+            contentType = "application/pdf";
+        } else if (filename.contains(".png")) {
+            contentType = "image/png";
+        } else if (filename.contains(".apk")) {
+            contentType = "application/vnd.android.package-archive";
+        } else if (filename.contains(".ipa")) {
+            contentType = "application/octet-stream";
+        }
+
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "filename=\"" + filename + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, "*")
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .body(bytes);
     }
 }

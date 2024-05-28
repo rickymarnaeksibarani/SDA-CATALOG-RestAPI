@@ -38,15 +38,15 @@ public class DashboardEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "mapping_func_list")
+    @Column(name = "mapping_func_list", columnDefinition = "jsonb")
     private String mappingFunctionList;
 
-    @Column(name = "dept_list")
+    @Column(name = "dept_list", columnDefinition = "jsonb")
     private String deptList;
 
-    @Column(name = "fe_list")
+    @Column(name = "fe_list", columnDefinition = "jsonb")
     private String feList;
 
-    @Column(name = "be_list")
+    @Column(name = "be_list", columnDefinition = "jsonb")
     private String beList;
 }

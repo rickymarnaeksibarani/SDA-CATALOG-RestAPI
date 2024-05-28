@@ -30,10 +30,10 @@ public class MobileAppResponseDto {
     private List<PICDeveloperEntity> picDevelopers;
     private String description;
     private String applicationFunction;
-    private List<String> documentation;
+    private List<ApplicationFileDto> documentation;
     private List<VersioningAppDto> versioningApplication;
     private ApplicationUrlDto applicationUrl;
-    private List<String> applicationFilePath;
+    private List<ApplicationFileDto> applicationFilePath;
     private List<FrontEndEntity> sdaFrontEnds;
     private List<BackEndEntity> sdaBackEnds;
     private String webServer;

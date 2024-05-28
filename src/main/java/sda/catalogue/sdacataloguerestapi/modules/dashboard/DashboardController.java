@@ -2,7 +2,6 @@ package sda.catalogue.sdacataloguerestapi.modules.dashboard;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PagingResponse;
-import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
-import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.ListAllSdaDto;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.PagingRequest;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticByHostingDto;
 import sda.catalogue.sdacataloguerestapi.modules.dashboard.dto.StatisticStatusResponseDto;
-import sda.catalogue.sdacataloguerestapi.modules.dashboard.entity.DashboardEntity;
 
 import java.util.List;
 
@@ -76,19 +71,5 @@ public class DashboardController {
                 .status(HttpStatus.OK)
                 .message("Success get all sda data")
                 .build();
-
-//        Page<ListAllSdaDto> allSdaData = dashboardService.getAllSdaData(pagingRequest);
-//        Integer totalPage = (int) Math.ceil(allSdaData.getTotalPages() / allSdaData.getSize());
-
-//        return ApiResponse.builder()
-//                .message("Success get data")
-//                .status(HttpStatus.OK)
-//                .paging(PagingResponse.builder()
-//                        .totalPage(totalPage)
-//                        .currentPage(allSdaData.getNumber() + 1)
-//                        .totalItems(allSdaData.getTotalElements())
-//                        .build())
-//                .result(allSdaData.getContent())
-//                .build();
     }
 }
