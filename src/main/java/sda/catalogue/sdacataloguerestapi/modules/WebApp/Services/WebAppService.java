@@ -74,7 +74,7 @@ public class WebAppService extends BaseController {
     private WebAppRepository webAppRepository;
     @Autowired
     private PICDeveloperRepository picDeveloperRepository;
-//    @Autowired
+    //    @Autowired
 //    private PICAnalystRepository picAnalystRepository;
     @Autowired
     private MappingFunctionRepository mappingFunctionRepository;
@@ -305,8 +305,6 @@ public class WebAppService extends BaseController {
 
     }
 
-
-
     //Getting data by ID
     public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
         WebAppEntity result = webAppRepository.findById(id_webapp)
@@ -345,6 +343,20 @@ public class WebAppService extends BaseController {
             MultipartFile fileIpa = request.getFileIpa();
             MultipartFile fileManifest = request.getFileManifest();
 
+            //upload new Documentation
+            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+
+            WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
+            if (documentPaths != null){
+                documentPaths.stream().forEach(path -> {
+                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                    documentUploadEntity.setPath(path);
+                    documentUploadEntity.setWebAppEntity(data);
+                    documentUploadEntities.add(documentUploadEntity);
+                });
+            }
+            data.setDocumentUploadList(documentUploadEntities);
 
             //Fetching from data master
             List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
@@ -517,12 +529,15 @@ public class WebAppService extends BaseController {
     }
 
     private List<String> uploadDocument(List<MultipartFile> documents){
-        if (documents == null || documents.isEmpty()) return null;
+        if (documents == null || documents.isEmpty()) return Collections.emptyList();
 
         List<String> documentPaths = new ArrayList<>();
         String generatedString = generateRandomString();
 
         documents.forEach(doc -> {
+            if (!Objects.equals(doc.getContentType(), "application/pdf")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"PDF Only");
+            }
             try {
                 String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
 
@@ -536,9 +551,9 @@ public class WebAppService extends BaseController {
         return documentPaths;
     }
     private String uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
-        if (file == null || file.isEmpty()) return null;
+        if (file == null || file.isEmpty()) return Collections.emptyList().toString();
 
-        String filePaths = null;
+        List<String> filePaths = new ArrayList<>();
         String generatedString = generateRandomString();
 
         if (Objects.equals(appFileCategory, "apk")) {
@@ -548,17 +563,21 @@ public class WebAppService extends BaseController {
 
             String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
 
-            filePaths = LocalDate.now().getYear() + "/android/" + androidFilename;
+            String filePath = LocalDate.now().getYear() + "/android/" + androidFilename;
+            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
+            filePaths.add(objectWriteResponse.object());
         }
 
         if (Objects.equals(appFileCategory, "ipa")) {
-            String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+            if (!Objects.equals(file.getContentType(), "application/octet-stream")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
 
-            filePaths = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
+            String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+            String filePath = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
+            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
+            filePaths.add(objectWriteResponse.object());
         }
 
-        ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePaths, file);
-        return objectWriteResponse.object();
+        return filePaths.toString();
     }
 
 
