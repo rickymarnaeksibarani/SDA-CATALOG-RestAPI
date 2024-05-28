@@ -1,10 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -23,13 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
-import sda.catalogue.sdacataloguerestapi.core.enums.BusinessImpactPriority;
-import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
-import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Services.DocumentUploadService;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
@@ -53,13 +44,9 @@ import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningA
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;
-import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
 import sda.catalogue.sdacataloguerestapi.modules.storage.StorageService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -91,21 +78,13 @@ public class WebAppService extends BaseController {
     @Autowired
     private ApiRepository apiRepository;
     @Autowired
-    private DocumentUploadService documentUploadService;
-    @Autowired
     private TypeDatabaseRepository typeDatabaseRepository;
     @Autowired
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private StorageService storageService;
 
 
-
-    private static final String UPLOAD_DIR_APK = "src/main/resources/uploads/apk";
-    private static final String UPLOAD_DIR_IPA = "src/main/resources/uploads/ipa";
-    private static final String UPLOAD_DIR_MANIFEST = "src/main/resources/uploads/manifest";
     private final Date date = new Date();
     private final Long time = date.getTime();
 
@@ -124,35 +103,6 @@ public class WebAppService extends BaseController {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
-            }
-            //File Android Process
-            Path apkPath = null;
-            if (request.getFileAndroid() != null) {
-                super.isValidApkType(request.getFileAndroid());
-                String apkFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileAndroid().getOriginalFilename()));
-                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-                Files.createDirectories(newApkPath);
-                apkPath = newApkPath.resolve(apkFileName);
-                Files.copy(request.getFileAndroid().getInputStream(), apkPath);
-            }
-            //Ipa Process
-            Path ipaPath = null;
-            if (request.getFileIpa() != null) {
-                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileIpa().getOriginalFilename()));
-                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-                Files.createDirectories(newIpaPath);
-                ipaPath = newIpaPath.resolve(ipaFileName);
-                Files.copy(request.getFileIpa().getInputStream(), ipaPath);
-            }
-
-            //Manifest Process
-            Path manifestPath = null;
-            if (request.getFileManifest() != null) {
-                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(request.getFileManifest().getOriginalFilename()));
-                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-                Files.createDirectories(newManifestPath);
-                manifestPath = newManifestPath.resolve(manifestFileName);
-                Files.copy(request.getFileManifest().getInputStream(), manifestPath);
             }
 
             //PIC Developer Process
@@ -193,16 +143,6 @@ public class WebAppService extends BaseController {
             }
 
 
-            //App fie Process
-            String ipa = uploadFileApp(request.getFileIpa(), "ipa");
-            String android = uploadFileApp(request.getFileAndroid(), "android");
-            String manifest = uploadFileApp(request.getFileManifest(), "manifest");
-
-            List<String> filePaths = new ArrayList<>();
-            filePaths.add(ipa);
-            filePaths.add(android);
-            filePaths.add(manifest);
-
             //Documentation process
             List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
@@ -216,7 +156,6 @@ public class WebAppService extends BaseController {
                 });
             }
             data.setDocumentUploadList(documentUploadEntities);
-
             WebAppEntity result = webAppRepository.save(data);
 
             //Versioning Application Process
@@ -266,8 +205,6 @@ public class WebAppService extends BaseController {
             databaseRepository.saveAll(databaseListData);
             versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -306,7 +243,7 @@ public class WebAppService extends BaseController {
     }
 
     //Getting data by ID
-    public WebAppEntity getWebAppById(Long id_webapp) throws JsonProcessingException {
+    public WebAppEntity getWebAppById(Long id_webapp) {
         WebAppEntity result = webAppRepository.findById(id_webapp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
         return result;
@@ -326,138 +263,97 @@ public class WebAppService extends BaseController {
                                            List<ApiEntity> apiEntities
 
     ) {
-        try {
-            WebAppEntity findData = webAppRepository.findByUuid(uuid);
-            if (findData == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
+        WebAppEntity findData = webAppRepository.findByUuid(uuid);
+        if (findData == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
+        }
+
+        if (!findData.getApplicationName().equals(request.getApplicationName())){
+            WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
+            if (existingApp != null && !existingApp.getUuid().equals(uuid)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT,"Application name already exist");
             }
+        }
 
-            if (!findData.getApplicationName().equals(request.getApplicationName())){
-                WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
-                if (existingApp != null && !existingApp.getUuid().equals(uuid)){
-                    throw new ResponseStatusException(HttpStatus.CONFLICT,"Application name already exist");
-                }
-            }
+        //Update new Documentation
+        List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+        List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
-            MultipartFile fileAndroid = request.getFileAndroid();
-            MultipartFile fileIpa = request.getFileIpa();
-            MultipartFile fileManifest = request.getFileManifest();
+        WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
+        if (documentPaths != null){
+            documentPaths.stream().forEach(path -> {
+                DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                documentUploadEntity.setPath(path);
+                documentUploadEntity.setWebAppEntity(data);
+                documentUploadEntities.add(documentUploadEntity);
+            });
+        }
 
-            //upload new Documentation
-            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
-            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+        log.info("documentation {}", documentUploadEntities.stream().map(DocumentUploadEntity::getPath).toList());
 
-            WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
-            if (documentPaths != null){
-                documentPaths.stream().forEach(path -> {
-                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
-                    documentUploadEntity.setPath(path);
-                    documentUploadEntity.setWebAppEntity(data);
-                    documentUploadEntities.add(documentUploadEntity);
-                });
-            }
-            data.setDocumentUploadList(documentUploadEntities);
-
-            //Fetching from data master
-            List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
-            if (picDeveloper.isEmpty()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
-            }
+        //Fetching from data master
+        List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
+        if (picDeveloper.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+        }
 
 //            List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
 //            if (picAnalyst.isEmpty()){
 //                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
 //            }
 
-            List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
-            if (mappingFunction.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
-            }
-
-            List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
-            if (frontEnd.isEmpty()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
-            }
-
-            List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
-            if (backEnd.isEmpty()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
-            }
-
-            List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
-            if (webServer.isEmpty()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
-            }
-
-            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-            if (!findSdaHosting.isEmpty()){
-                findSdaHosting.stream().forEach(findData::setSdaHostingEntity);
-            }else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
-            }
-
-            Path apkPath;
-            Path ipaPath;
-            Path manifestPath;
-
-            //Apk Andorid Process
-            if (fileAndroid != null) {
-                super.isValidApkType(fileAndroid);
-                String apkFileName = super.generateNewFilename(Objects.requireNonNull(fileAndroid.getOriginalFilename()));
-                Path newApkPath = Paths.get(UPLOAD_DIR_APK);
-                Files.createDirectories(newApkPath);
-                apkPath = newApkPath.resolve(apkFileName);
-                Files.copy(fileAndroid.getInputStream(), apkPath);
-            }
-
-            //Ipa Process
-            if (fileIpa != null) {
-                String ipaFileName = super.generateNewFilename(Objects.requireNonNull(fileIpa.getOriginalFilename()));
-                Path newIpaPath = Paths.get(UPLOAD_DIR_IPA);
-                Files.createDirectories(newIpaPath);
-                ipaPath = newIpaPath.resolve(ipaFileName);
-                Files.copy(fileIpa.getInputStream(), ipaPath);
-            }
-
-            //Manifest Process
-            if (fileManifest != null) {
-                String manifestFileName = super.generateNewFilename(Objects.requireNonNull(fileManifest.getOriginalFilename()));
-                Path newManifestPath = Paths.get(UPLOAD_DIR_MANIFEST);
-                Files.createDirectories(newManifestPath);
-                manifestPath = newManifestPath.resolve(manifestFileName);
-                Files.copy(fileManifest.getInputStream(), manifestPath);
-            }
-
-            findData.setAddress(request.getAddress());
-            findData.setApplicationName(request.getApplicationName());
-            findData.setLinkIOS(request.getLinkIOS());
-            findData.setLinkAndroid(request.getLinkAndroid());
-            findData.setFileIpa(String.valueOf(request.getFileIpa()));
-            findData.setFileAndroid(String.valueOf(request.getFileAndroid()));
-            findData.setFileManifest(String.valueOf(request.getFileManifest()));
-            findData.setDescription(request.getDescription());
-            findData.setFunctionApplication(request.getFunctionApplication());
-            findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
-            findData.setStatus(request.getStatus());
-            findData.setSapIntegration(request.getSapIntegration());
-            findData.setIpDatabase(request.getIpDatabase());
-            findData.setPmoNumber(request.getPmoNumber());
-            findData.setPicDeveloperList(picDeveloper);
-//            findData.setPicAnalystList(picAnalyst);
-            findData.setMappingFunctionList(mappingFunction);
-            findData.setFrontEndList(frontEnd);
-            findData.setBackEndList(backEnd);
-            findData.setWebServerList(webServer);
-            findData.setVersioningApplicationList(versioningApplicationEntities);
-            findData.setDatabaseList(databaseEntities);
-            findData.setApiList(apiEntities);
-
-            webAppRepository.save(findData);
-
-            return webAppRepository.save(findData);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.toString());
+        List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
+        if (mappingFunction.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
         }
+
+        List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
+        if (frontEnd.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+        }
+
+        List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
+        if (backEnd.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+        }
+
+        List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
+        if (webServer.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
+        }
+
+        List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+        if (!findSdaHosting.isEmpty()){
+            findSdaHosting.stream().forEach(findData::setSdaHostingEntity);
+        }else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
+        }
+
+        findData.setAddress(request.getAddress());
+        findData.setApplicationName(request.getApplicationName());
+        findData.setLinkIOS(request.getLinkIOS());
+        findData.setLinkAndroid(request.getLinkAndroid());
+        findData.setDescription(request.getDescription());
+        findData.setFunctionApplication(request.getFunctionApplication());
+        findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
+        findData.setStatus(request.getStatus());
+        findData.setSapIntegration(request.getSapIntegration());
+        findData.setIpDatabase(request.getIpDatabase());
+        findData.setPmoNumber(request.getPmoNumber());
+        findData.setPicDeveloperList(picDeveloper);
+//            findData.setPicAnalystList(picAnalyst);
+        findData.setMappingFunctionList(mappingFunction);
+        findData.setFrontEndList(frontEnd);
+        findData.setBackEndList(backEnd);
+        findData.setWebServerList(webServer);
+        findData.setVersioningApplicationList(versioningApplicationEntities);
+        findData.setDatabaseList(databaseEntities);
+        findData.setApiList(apiEntities);
+        findData.setDocumentUploadList(documentUploadEntities);
+
+        webAppRepository.save(findData);
+
+        return webAppRepository.save(findData);
     }
 
     //Deleting data WebApp by UUID
@@ -471,21 +367,6 @@ public class WebAppService extends BaseController {
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
-        }
-    }
-
-    private void deleteApkIpaManifest(Path apkPath, Path ipaPath, Path manifestPath) {
-        try {
-            //APK Process
-            Files.delete(apkPath);
-
-            //Ipa Process
-            Files.delete(ipaPath);
-
-            //Manifest Process
-            Files.delete(manifestPath);
-        } catch (IOException e) {
-            throw new CustomRequestException(e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -549,35 +430,6 @@ public class WebAppService extends BaseController {
             }
         });
         return documentPaths;
-    }
-    private String uploadFileApp(MultipartFile file, String appFileCategory) throws Exception {
-        if (file == null || file.isEmpty()) return Collections.emptyList().toString();
-
-        List<String> filePaths = new ArrayList<>();
-        String generatedString = generateRandomString();
-
-        if (Objects.equals(appFileCategory, "apk")) {
-            if (!Objects.equals(file.getContentType(), "application/vnd.android.package-archive")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid android file");
-            }
-
-            String androidFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-
-            String filePath = LocalDate.now().getYear() + "/android/" + androidFilename;
-            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
-            filePaths.add(objectWriteResponse.object());
-        }
-
-        if (Objects.equals(appFileCategory, "ipa")) {
-            if (!Objects.equals(file.getContentType(), "application/octet-stream")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ipa file");
-
-            String ipaFilename = time + generatedString + "_" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
-            String filePath = LocalDate.now().getYear() + "/ipa/" + ipaFilename;
-            ObjectWriteResponse objectWriteResponse = storageService.storeToS3(filePath, file);
-            filePaths.add(objectWriteResponse.object());
-        }
-
-        return filePaths.toString();
     }
 
 
