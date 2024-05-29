@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
+import sda.catalogue.sdacataloguerestapi.core.utils.GenerateAssetNumber;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -95,7 +96,7 @@ public class MobileAppService {
                 .id(mobileApp.getId())
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
-                .pmoNumber(mobileApp.getPmoNumber())
+                .assetNumber(mobileApp.getAssetNumber())
                 .sdaHostingList(mobileApp.getSdaHostingList())
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
@@ -151,6 +152,7 @@ public class MobileAppService {
 
         MobileAppEntity mobileApp = new MobileAppEntity();
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documents, filePaths);
+        payload.setAssetNumber(GenerateAssetNumber.generateAssetNumber("AM", mobileAppRepository.count() + 1)); // AM for 'Asset Mobile'
         payload.setMappingFunctions(mappingFunction);
         payload.setPicDevelopers(picDeveloper);
         payload.setFrontEnds(frontEndData);
@@ -170,7 +172,7 @@ public class MobileAppService {
                 predicates.add(
                         builder.or(
                                 builder.like(builder.upper(root.get("applicationName")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("assetNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
                         )
                 );
             }
@@ -298,7 +300,6 @@ public class MobileAppService {
 
     private MobileAppEntity mobileAppPayload(MobileAppDto request, MobileAppEntity mobileApp, List<ApplicationFileDto> documents, List<ApplicationFileDto> appFiles) throws JsonProcessingException {
         mobileApp.setApplicationName(request.getApplicationName());
-        mobileApp.setPmoNumber(request.getPmoNumber());
         mobileApp.setStatus(request.getStatus());
         mobileApp.setRole(objectMapper.writeValueAsString(request.getRole()));
         mobileApp.setBusinessImpactPriority(request.getBusinessImpactPriority());

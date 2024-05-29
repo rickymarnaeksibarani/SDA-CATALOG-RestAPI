@@ -21,7 +21,7 @@ import java.util.List;
 public class MobileAppResponseDto {
     private Long id;
     private String applicationName;
-    private String pmoNumber;
+    private String assetNumber;
     private Status status;
     private List<SDAHostingEntity> sdaHostingList;
     private List<MappingFunctionEntity> mappingFunctions;

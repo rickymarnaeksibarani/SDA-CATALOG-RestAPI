@@ -24,9 +24,6 @@ public class MobileAppDto {
     @NotBlank
     private String applicationName;
 
-    @NotBlank
-    private String pmoNumber;
-
     @Enumerated
     private Status status;
 

@@ -34,8 +34,8 @@ public class MobileAppEntity {
     @Column(name = "application_name", nullable = false)
     private String applicationName;
 
-    @Column(name = "pmo_number", nullable = false)
-    private String pmoNumber;
+    @Column(name = "asset_number", nullable = false, length = 50, unique = true)
+    private String assetNumber;
 
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
