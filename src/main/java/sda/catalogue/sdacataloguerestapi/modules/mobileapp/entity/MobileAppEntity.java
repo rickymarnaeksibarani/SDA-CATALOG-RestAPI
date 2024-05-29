@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,6 +13,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 
@@ -138,4 +140,9 @@ public class MobileAppEntity {
             inverseJoinColumns = @JoinColumn(name = "id_sda_hosting")
     )
     private List<SDAHostingEntity> sdaHostingList;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "pic_analyst_id", referencedColumnName = "id_pic_analyst")
+    private PICAnalystEntity picAnalyst;
 }

@@ -8,6 +8,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.*;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 
@@ -28,6 +29,7 @@ public class MobileAppResponseDto {
     private List<Role> role;
     private BusinessImpactPriority businessImpactPriority;
     private List<PICDeveloperEntity> picDevelopers;
+    private PICAnalystEntity picAnalyst;
     private String description;
     private String applicationFunction;
     private List<ApplicationFileDto> documentation;

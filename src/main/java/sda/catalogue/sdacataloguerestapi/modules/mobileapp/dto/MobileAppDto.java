@@ -85,4 +85,7 @@ public class MobileAppDto {
     private List<AppApiListDto> applicationApiList;
 
     private List<DbListDto> applicationDatabaseList;
+
+    @NotBlank
+    private String picAnalyst;
 }
