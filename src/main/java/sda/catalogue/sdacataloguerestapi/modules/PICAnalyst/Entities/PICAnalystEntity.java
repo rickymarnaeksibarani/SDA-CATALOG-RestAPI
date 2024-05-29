@@ -1,5 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,8 +10,10 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -42,6 +46,11 @@ public class PICAnalystEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(mappedBy = "picAnalyst")
+    private List<MobileAppEntity> mobileApp;
 
     public PICAnalystEntity(Long id) {
         // Assuming you want to set the idPicDeveloper field with the provided id

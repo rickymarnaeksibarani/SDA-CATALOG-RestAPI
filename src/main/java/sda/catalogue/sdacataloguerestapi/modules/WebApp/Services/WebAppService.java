@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.BaseController;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.ObjectMapper.ObjectMapperUtil;
+import sda.catalogue.sdacataloguerestapi.core.utils.GenerateAssetNumber;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -156,6 +157,7 @@ public class WebAppService extends BaseController {
                 });
             }
             data.setDocumentUploadList(documentUploadEntities);
+            data.setAssetNumber(GenerateAssetNumber.generateAssetNumber("AW", webAppRepository.count() + 1));
             WebAppEntity result = webAppRepository.save(data);
 
             //Versioning Application Process
@@ -220,7 +222,7 @@ public class WebAppService extends BaseController {
                 predicates.add(
                         builder.or(
                                 builder.like(builder.upper(root.get("applicationName")), "%" + requestDto.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + requestDto.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("assetNumber")), "%" + requestDto.getSearchTerm().toUpperCase() + "%")
                         )
                 );
             }
@@ -337,7 +339,6 @@ public class WebAppService extends BaseController {
         findData.setStatus(request.getStatus());
         findData.setSapIntegration(request.getSapIntegration());
         findData.setIpDatabase(request.getIpDatabase());
-        findData.setPmoNumber(request.getPmoNumber());
         findData.setPicDeveloperList(picDeveloper);
 //            findData.setPicAnalystList(picAnalyst);
         findData.setMappingFunctionList(mappingFunction);

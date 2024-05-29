@@ -24,9 +24,6 @@ public class MobileAppDto {
     @NotBlank
     private String applicationName;
 
-    @NotBlank
-    private String pmoNumber;
-
     @Enumerated
     private Status status;
 
@@ -88,4 +85,7 @@ public class MobileAppDto {
     private List<AppApiListDto> applicationApiList;
 
     private List<DbListDto> applicationDatabaseList;
+
+    @NotBlank
+    private String picAnalyst;
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.enums.Role;
+import sda.catalogue.sdacataloguerestapi.core.utils.GenerateAssetNumber;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
@@ -24,6 +25,8 @@ import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntit
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -58,6 +61,8 @@ public class MobileAppService {
     private FrontEndRepository frontEndRepository;
     @Autowired
     private BackEndRepository backEndRepository;
+    @Autowired
+    private PICAnalystRepository picAnalystRepository;
     @Autowired
     private ObjectMapper objectMapper;
     private final Path uploadpath = Paths.get("src/main/resources/uploads/");
@@ -95,12 +100,13 @@ public class MobileAppService {
                 .id(mobileApp.getId())
                 .applicationFilePath(appFilePaths)
                 .versioningApplication(versioningApp)
-                .pmoNumber(mobileApp.getPmoNumber())
+                .assetNumber(mobileApp.getAssetNumber())
                 .sdaHostingList(mobileApp.getSdaHostingList())
                 .businessImpactPriority(mobileApp.getBusinessImpactPriority())
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
                 .appCategory(mobileApp.getAppCategory())
+                .picAnalyst(mobileApp.getPicAnalyst())
                 .build();
     }
 
@@ -138,6 +144,9 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
 
+        PICAnalystEntity picAnalyst = picAnalystRepository.findByPersonalName(request.getPicAnalyst())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found"));
+
         // Documentation
         List<ApplicationFileDto> documents = uploadDocument(request.getDocumentation());
 
@@ -151,11 +160,13 @@ public class MobileAppService {
 
         MobileAppEntity mobileApp = new MobileAppEntity();
         MobileAppEntity payload = mobileAppPayload(request, mobileApp, documents, filePaths);
+        payload.setAssetNumber(GenerateAssetNumber.generateAssetNumber("AM", mobileAppRepository.count() + 1)); // AM for 'Asset Mobile'
         payload.setMappingFunctions(mappingFunction);
         payload.setPicDevelopers(picDeveloper);
         payload.setFrontEnds(frontEndData);
         payload.setBackEnds(backendData);
         payload.setSdaHostingList(sdaHosting);
+        payload.setPicAnalyst(picAnalyst);
         mobileAppRepository.save(payload);
 
         return toMobileAppResponse(payload);
@@ -170,7 +181,7 @@ public class MobileAppService {
                 predicates.add(
                         builder.or(
                                 builder.like(builder.upper(root.get("applicationName")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("pmoNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("assetNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
                         )
                 );
             }
@@ -219,6 +230,9 @@ public class MobileAppService {
         if (backendData.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
+
+        PICAnalystEntity picAnalyst = picAnalystRepository.findByPersonalName(request.getPicAnalyst())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found"));
 
         // Get old documents and remove
         List<ApplicationFileDto> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<ArrayList<ApplicationFileDto>>() {});
@@ -269,6 +283,7 @@ public class MobileAppService {
         payload.setFrontEnds(frontEndData);
         payload.setBackEnds(backendData);
         payload.setSdaHostingList(sdaHosting);
+        payload.setPicAnalyst(picAnalyst);
         mobileAppRepository.saveAndFlush(payload);
 
         return toMobileAppResponse(payload);
@@ -298,7 +313,6 @@ public class MobileAppService {
 
     private MobileAppEntity mobileAppPayload(MobileAppDto request, MobileAppEntity mobileApp, List<ApplicationFileDto> documents, List<ApplicationFileDto> appFiles) throws JsonProcessingException {
         mobileApp.setApplicationName(request.getApplicationName());
-        mobileApp.setPmoNumber(request.getPmoNumber());
         mobileApp.setStatus(request.getStatus());
         mobileApp.setRole(objectMapper.writeValueAsString(request.getRole()));
         mobileApp.setBusinessImpactPriority(request.getBusinessImpactPriority());

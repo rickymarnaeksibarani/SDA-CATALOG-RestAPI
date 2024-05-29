@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +56,7 @@ public interface PICAnalystRepository extends JpaRepository<PICAnalystEntity, Lo
 
     List<PICAnalystEntity> findByIdPicAnalystIsIn(Collection<Long> id);
 
-    default boolean existsByPICAnalyst(String picDeveloper) {
-        return false;
-    }
+    boolean existsByPersonalName(String picDeveloper);
+
+    Optional<PICAnalystEntity> findByPersonalName(String name);
 }

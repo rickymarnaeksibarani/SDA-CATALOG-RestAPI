@@ -8,6 +8,7 @@ import sda.catalogue.sdacataloguerestapi.core.enums.*;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 
@@ -21,13 +22,14 @@ import java.util.List;
 public class MobileAppResponseDto {
     private Long id;
     private String applicationName;
-    private String pmoNumber;
+    private String assetNumber;
     private Status status;
     private List<SDAHostingEntity> sdaHostingList;
     private List<MappingFunctionEntity> mappingFunctions;
     private List<Role> role;
     private BusinessImpactPriority businessImpactPriority;
     private List<PICDeveloperEntity> picDevelopers;
+    private PICAnalystEntity picAnalyst;
     private String description;
     private String applicationFunction;
     private List<ApplicationFileDto> documentation;

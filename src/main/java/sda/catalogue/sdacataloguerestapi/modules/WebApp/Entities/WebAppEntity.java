@@ -51,8 +51,8 @@ public class WebAppEntity {
     @Column(name = "application_name", nullable = false)
     private String applicationName;
 
-    @Column(name = "pmo_number")
-    private String pmoNumber;
+    @Column(name = "asset_number", nullable = false, length = 50, unique = true)
+    private String assetNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sap_integration", nullable = false)
