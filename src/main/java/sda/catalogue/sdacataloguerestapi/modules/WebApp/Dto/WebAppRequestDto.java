@@ -42,5 +42,6 @@ public class WebAppRequestDto {
     private String applicationSourceBe;
     private String ipDatabase;
     private Long sdaHostingEntity;
+    private List<String> picAnalyst;
     private List<Status> filterByStatus;
 }
