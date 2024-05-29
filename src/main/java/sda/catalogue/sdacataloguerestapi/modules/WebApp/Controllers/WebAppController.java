@@ -45,7 +45,7 @@ public class WebAppController {
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
-//            @RequestPart("picAnalystList") List<Long> picAnalystList,
+            @RequestPart("picAnalystList") List<Long> picAnalystList,
             @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
             @RequestPart("frontEndList") List<Long> frontEndList,
             @RequestPart("backEndList") List<Long> backEndList,
@@ -55,7 +55,7 @@ public class WebAppController {
             @RequestPart("apiList") List<ApiDTO> apiList
     ) {
         try {
-            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, picAnalystList,mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -78,7 +78,7 @@ public class WebAppController {
     @GetMapping(value = "/{id_webapp}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getWebAppById(
             @PathVariable("id_webapp")Long id_webapp
-    ) throws JsonProcessingException {
+    ) {
         try {
             WebAppEntity result = webAppService.getWebAppById(id_webapp);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Successfully retrieved data webapp!", result);
@@ -124,7 +124,7 @@ public class WebAppController {
             @PathVariable("uuid") UUID uuid,
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
-//            @RequestPart("picAnalystList") List<Long> picAnalystList,
+            @RequestPart("picAnalystList") List<Long> picAnalystList,
             @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
             @RequestPart("frontEndList") List<Long> frontEndList,
             @RequestPart("backEndList") List<Long> backEndList,
@@ -135,7 +135,7 @@ public class WebAppController {
 
             ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
+            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, picAnalystList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

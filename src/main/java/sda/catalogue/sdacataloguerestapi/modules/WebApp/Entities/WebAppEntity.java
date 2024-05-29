@@ -124,6 +124,7 @@ public class WebAppEntity {
     )
     private List<PICAnalystEntity> picAnalystList;
 
+
     @ManyToMany
     @JoinTable(
             name = "webapp_mapping_function",
