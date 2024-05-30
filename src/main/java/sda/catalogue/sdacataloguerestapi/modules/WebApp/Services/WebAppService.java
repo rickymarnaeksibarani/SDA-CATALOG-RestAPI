@@ -22,6 +22,7 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Repositories.DocumentUploadRepository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
@@ -84,6 +85,8 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private DocumentUploadRepository documentUploadRepository;
 
 
     private final Date date = new Date();
@@ -281,12 +284,11 @@ public class WebAppService extends BaseController {
         List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
-        WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
         if (documentPaths != null){
             documentPaths.stream().forEach(path -> {
                 DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
                 documentUploadEntity.setPath(path);
-                documentUploadEntity.setWebAppEntity(data);
+                documentUploadEntity.setWebAppEntity(findData);
                 documentUploadEntities.add(documentUploadEntity);
             });
         }
@@ -331,8 +333,6 @@ public class WebAppService extends BaseController {
 
         findData.setAddress(request.getAddress());
         findData.setApplicationName(request.getApplicationName());
-        findData.setLinkIOS(request.getLinkIOS());
-        findData.setLinkAndroid(request.getLinkAndroid());
         findData.setDescription(request.getDescription());
         findData.setFunctionApplication(request.getFunctionApplication());
         findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
@@ -349,8 +349,6 @@ public class WebAppService extends BaseController {
         findData.setDatabaseList(databaseEntities);
         findData.setApiList(apiEntities);
         findData.setDocumentUploadList(documentUploadEntities);
-
-        webAppRepository.save(findData);
 
         return webAppRepository.save(findData);
     }

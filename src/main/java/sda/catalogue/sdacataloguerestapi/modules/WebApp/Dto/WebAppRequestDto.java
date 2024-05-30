@@ -29,7 +29,6 @@ public class WebAppRequestDto {
 
     private long idWebApp;
     private String applicationName;
-    private String pmoNumber;
 //    private String role;
     private SapIntegration sapIntegration;
     private String categoryApp;
@@ -42,6 +41,5 @@ public class WebAppRequestDto {
     private String applicationSourceBe;
     private String ipDatabase;
     private Long sdaHostingEntity;
-    private List<String> picAnalyst;
     private List<Status> filterByStatus;
 }
