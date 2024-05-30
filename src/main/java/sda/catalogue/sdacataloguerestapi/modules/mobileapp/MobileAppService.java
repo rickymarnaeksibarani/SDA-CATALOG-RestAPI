@@ -7,6 +7,7 @@ import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,8 +38,6 @@ import sda.catalogue.sdacataloguerestapi.modules.mobileapp.repository.MobileAppR
 import sda.catalogue.sdacataloguerestapi.modules.storage.StorageService;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -65,9 +64,10 @@ public class MobileAppService {
     private PICAnalystRepository picAnalystRepository;
     @Autowired
     private ObjectMapper objectMapper;
-    private final Path uploadpath = Paths.get("src/main/resources/uploads/");
     private final Date date = new Date();
     private final Long time = date.getTime();
+    @Value("${baseUrl}")
+    private String baseUrl;
 
     private MobileAppResponseDto toMobileAppResponse(MobileAppEntity mobileApp) throws JsonProcessingException {
         List<AppApiListDto> appApiList = objectMapper.readValue(mobileApp.getApplicationApiList(), new TypeReference<>() {});
@@ -112,7 +112,7 @@ public class MobileAppService {
 
     @Transactional
     public MobileAppResponseDto createMobileApp(MobileAppDto request) throws Exception {
-        Boolean existsByApplicationName = mobileAppRepository.existsByApplicationName(request.getApplicationName());
+        boolean existsByApplicationName = mobileAppRepository.existsByApplicationName(request.getApplicationName());
         if (existsByApplicationName) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Application Name already exists");
         }
@@ -208,6 +208,11 @@ public class MobileAppService {
 
     @Transactional
     public MobileAppResponseDto updateMobileApp(Long id, MobileAppDto request) throws Exception {
+//        boolean existsByApplicationName = mobileAppRepository.existsByApplicationName(request.getApplicationName());
+//        if (existsByApplicationName) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Application Name already exists");
+//        }
+
         MobileAppEntity mobileApp = mobileAppRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
         List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByMappingFunctionIsIn(request.getMappingFunction());
         if (mappingFunction.isEmpty()) {
@@ -309,6 +314,28 @@ public class MobileAppService {
         }
 
         mobileAppRepository.deleteById(id);
+    }
+
+    public CheckVersionResponseDto checkMobileVersion(String appName) throws JsonProcessingException {
+        MobileAppEntity mobileApp = mobileAppRepository.findByApplicationName(appName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "App not found"));
+
+        List<ApplicationFileDto> appUrl = objectMapper.readValue(mobileApp.getApplicationFile(), new TypeReference<>() {});
+        Optional<ApplicationFileDto> ios = appUrl.stream().filter(item -> item.getPath().endsWith(".ipa")).findFirst();
+        Optional<ApplicationFileDto> apk = appUrl.stream().filter(item -> item.getPath().endsWith(".apk")).findFirst();
+        String iosPath = ios.map(ApplicationFileDto::getPath).orElse(null);
+        String apkPath = apk.map(ApplicationFileDto::getPath).orElse(null);
+
+        List<VersioningAppDto> appVersion = objectMapper.readValue(mobileApp.getVersioningApplication(), new TypeReference<>() {});
+        VersioningAppDto lastVersionApp = appVersion.get(appVersion.size() - 1);
+
+        return CheckVersionResponseDto.builder()
+                .apkUrl(apkPath != null ? baseUrl + "/api/v1/files?path=" + apkPath : null)
+                .appName(mobileApp.getApplicationName())
+                .version(lastVersionApp.getVersion())
+                .iosUrl(iosPath != null ? baseUrl + "/api/v1/files?path=" + iosPath : null)
+                .slug(mobileApp.getApplicationName().replace(" ", "-").toLowerCase())
+                .build();
     }
 
     private MobileAppEntity mobileAppPayload(MobileAppDto request, MobileAppEntity mobileApp, List<ApplicationFileDto> documents, List<ApplicationFileDto> appFiles) throws JsonProcessingException {

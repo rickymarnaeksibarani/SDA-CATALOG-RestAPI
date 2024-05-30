@@ -7,3 +7,4 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+baseUrl: https://api-dev.gmf-aeroasia.co.id/td/sdacatalog/api
