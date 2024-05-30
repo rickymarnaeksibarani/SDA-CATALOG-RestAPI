@@ -68,7 +68,7 @@ public class PICAnalystService {
     @Transactional
     public void deletePICAnalyst(UUID uuid){
         PICAnalystEntity findData = picAnalystRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("PIC Developer does not exist", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomRequestException("PIC Analyst does not exist", HttpStatus.NOT_FOUND));
         picAnalystRepository.delete(findData);
     }
 }

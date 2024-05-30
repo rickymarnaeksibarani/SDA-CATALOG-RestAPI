@@ -34,9 +34,6 @@ public class WebAppPostDTO {
     @JsonProperty("applicationName")
     private String applicationName;
 
-    @JsonProperty("pmoNumber")
-    private String pmoNumber;
-
     @JsonProperty("sapIntegration")
     private SapIntegration sapIntegration;
 
@@ -60,21 +57,6 @@ public class WebAppPostDTO {
 
     @Enumerated
     private Status status;
-
-
-    private String linkIOS;
-
-
-    private String linkAndroid;
-
-
-    private MultipartFile fileManifest;
-
-
-    private MultipartFile fileIpa;
-
-
-    private MultipartFile fileAndroid;
 
     @JsonProperty("applicationSourceFe")
     private String applicationSourceFe;
@@ -108,8 +90,6 @@ public class WebAppPostDTO {
 
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;
-    @JsonIgnore
-    private List<MultipartFile> documentation;
 
 
 }

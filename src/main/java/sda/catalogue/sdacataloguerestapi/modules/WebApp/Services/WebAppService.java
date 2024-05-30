@@ -22,12 +22,13 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Repositories.DocumentUploadRepository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Repositories.FrontEndRepository;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Entities.MappingFunctionEntity;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Repositories.MappingFunctionRepository;
-//import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
-//import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
@@ -62,8 +63,8 @@ public class WebAppService extends BaseController {
     private WebAppRepository webAppRepository;
     @Autowired
     private PICDeveloperRepository picDeveloperRepository;
-    //    @Autowired
-//    private PICAnalystRepository picAnalystRepository;
+    @Autowired
+    private PICAnalystRepository picAnalystRepository;
     @Autowired
     private MappingFunctionRepository mappingFunctionRepository;
     @Autowired
@@ -84,6 +85,8 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private DocumentUploadRepository documentUploadRepository;
 
 
     private final Date date = new Date();
@@ -93,7 +96,7 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request,
                                      List<Long> picDeveloperList,
-//                                     List<Long> picAnalystList,
+                                     List<Long> picAnalystList,
                                      List<Long> mappingFunctionList,
                                      List<Long> frontEndList,
                                      List<Long> backEndList,
@@ -110,7 +113,7 @@ public class WebAppService extends BaseController {
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
 
             //PIC Analyst Process
-//            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
+            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
 
             //Mapping Function Process
             List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunctionList, mappingFunctionRepository, Function.identity(), "Mapping Function");
@@ -128,7 +131,7 @@ public class WebAppService extends BaseController {
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
 
             data.setPicDeveloperList(picDeveloperData);
-//            data.setPicAnalystList(picAnalystData);
+            data.setPicAnalystList(picAnalystData);
             data.setMappingFunctionList(mappingFunctionData);
             data.setFrontEndList(frontEndData);
             data.setBackEndList(backEndData);
@@ -255,7 +258,7 @@ public class WebAppService extends BaseController {
     public WebAppEntity updateWebAppByUuid(UUID uuid,
                                            WebAppPostDTO request,
                                            List<Long> picDeveloperList,
-//                                           List<Long> picAnalystList,
+                                           List<Long> picAnalystList,
                                            List<Long> mappingFunctionList,
                                            List<Long> frontEndList,
                                            List<Long> backEndList,
@@ -281,12 +284,11 @@ public class WebAppService extends BaseController {
         List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
-        WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
         if (documentPaths != null){
             documentPaths.stream().forEach(path -> {
                 DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
                 documentUploadEntity.setPath(path);
-                documentUploadEntity.setWebAppEntity(data);
+                documentUploadEntity.setWebAppEntity(findData);
                 documentUploadEntities.add(documentUploadEntity);
             });
         }
@@ -297,10 +299,10 @@ public class WebAppService extends BaseController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
         }
 
-//            List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
-//            if (picAnalyst.isEmpty()){
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
-//            }
+        List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
+        if (picAnalyst.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
+        }
 
         List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
         if (mappingFunction.isEmpty()) {
@@ -331,8 +333,6 @@ public class WebAppService extends BaseController {
 
         findData.setAddress(request.getAddress());
         findData.setApplicationName(request.getApplicationName());
-        findData.setLinkIOS(request.getLinkIOS());
-        findData.setLinkAndroid(request.getLinkAndroid());
         findData.setDescription(request.getDescription());
         findData.setFunctionApplication(request.getFunctionApplication());
         findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
@@ -340,7 +340,7 @@ public class WebAppService extends BaseController {
         findData.setSapIntegration(request.getSapIntegration());
         findData.setIpDatabase(request.getIpDatabase());
         findData.setPicDeveloperList(picDeveloper);
-//            findData.setPicAnalystList(picAnalyst);
+        findData.setPicAnalystList(picAnalyst);
         findData.setMappingFunctionList(mappingFunction);
         findData.setFrontEndList(frontEnd);
         findData.setBackEndList(backEnd);
@@ -349,8 +349,6 @@ public class WebAppService extends BaseController {
         findData.setDatabaseList(databaseEntities);
         findData.setApiList(apiEntities);
         findData.setDocumentUploadList(documentUploadEntities);
-
-        webAppRepository.save(findData);
 
         return webAppRepository.save(findData);
     }

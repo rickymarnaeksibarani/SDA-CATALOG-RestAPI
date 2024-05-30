@@ -124,6 +124,7 @@ public class WebAppEntity {
     )
     private List<PICAnalystEntity> picAnalystList;
 
+
     @ManyToMany
     @JoinTable(
             name = "webapp_mapping_function",
@@ -165,10 +166,8 @@ public class WebAppEntity {
 //    @Column(name = "sda_hosting_id", columnDefinition = "json")
 //    private String sdaHosting;
 
-    @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @Cascade(CascadeType.ALL)
     private List<DocumentUploadEntity> documentUploadList;
 
     @Cascade(CascadeType.ALL)
