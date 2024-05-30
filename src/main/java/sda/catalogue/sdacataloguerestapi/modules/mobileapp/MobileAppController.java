@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.mobileapp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sda.catalogue.sdacataloguerestapi.core.CustomResponse.ApiResponse;
+import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.CheckVersionResponseDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.MobileAppResponseDto;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.dto.UserFilterRequest;
@@ -112,6 +114,16 @@ public class MobileAppController {
                 .result("Deleted")
                 .status(HttpStatus.NO_CONTENT)
                 .message("Success delete data")
+                .build();
+    }
+
+    @GetMapping(value = "{appName}/version", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponse<CheckVersionResponseDto> checkMobileAppVersion(@PathVariable String appName) throws JsonProcessingException {
+        CheckVersionResponseDto mobileApp = mobileAppService.checkMobileVersion(appName);
+        return ApiResponse.<CheckVersionResponseDto>builder()
+                .result(mobileApp)
+                .status(HttpStatus.OK)
+                .message("Success check version data")
                 .build();
     }
 }

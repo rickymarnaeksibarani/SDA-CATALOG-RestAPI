@@ -8,10 +8,11 @@ import sda.catalogue.sdacataloguerestapi.core.enums.Status;
 import sda.catalogue.sdacataloguerestapi.modules.mobileapp.entity.MobileAppEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MobileAppRepository extends JpaRepository<MobileAppEntity, Long>, JpaSpecificationExecutor<MobileAppEntity> {
-    Boolean existsByApplicationName(String applicationName);
+    boolean existsByApplicationName(String applicationName);
 
     Integer countAllByStatus(Status status);
 
@@ -25,4 +26,6 @@ public interface MobileAppRepository extends JpaRepository<MobileAppEntity, Long
             GROUP BY
               name;""", nativeQuery = true)
     List<Object[]> countAllBySdaHosting();
+
+    Optional<MobileAppEntity> findByApplicationName(String applicationName);
 }
