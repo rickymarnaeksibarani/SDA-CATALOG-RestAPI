@@ -86,6 +86,6 @@ public class MobileAppDto {
 
     private List<DbListDto> applicationDatabaseList;
 
-    @NotBlank
-    private String picAnalyst;
+    @NotEmpty
+    private List<String> picAnalyst;
 }

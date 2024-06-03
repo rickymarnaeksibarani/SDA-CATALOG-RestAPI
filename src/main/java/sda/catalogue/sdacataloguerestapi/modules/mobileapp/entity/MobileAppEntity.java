@@ -142,7 +142,11 @@ public class MobileAppEntity {
     private List<SDAHostingEntity> sdaHostingList;
 
     @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "pic_analyst_id", referencedColumnName = "id_pic_analyst")
-    private PICAnalystEntity picAnalyst;
+    @ManyToMany
+    @JoinTable(
+            name = "pic_analyst_list",
+            joinColumns = @JoinColumn(name = "mobileapp_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_pic_analyst")
+    )
+    private List<PICAnalystEntity> picAnalystList;
 }

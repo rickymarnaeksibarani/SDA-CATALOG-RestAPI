@@ -106,7 +106,7 @@ public class MobileAppService {
                 .documentation(docs)
                 .sapIntegration(mobileApp.getSapIntegration())
                 .appCategory(mobileApp.getAppCategory())
-                .picAnalyst(mobileApp.getPicAnalyst())
+                .picAnalyst(mobileApp.getPicAnalystList())
                 .build();
     }
 
@@ -144,8 +144,10 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
 
-        PICAnalystEntity picAnalyst = picAnalystRepository.findByPersonalName(request.getPicAnalyst())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found"));
+        List<PICAnalystEntity> picAnalystList = picAnalystRepository.findByPersonalNameIsIn(request.getPicAnalyst());
+        if (picAnalystList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found");
+        }
 
         // Documentation
         List<ApplicationFileDto> documents = uploadDocument(request.getDocumentation());
@@ -166,7 +168,7 @@ public class MobileAppService {
         payload.setFrontEnds(frontEndData);
         payload.setBackEnds(backendData);
         payload.setSdaHostingList(sdaHosting);
-        payload.setPicAnalyst(picAnalyst);
+        payload.setPicAnalystList(picAnalystList);
         mobileAppRepository.save(payload);
 
         return toMobileAppResponse(payload);
@@ -236,8 +238,10 @@ public class MobileAppService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
 
-        PICAnalystEntity picAnalyst = picAnalystRepository.findByPersonalName(request.getPicAnalyst())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found"));
+        List<PICAnalystEntity> picAnalystList = picAnalystRepository.findByPersonalNameIsIn(request.getPicAnalyst());
+        if (picAnalystList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pic Analyst not found");
+        }
 
         // Get old documents and remove
         List<ApplicationFileDto> docs = objectMapper.readValue(mobileApp.getDocumentation(), new TypeReference<ArrayList<ApplicationFileDto>>() {});
@@ -288,7 +292,7 @@ public class MobileAppService {
         payload.setFrontEnds(frontEndData);
         payload.setBackEnds(backendData);
         payload.setSdaHostingList(sdaHosting);
-        payload.setPicAnalyst(picAnalyst);
+        payload.setPicAnalystList(picAnalystList);
         mobileAppRepository.saveAndFlush(payload);
 
         return toMobileAppResponse(payload);
