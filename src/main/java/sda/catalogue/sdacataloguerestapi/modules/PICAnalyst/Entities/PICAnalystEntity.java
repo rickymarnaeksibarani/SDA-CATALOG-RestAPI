@@ -52,9 +52,4 @@ public class PICAnalystEntity {
     @OneToMany(mappedBy = "picAnalyst")
     private List<MobileAppEntity> mobileApp;
 
-    public PICAnalystEntity(Long id) {
-        // Assuming you want to set the idPicDeveloper field with the provided id
-        this.idPicAnalyst = id;
-        // You might need to initialize other fields based on the id or provide additional logic
-    }
 }

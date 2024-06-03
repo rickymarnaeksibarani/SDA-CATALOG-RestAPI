@@ -55,7 +55,7 @@ public class PICDeveloperService {
     }
 
     //Getting data PIC Developer by ID
-    public PICDeveloperEntity getPICDeveloperByUUID(Long id_pic_developer) {
+    public PICDeveloperEntity getPICDeveloperByID(Long id_pic_developer) {
         PICDeveloperEntity result = pICDeveloperRepository.findById(id_pic_developer).orElse(null);
         if (result == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"ID" + id_pic_developer + " not found");
