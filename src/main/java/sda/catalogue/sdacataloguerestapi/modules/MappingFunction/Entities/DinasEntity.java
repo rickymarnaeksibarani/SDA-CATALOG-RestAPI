@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sda.catalogue.sdacataloguerestapi.modules.MappingFunction.Dto.DinasDTO;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "tb_dinas_mapping_function")
+@EntityListeners({AuditingEntityListener.class})
 public class DinasEntity extends DinasDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

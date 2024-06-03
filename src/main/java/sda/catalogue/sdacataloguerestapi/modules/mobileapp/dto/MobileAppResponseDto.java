@@ -29,7 +29,7 @@ public class MobileAppResponseDto {
     private List<Role> role;
     private BusinessImpactPriority businessImpactPriority;
     private List<PICDeveloperEntity> picDevelopers;
-    private PICAnalystEntity picAnalyst;
+    private List<PICAnalystEntity> picAnalyst;
     private String description;
     private String applicationFunction;
     private List<ApplicationFileDto> documentation;

@@ -42,6 +42,12 @@ public class FrontEndService {
                 );
             }
 
+            if (searchRequest.getStatus() != null && !searchRequest.getStatus().isEmpty()) {
+                predicates.add(
+                        builder.in(root.get("feStatus")).value(searchRequest.getStatus())
+                );
+            }
+
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 

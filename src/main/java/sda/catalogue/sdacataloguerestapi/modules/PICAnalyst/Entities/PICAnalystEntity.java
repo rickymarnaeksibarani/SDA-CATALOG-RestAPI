@@ -47,10 +47,10 @@ public class PICAnalystEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @JsonManagedReference
-    @JsonIgnore
-    @OneToMany(mappedBy = "picAnalyst")
-    private List<MobileAppEntity> mobileApp;
+//    @JsonManagedReference
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "picAnalyst")
+//    private List<MobileAppEntity> mobileApp;
 
     public PICAnalystEntity(Long id) {
         // Assuming you want to set the idPicDeveloper field with the provided id
