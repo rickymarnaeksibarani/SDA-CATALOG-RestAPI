@@ -7,7 +7,7 @@ logging:
         security: DEBUG
 spring:
   profiles:
-    active: local
+    active: dev
   application:
     name: td-sdacatalog-service
     version: 1.0.0
