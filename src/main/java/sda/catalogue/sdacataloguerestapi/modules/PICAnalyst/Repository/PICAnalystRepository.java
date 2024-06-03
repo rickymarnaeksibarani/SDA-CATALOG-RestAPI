@@ -52,11 +52,10 @@ public interface PICAnalystRepository extends JpaRepository<PICAnalystEntity, Lo
     @Query("DELETE FROM PICAnalystEntity w WHERE w.uuid = :uuid")
     int findByUuidAndDelete(UUID uuid);
 
-    List<PICAnalystEntity> findByPersonalNameIsIn(Collection<String> name);
-
     List<PICAnalystEntity> findByIdPicAnalystIsIn(Collection<Long> id);
 
-    boolean existsByPersonalName(String picDeveloper);
+    boolean existsByPersonalName(String picAnalyst);
+    boolean existsByPersonalNumber(String picAnalyst);
 
     Optional<PICAnalystEntity> findByPersonalName(String name);
 }
