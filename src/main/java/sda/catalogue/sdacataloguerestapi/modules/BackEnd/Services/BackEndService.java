@@ -38,6 +38,12 @@ public class BackEndService {
                 );
             }
 
+            if (searchRequest.getStatus() != null && !searchRequest.getStatus().isEmpty()) {
+                predicates.add(
+                        builder.in(root.get("beStatus")).value(searchRequest.getStatus())
+                );
+            }
+
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 

@@ -36,6 +36,12 @@ public class TypeDatabaseService {
               );
             };
 
+            if (searchRequest.getStatus() != null && !searchRequest.getStatus().isEmpty()) {
+                predicates.add(
+                        builder.in(root.get("dbStatus")).value(searchRequest.getStatus())
+                );
+            }
+
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 
