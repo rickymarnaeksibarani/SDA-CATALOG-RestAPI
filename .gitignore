@@ -39,4 +39,4 @@ build/
 #/src/main/resources/file-test/
 /src/main/resources/uploads/
 
-src/main/resources/application-local.yml
+/src/main/resources/application-local.yml
