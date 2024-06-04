@@ -57,5 +57,4 @@ public interface PICAnalystRepository extends JpaRepository<PICAnalystEntity, Lo
     List<PICAnalystEntity> findByIdPicAnalystIsIn(Collection<Long> id);
 
     boolean existsByPersonalName(String picDeveloper);
-    boolean existsByPersonalNumber(String picAnalyst);
 }

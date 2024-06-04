@@ -43,9 +43,8 @@ public class PICAnalystService {
     //Creating data PIC Analyst
     public PICAnalystEntity createPICAnalyst(PICAnalystDTO request) {
         boolean existsBypersonalName = picAnalystRepository.existsByPersonalName(request.getPersonalName());
-        boolean existsBypersonalNumber = picAnalystRepository.existsByPersonalNumber(request.getPersonalNumber());
-        if (existsBypersonalName || existsBypersonalNumber){
-            throw new CustomRequestException("PIC Analyst already exists, please check personal name/personal number", HttpStatus.CONFLICT);
+        if (existsBypersonalName){
+            throw new CustomRequestException("PIC Analyst already exists, please check personal name", HttpStatus.CONFLICT);
         }
 
         PICAnalystEntity data = new PICAnalystEntity();
