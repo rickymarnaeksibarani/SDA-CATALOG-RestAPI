@@ -44,13 +44,13 @@ public class PICDeveloperController {
         }
     }
 
-    //Getting data PIC Developer by UUID
+    //Getting data PIC Developer by ID
     @GetMapping(value = "/{id_pic_developer}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getPicDeveloperById(
             @PathVariable("id_pic_developer") Long id_pic_developer
     ) {
         try {
-            PICDeveloperEntity result = picDeveloperService.getPICDeveloperByUUID(id_pic_developer);
+            PICDeveloperEntity result = picDeveloperService.getPICDeveloperByID(id_pic_developer);
             ApiResponse<PICDeveloperEntity> response = new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
