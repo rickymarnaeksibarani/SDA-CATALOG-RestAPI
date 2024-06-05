@@ -1,6 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +38,7 @@ public class VersioningApplicationEntity {
     private String description;
 
     @Column(name = "release_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date releaseDate;
 
     @CreationTimestamp
