@@ -144,4 +144,27 @@ public class StorageServiceImpl implements StorageService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed get file from s3: " + e);
         }
     }
+
+    @Override
+    public void deleteAllFilesFromS3(List<String> oldPaths) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        MinioClient minioClient = initMinioClient();
+
+        for (String filePath : oldPaths) {
+            try {
+                log.info("Deleting file from S3: {}", filePath);
+
+                minioClient.removeObject(RemoveObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(filePath)
+                        .build());
+
+                log.info("Successfully deleted file from S3: {}", filePath);
+            } catch (MinioException e) {
+                log.error("Failed to delete file from S3: {}", filePath, e);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to delete file: " + e);
+            }
+        }
+    }
+
+
 }
