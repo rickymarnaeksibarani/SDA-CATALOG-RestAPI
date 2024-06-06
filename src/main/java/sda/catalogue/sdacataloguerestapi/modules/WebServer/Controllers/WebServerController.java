@@ -69,29 +69,26 @@ public class WebServerController {
     }
 
     @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateWebServer(
+    public ApiResponse<WebServerEntity> updateWebServer(
             @PathVariable("uuid") UUID uuid,
             @Valid @RequestBody WebServerDTO request
     ) {
-        try {
             WebServerEntity result = webServerService.updateWebServer(uuid, request);
-            ApiResponse<WebServerEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Success update data web server!", result);
-            return new ResponseEntity<>(response, response.getStatus());
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
+            return ApiResponse.<WebServerEntity>builder()
+                    .result(result)
+                    .status(HttpStatus.OK)
+                    .message("Success update data web server!")
+                    .build();
     }
 
     @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteBackEnd(
+    public ApiResponse<String> deleteBackEnd(
             @PathVariable("uuid") UUID uuid
     ) {
-        try {
-            webServerService.deleteWebServer(uuid);
-            ApiResponse<String> response = new ApiResponse<>(HttpStatus.OK, "Success delete data", "DELETED");
-            return new ResponseEntity<>(response, response.getStatus());
-        } catch (CustomRequestException error) {
-            return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
-        }
+        webServerService.deleteWebServer(uuid);
+        return ApiResponse.<String>builder()
+                .message("Success delete data web server!")
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
