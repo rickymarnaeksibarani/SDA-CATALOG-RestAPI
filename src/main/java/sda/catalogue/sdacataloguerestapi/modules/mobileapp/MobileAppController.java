@@ -28,7 +28,7 @@ public class MobileAppController {
     private MobileAppService mobileAppService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MobileAppResponseDto> createMobileApp(
             @RequestPart @Valid MobileAppDto request,
             @RequestPart(value = "documentation", required = false) List<MultipartFile> documentation,
@@ -55,7 +55,7 @@ public class MobileAppController {
                 .build();
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MobileAppResponseDto> updateMobileAppById(
         @PathVariable Long id,
         @RequestPart @Valid MobileAppDto request,

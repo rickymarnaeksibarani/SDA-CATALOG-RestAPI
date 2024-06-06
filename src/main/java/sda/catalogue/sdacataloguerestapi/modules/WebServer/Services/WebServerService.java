@@ -9,13 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import sda.catalogue.sdacataloguerestapi.core.CustomResponse.PaginateResponse;
+import org.springframework.web.server.ResponseStatusException;
 import sda.catalogue.sdacataloguerestapi.core.Exception.CustomRequestException;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperDTO;
-import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.WebAppRequestDto;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Dto.WebServerRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
@@ -71,7 +67,7 @@ public class WebServerService {
     @Transactional
     public WebServerEntity updateWebServer(UUID uuid, WebServerDTO request) {
         WebServerEntity webServer = webServerRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("WEB Server does not exists", HttpStatus.CONFLICT));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WEB Server does not exists"));
         webServer.setWebServer(request.getWebServer());
         webServer.setWebServerStatus(request.getWebServerStatus());
         return webServerRepository.save(webServer);
@@ -80,7 +76,7 @@ public class WebServerService {
     @Transactional
     public void deleteWebServer(UUID uuid) {
         WebServerEntity findData = webServerRepository.findByUuid(uuid)
-                .orElseThrow(() -> new CustomRequestException("Web Server does not exist", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server does not exist"));
         webServerRepository.delete(findData);
     }
 }
