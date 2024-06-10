@@ -14,10 +14,10 @@ import java.util.List;
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("*");
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**").allowedMethods("*");
+//    }
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
