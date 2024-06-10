@@ -54,7 +54,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -152,7 +151,7 @@ public class WebAppService extends BaseController {
             List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
-            documentPaths.stream().forEach(path -> {
+            documentPaths.forEach(path -> {
                 DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
                 documentUploadEntity.setPath(path);
                 documentUploadEntity.setWebAppEntity(data);
@@ -304,18 +303,15 @@ public class WebAppService extends BaseController {
             }
         }
 
-    // Upload new documents and create document entities
+        // Upload new documents and create document entities
         List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
-        if (uploadedDocumentPaths != null) {
-            uploadedDocumentPaths.forEach(path -> {
-                DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
-                documentUploadEntity.setPath(path);
-                documentUploadEntity.setWebAppEntity(findData);
-                documentUploadEntities.add(documentUploadEntity);
-            });
-        }
-
+        uploadedDocumentPaths.forEach(path -> {
+            DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+            documentUploadEntity.setPath(path);
+            documentUploadEntity.setWebAppEntity(findData);
+            documentUploadEntities.add(documentUploadEntity);
+        });
 
 
         //Fetching from data master
