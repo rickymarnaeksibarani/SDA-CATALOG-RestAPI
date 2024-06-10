@@ -173,11 +173,13 @@ public class WebAppEntity {
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<VersioningApplicationEntity> versioningApplicationList;
 
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<ApiEntity> apiList;
 
     @Cascade(CascadeType.ALL)

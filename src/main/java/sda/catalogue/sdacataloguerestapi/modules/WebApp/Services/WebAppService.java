@@ -1,5 +1,8 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import sda.catalogue.sdacataloguerestapi.core.utils.GenerateAssetNumber;
 import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Entities.BackEndEntity;
 import sda.catalogue.sdacataloguerestapi.modules.BackEnd.Repositories.BackEndRepository;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Dto.DocumentUploadDTO;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Repositories.DocumentUploadRepository;
 import sda.catalogue.sdacataloguerestapi.modules.FrontEnd.Entities.FrontEndEntity;
@@ -59,6 +63,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class WebAppService extends BaseController {
+
     @Autowired
     private WebAppRepository webAppRepository;
     @Autowired
@@ -87,6 +92,8 @@ public class WebAppService extends BaseController {
     private StorageService storageService;
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     private final Date date = new Date();
@@ -142,7 +149,7 @@ public class WebAppService extends BaseController {
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
 
             if (!findSdaHosting.isEmpty()){
-                findSdaHosting.forEach(data::setSdaHostingEntity);
+                findSdaHosting.stream().forEach(data::setSdaHostingEntity);
             }else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
@@ -152,12 +159,14 @@ public class WebAppService extends BaseController {
             List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
-            documentPaths.stream().forEach(path -> {
-                DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
-                documentUploadEntity.setPath(path);
-                documentUploadEntity.setWebAppEntity(data);
-                documentUploadEntities.add(documentUploadEntity);
-            });
+            if (documentPaths != null){
+                documentPaths.stream().forEach(path -> {
+                    DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                    documentUploadEntity.setPath(path);
+                    documentUploadEntity.setWebAppEntity(data);
+                    documentUploadEntities.add(documentUploadEntity);
+                });
+            }
             data.setDocumentUploadList(documentUploadEntities);
             WebAppEntity result = webAppRepository.save(data);
 
@@ -247,12 +256,12 @@ public class WebAppService extends BaseController {
 
     //Getting data by ID
     public WebAppEntity getWebAppById(Long id_webapp) {
-        return webAppRepository.findById(id_webapp)
+        WebAppEntity result = webAppRepository.findById(id_webapp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
+        return result;
     }
 
     //Updating data WebApp by UUID
-    @Transactional
     public WebAppEntity updateWebAppByUuid(UUID uuid,
                                            WebAppPostDTO request,
                                            List<Long> picDeveloperList,
@@ -278,45 +287,60 @@ public class WebAppService extends BaseController {
             }
         }
 
-        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
-        List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
+//         Hapus dokumen lama
+//        log.info("Document upload list for WebApp: {}", findData.getDocumentUploadList());
+//        List<DocumentUploadEntity> oldDocuments = findData.getDocumentUploadList();
+//
+//        if (oldDocuments != null && !oldDocuments.isEmpty()) {
+//            log.info("Deleting old documents: {}", oldDocuments);
+//            documentUploadRepository.deleteAll(oldDocuments);
+//            List<String> oldPaths = oldDocuments.stream().map(DocumentUploadEntity::getPath).collect(Collectors.toList());
+//            storageService.deleteAllFileS3(oldPaths);
+//            findData.setDocumentUploadList(new ArrayList<>()); // Reset document list pada entity
+//            webAppRepository.save(findData); // Simpan perubahan
+//            log.info("Old documents deleted and changes saved");
+//        } else {
+//            log.info("No old documents to delete");
+//        }
 
-        if (existingDocuments != null) {
-            List<String> newDocumentPaths = newDocuments.stream()
-                    .map(MultipartFile::getOriginalFilename) // Asumsi path dokumen disimpan dalam nama file asli
-                    .collect(Collectors.toList());
+        //Remove Old Document
+//        List<DocumentUploadEntity> oldDocument = findData.getDocumentUploadList();
+//        List<String> docPathList = oldDocument.stream().map(DocumentUploadEntity::getPath).toList();
+//
+//        if (!docPathList.isEmpty()){
+//            storageService.deleteAllFilesFromS3(docPathList);
+//            documentUploadRepository.deleteAll(oldDocument);
+//            findData.setDocumentUploadList(new ArrayList<>()); // Reset document list pada entity
+//            webAppRepository.save(findData); // Simpan perubahan
+//        }
 
-            Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
-            while (iterator.hasNext()) {
-                DocumentUploadEntity existingDocument = iterator.next();
-                if (!newDocumentPaths.contains(existingDocument.getPath())) {
-                    // Remove document from MinIO
-                    try {
-                        storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException("Failed to delete file from MinIO", e);
-                    }
-                    // Remove document from database
-                    documentUploadRepository.delete(existingDocument);
-                    // Remove document from documentUploadList
-                    iterator.remove();
-                }
+//        Remove Old Document
+        List<DocumentUploadEntity> oldDocument = findData.getDocumentUploadList();
+        List<String> docPathList = oldDocument.stream().map(DocumentUploadEntity::getPath).toList();
+
+        if (!docPathList.isEmpty()){
+            try {
+                storageService.deleteAllFileS3(docPathList);
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
             }
+            documentUploadRepository.deleteAll(oldDocument);
+            findData.setDocumentUploadList(new ArrayList<>());
+            webAppRepository.save(findData);
         }
 
-// Upload new documents and create document entities
-        List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
+        //Update new Documentation
+        List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
-        if (uploadedDocumentPaths != null) {
-            uploadedDocumentPaths.forEach(path -> {
+
+        if (documentPaths != null){
+            documentPaths.stream().forEach(path -> {
                 DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
                 documentUploadEntity.setPath(path);
                 documentUploadEntity.setWebAppEntity(findData);
                 documentUploadEntities.add(documentUploadEntity);
             });
         }
-
-
 
         //Fetching from data master
         List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
@@ -351,11 +375,10 @@ public class WebAppService extends BaseController {
 
         List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
         if (!findSdaHosting.isEmpty()){
-            findSdaHosting.forEach(findData::setSdaHostingEntity);
+            findSdaHosting.stream().forEach(findData::setSdaHostingEntity);
         }else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
         }
-
 
         findData.setAddress(request.getAddress());
         findData.setApplicationName(request.getApplicationName());
@@ -383,29 +406,18 @@ public class WebAppService extends BaseController {
     @Transactional
     public void deleteWebAppByUuid(UUID uuid){
         try {
-            WebAppEntity findData = webAppRepository.findByUuid(uuid);
-            if (findData == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
-            }
-            // Remove documents from MinIO
-            List<DocumentUploadEntity> oldDocument = findData.getDocumentUploadList();
-            List<String> docPathList = oldDocument.stream().map(DocumentUploadEntity::getPath).toList();
-            if (!docPathList.isEmpty()) {
-                try {
-                    storageService.deleteAllFileS3(docPathList);
-                } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                    throw new RuntimeException(e);
-                }
-                documentUploadRepository.deleteAll(oldDocument);
-                findData.setDocumentUploadList(new ArrayList<>());
-                webAppRepository.save(findData);
-            }
 
-            webAppRepository.delete(findData);
-        } catch (DataIntegrityViolationException e) {
+            //remove old documents today!!!
+
+//            -------------------------------
+
+            webAppRepository.findByUuidAndDelete(uuid);
+        }
+        catch (DataIntegrityViolationException e){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the record. It is referenced by other record");
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found");
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Data not found");
         }
     }
 
@@ -448,15 +460,15 @@ public class WebAppService extends BaseController {
                 .toString();
     }
 
-    private List<String> uploadDocument(List<MultipartFile> documents) {
+    private List<String> uploadDocument(List<MultipartFile> documents){
         if (documents == null || documents.isEmpty()) return Collections.emptyList();
 
         List<String> documentPaths = new ArrayList<>();
         String generatedString = generateRandomString();
 
         documents.forEach(doc -> {
-            if (!Objects.equals(doc.getContentType(), "application/pdf")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF Only");
+            if (!Objects.equals(doc.getContentType(), "application/pdf")){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"PDF Only");
             }
             try {
                 String docFilename = time + generatedString + "_" + Objects.requireNonNull(doc.getOriginalFilename()).replace(" ", "_");
@@ -470,5 +482,10 @@ public class WebAppService extends BaseController {
         });
         return documentPaths;
     }
+
+
+
+
+
 
 }
