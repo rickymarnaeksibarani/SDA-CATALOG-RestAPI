@@ -41,7 +41,7 @@ public class WebAppController {
 
     //Create Data Web App
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createWebApp(
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
@@ -119,7 +119,7 @@ public class WebAppController {
     }
 
     //Update Data Web App By UUID
-    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateWebApp(
             @PathVariable("uuid") UUID uuid,
             @Valid @ModelAttribute WebAppPostDTO request,
@@ -132,8 +132,7 @@ public class WebAppController {
             @RequestPart("versioningApplicationList") List<VersioningApplicationEntity> versioningApplicationEntityList,
             @RequestPart("databaseList") List<DatabaseEntity> databaseEntityList,
             @RequestPart("apiList") List<ApiEntity> apiList
-
-            ) {
+    ) {
         try {
             WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, picAnalystList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
