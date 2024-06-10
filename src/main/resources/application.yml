@@ -7,7 +7,7 @@ logging:
         security: DEBUG
 spring:
   profiles:
-    active: dev
+    active: local
   application:
     name: td-sdacatalog-service
     version: 1.0.0
@@ -37,6 +37,7 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
+      
   security:
     oauth2:
       client:
