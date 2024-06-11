@@ -5,11 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sda.catalogue.sdacataloguerestapi.core.enums.SapIntegration;
 import sda.catalogue.sdacataloguerestapi.core.enums.Status;
+import sda.catalogue.sdacataloguerestapi.modules.DocumentUpload.Entities.DocumentUploadEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,4 +101,9 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     List<Object[]> countAllBySdaHosting();
 
     WebAppEntity findByApplicationName(String applicationName);
+
+    List<WebAppEntity> findByDocumentUploadListIn(Collection<List<DocumentUploadEntity>> documentUploadList);
+
+//    @Query("SELECT wa FROM WebAppEntity wa JOIN wa.documentUploadList du WHERE du.path IN :documentPaths")
+//    List<WebAppEntity> findByDocumentUploadListInSubquery(@Param("documentPaths") List<String> documentPaths);
 }
