@@ -1,5 +1,7 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -84,6 +87,8 @@ public class WebAppService extends BaseController {
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
 
@@ -277,33 +282,23 @@ public class WebAppService extends BaseController {
             }
         }
 
-        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
+        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList() != null ? new ArrayList<>(findData.getDocumentUploadList()) : new ArrayList<>();
         List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
 
-        if (existingDocuments != null) {
-            List<String> newDocumentPaths = newDocuments.stream()
-                    .map(MultipartFile::getOriginalFilename) // Asumsi path dokumen disimpan dalam nama file asli
-                    .toList();
+        // Menyimpan daftar path dokumen baru
+        List<String> newDocumentPaths = newDocuments.stream()
+                .map(MultipartFile::getOriginalFilename)
+                .toList();
 
-            Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
-            while (iterator.hasNext()) {
-                DocumentUploadEntity existingDocument = iterator.next();
-                if (!newDocumentPaths.contains(existingDocument.getPath())) {
-                    // Remove document from MinIO
-                    try {
-                        storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException("Failed to delete file from MinIO", e);
-                    }
-                    // Remove document from database
-                    documentUploadRepository.delete(existingDocument);
-                    // Remove document from documentUploadList
-                    iterator.remove();
-                }
-            }
-        }
+        // Menyimpan daftar path dokumen yang sudah ada
+        List<String> existingDocumentPaths = existingDocuments.stream()
+                .map(DocumentUploadEntity::getPath)
+                .toList();
 
-        // Upload new documents and create document entities
+        // Menghapus dokumen yang tidak ada dalam daftar dokumen baru
+        existingDocuments.removeIf(existingDocument -> !newDocumentPaths.contains(existingDocument.getPath()));
+
+        // Upload dokumen baru dan buat entitas dokumen
         List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
         uploadedDocumentPaths.forEach(path -> {
@@ -313,6 +308,9 @@ public class WebAppService extends BaseController {
             documentUploadEntities.add(documentUploadEntity);
         });
 
+        // Gabungkan dokumen yang sudah ada dengan dokumen baru
+        existingDocuments.addAll(documentUploadEntities);
+        findData.setDocumentUploadList(existingDocuments);
 
         //Fetching from data master
         List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
@@ -370,7 +368,6 @@ public class WebAppService extends BaseController {
         findData.setVersioningApplicationList(versioningApplicationEntities);
         findData.setDatabaseList(databaseEntities);
         findData.setApiList(apiEntities);
-        findData.setDocumentUploadList(documentUploadEntities);
 
         return webAppRepository.save(findData);
     }
@@ -383,19 +380,7 @@ public class WebAppService extends BaseController {
             if (findData == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
             }
-            // Remove documents from MinIO
-            List<DocumentUploadEntity> oldDocument = findData.getDocumentUploadList();
-            List<String> docPathList = oldDocument.stream().map(DocumentUploadEntity::getPath).toList();
-            if (!docPathList.isEmpty()) {
-                try {
-                    storageService.deleteAllFileS3(docPathList);
-                } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                    throw new RuntimeException(e);
-                }
-                documentUploadRepository.deleteAll(oldDocument);
-                findData.setDocumentUploadList(new ArrayList<>());
-                webAppRepository.save(findData);
-            }
+            // Remove documents from MinIO and database if not referenced by other WebApp entities
 
             webAppRepository.delete(findData);
         } catch (DataIntegrityViolationException e) {

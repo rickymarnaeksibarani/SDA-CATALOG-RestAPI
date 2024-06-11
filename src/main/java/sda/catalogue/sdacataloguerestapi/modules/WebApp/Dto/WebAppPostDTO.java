@@ -91,5 +91,8 @@ public class WebAppPostDTO {
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;
 
+    @JsonIgnore
+    private List<MultipartFile> documentation;
+
 
 }

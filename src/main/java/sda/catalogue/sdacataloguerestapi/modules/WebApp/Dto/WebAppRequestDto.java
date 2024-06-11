@@ -42,4 +42,5 @@ public class WebAppRequestDto {
     private String ipDatabase;
     private Long sdaHostingEntity;
     private List<Status> filterByStatus;
+    private List<DocumentDto> documentation;
 }

@@ -100,6 +100,9 @@ public class WebAppEntity {
     @Column(name = "ip_database")
     private String ipDatabase;
 
+    @Column(columnDefinition = "text")
+    private String documentation;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -166,8 +169,7 @@ public class WebAppEntity {
 //    @Column(name = "sda_hosting_id", columnDefinition = "json")
 //    private String sdaHosting;
 
-    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
-    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL)
     private List<DocumentUploadEntity> documentUploadList;
 
     @Cascade(CascadeType.ALL)
