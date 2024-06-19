@@ -6,5 +6,5 @@ spring:
     password: sd4_c4t4l0g
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
 baseUrl: https://api-dev.gmf-aeroasia.co.id/td/sdacatalog/api
