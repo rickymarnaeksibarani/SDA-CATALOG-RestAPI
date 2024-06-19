@@ -282,23 +282,33 @@ public class WebAppService extends BaseController {
             }
         }
 
-        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList() != null ? new ArrayList<>(findData.getDocumentUploadList()) : new ArrayList<>();
+        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
         List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
 
-        // Menyimpan daftar path dokumen baru
-        List<String> newDocumentPaths = newDocuments.stream()
-                .map(MultipartFile::getOriginalFilename)
-                .toList();
+        if (existingDocuments != null) {
+            List<String> newDocumentPaths = newDocuments.stream()
+                    .map(MultipartFile::getOriginalFilename) // Asumsi path dokumen disimpan dalam nama file asli
+                    .toList();
 
-        // Menyimpan daftar path dokumen yang sudah ada
-        List<String> existingDocumentPaths = existingDocuments.stream()
-                .map(DocumentUploadEntity::getPath)
-                .toList();
+            Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
+            while (iterator.hasNext()) {
+                DocumentUploadEntity existingDocument = iterator.next();
+                if (!newDocumentPaths.contains(existingDocument.getPath())) {
+                    // Remove document from MinIO
+                    try {
+                        storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+                        throw new RuntimeException("Failed to delete file from MinIO", e);
+                    }
+                    // Remove document from database
+                    documentUploadRepository.delete(existingDocument);
+                    // Remove document from documentUploadList
+                    iterator.remove();
+                }
+            }
+        }
 
-        // Menghapus dokumen yang tidak ada dalam daftar dokumen baru
-        existingDocuments.removeIf(existingDocument -> !newDocumentPaths.contains(existingDocument.getPath()));
-
-        // Upload dokumen baru dan buat entitas dokumen
+        // Upload new documents and create document entities
         List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
         List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
         uploadedDocumentPaths.forEach(path -> {
@@ -307,10 +317,6 @@ public class WebAppService extends BaseController {
             documentUploadEntity.setWebAppEntity(findData);
             documentUploadEntities.add(documentUploadEntity);
         });
-
-        // Gabungkan dokumen yang sudah ada dengan dokumen baru
-        existingDocuments.addAll(documentUploadEntities);
-        findData.setDocumentUploadList(existingDocuments);
 
         //Fetching from data master
         List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
@@ -368,6 +374,8 @@ public class WebAppService extends BaseController {
         findData.setVersioningApplicationList(versioningApplicationEntities);
         findData.setDatabaseList(databaseEntities);
         findData.setApiList(apiEntities);
+        findData.setDocumentUploadList(documentUploadEntities);
+
 
         return webAppRepository.save(findData);
     }
@@ -381,7 +389,18 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
             }
             // Remove documents from MinIO and database if not referenced by other WebApp entities
+            List<DocumentUploadEntity> documentUploadEntities = findData.getDocumentUploadList();
+            if (documentUploadEntities != null && !documentUploadEntities.isEmpty()) {
+                List<String> documentPaths = documentUploadEntities.stream()
+                        .map(DocumentUploadEntity::getPath)
+                        .collect(Collectors.toList());
+                storageService.deleteAllFileS3(documentPaths);
+            }
 
+            // Menghapus entitas DocumentUpload dari database
+            documentUploadRepository.deleteAll(documentUploadEntities);
+
+            // Menghapus entitas WebApp dari database
             webAppRepository.delete(findData);
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the record. It is referenced by other record");
