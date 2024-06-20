@@ -12,6 +12,8 @@ import sda.catalogue.sdacataloguerestapi.core.utils.PaginationUtil;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Dto.PICAnalystDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Dto.PICAnalystRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperRequestDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -23,13 +25,13 @@ public class PICAnalystController {
     @Autowired
     private PICAnalystService picAnalystService;
 
-    //Getting data PIC Analyst with search and pagination
+    //Getting data PIC Developer with search and pagination
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchPIC(PICAnalystRequestDTO searchDTO) {
 
         try {
             PaginationUtil<PICAnalystEntity, PICAnalystEntity> result = picAnalystService.getAllPICAnalystByPagination(searchDTO);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic analyst!", result), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
