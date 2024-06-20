@@ -1,5 +1,6 @@
 package sda.catalogue.sdacataloguerestapi.modules.PICAnalyst;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,11 @@ import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Dto.PICAnalystDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Dto.PICAnalystRequestDTO;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Entities.PICAnalystEntity;
 import sda.catalogue.sdacataloguerestapi.modules.PICAnalyst.Repository.PICAnalystRepository;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Dto.PICDeveloperRequestDTO;
+import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDeveloperEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,11 +30,26 @@ public class PICAnalystService {
 
     //Getting data PIC Analyst with search and pagination
     public PaginationUtil<PICAnalystEntity, PICAnalystEntity> getAllPICAnalystByPagination(PICAnalystRequestDTO searchRequest) {
+        Specification<PICAnalystEntity> specification = (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (searchRequest.getSearchTerm() != null) {
+                predicates.add(
+                        builder.or(
+                                builder.like(builder.upper(root.get("personalName")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%"),
+                                builder.like(builder.upper(root.get("personalNumber")), "%" + searchRequest.getSearchTerm().toUpperCase() + "%")
+                        )
+                );
+            }
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+
         Pageable paging = PageRequest.of(searchRequest.getPage() - 1, searchRequest.getSize());
-        Specification<PICAnalystEntity> specs = Specification.where(null);
-        Page<PICAnalystEntity> pagedResult = picAnalystRepository.findAll(specs, paging);
+        Page<PICAnalystEntity> pagedResult = picAnalystRepository.findAll(specification, paging);
         return new PaginationUtil<>(pagedResult, PICAnalystEntity.class);
     }
+
 
     //Getting data PIC Analyst by ID
     public PICAnalystEntity getPICAnalystByUUID(Long id_pic_analyst) {

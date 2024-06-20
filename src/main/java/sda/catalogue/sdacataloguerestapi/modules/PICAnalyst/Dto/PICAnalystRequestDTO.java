@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PICAnalystRequestDTO {
     private Integer page;
-
+    private String searchTerm;
     private Integer size;
 
     PICAnalystRequestDTO() {
