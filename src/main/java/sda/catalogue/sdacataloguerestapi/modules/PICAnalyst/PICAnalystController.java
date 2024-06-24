@@ -31,7 +31,7 @@ public class PICAnalystController {
 
         try {
             PaginationUtil<PICAnalystEntity, PICAnalystEntity> result = picAnalystService.getAllPICAnalystByPagination(searchDTO);
-            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic developer!", result), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK, "Success retrieved data pic analyst!", result), HttpStatus.OK);
         } catch (CustomRequestException error) {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
