@@ -66,7 +66,7 @@ public class WebAppEntity {
     @Column(name = "app_category", nullable = false)
     private AppCategory appCategory = AppCategory.WEB;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
 
     @Column(name = "function_application")
