@@ -69,7 +69,7 @@ public class WebAppEntity {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @Column(name = "function_application")
+    @Column(name = "function_application", columnDefinition = "text")
     private String functionApplication;
 
     @Column(name = "address")
