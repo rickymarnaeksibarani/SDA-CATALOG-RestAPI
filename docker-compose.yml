@@ -16,4 +16,6 @@ services:
       SPRING_PROFILES_ACTIVE: dev
 
 networks:
-  microservice_global_network:
+  microservice_network:
+    external:
+      name: microservice_global_network
