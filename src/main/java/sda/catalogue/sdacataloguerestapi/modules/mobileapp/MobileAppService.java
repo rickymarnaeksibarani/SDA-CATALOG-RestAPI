@@ -183,7 +183,7 @@ public class MobileAppService {
                 predicates.add(
                         builder.or(
                                 builder.like(builder.upper(root.get("applicationName")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("assetNumber")), "%" + filterRequest.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("assetNumber")),  filterRequest.getSearchTerm().toUpperCase())
                         )
                 );
             }

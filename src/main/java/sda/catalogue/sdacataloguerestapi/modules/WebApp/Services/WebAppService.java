@@ -227,7 +227,7 @@ public class WebAppService extends BaseController {
                 predicates.add(
                         builder.or(
                                 builder.like(builder.upper(root.get("applicationName")), "%" + requestDto.getSearchTerm().toUpperCase() + "%"),
-                                builder.like(builder.upper(root.get("assetNumber")), "%" + requestDto.getSearchTerm().toUpperCase() + "%")
+                                builder.like(builder.upper(root.get("assetNumber")), requestDto.getSearchTerm().toUpperCase())
                         )
                 );
             }
