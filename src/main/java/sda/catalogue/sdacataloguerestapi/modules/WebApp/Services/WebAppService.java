@@ -88,8 +88,6 @@ public class WebAppService extends BaseController {
     @Autowired
     private StorageService storageService;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private DocumentUploadRepository documentUploadRepository;
 
 
@@ -255,39 +253,38 @@ public class WebAppService extends BaseController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Data not found"));
     }
 
-    //Updating data WebApp by UUID
+    //Updating data WebApp by id
     @Transactional
-    public WebAppEntity updateWebAppByUuid(UUID uuid,
-                                           WebAppPostDTO request,
-                                           List<Long> picDeveloperList,
-                                           List<Long> picAnalystList,
-                                           List<Long> mappingFunctionList,
-                                           List<Long> frontEndList,
-                                           List<Long> backEndList,
-                                           List<Long> webServerList,
-                                           List<VersioningApplicationEntity> versioningApplicationEntities,
-                                           List<DatabaseEntity> databaseEntities,
-                                           List<ApiEntity> apiEntities
-
-    ) {
-        WebAppEntity findData = webAppRepository.findByUuid(uuid);
+    public WebAppEntity updateWebAppById(Long idWebapp,
+                                         WebAppPostDTO request,
+                                         List<Long> picDeveloperList,
+                                         List<Long> picAnalystList,
+                                         List<Long> mappingFunctionList,
+                                         List<Long> frontEndList,
+                                         List<Long> backEndList,
+                                         List<Long> webServerList,
+                                         List<VersioningApplicationEntity> versioningApplicationEntities,
+                                         List<DatabaseEntity> databaseEntities,
+                                         List<ApiEntity> apiEntities) {
+        WebAppEntity findData = webAppRepository.findById(idWebapp).orElse(null);
         if (findData == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with ID : " + idWebapp + " not found");
         }
 
-        if (!findData.getApplicationName().equals(request.getApplicationName())){
+        if (!findData.getApplicationName().equals(request.getApplicationName())) {
             WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
-            if (existingApp != null && !existingApp.getUuid().equals(uuid)){
-                throw new ResponseStatusException(HttpStatus.CONFLICT,"Application name already exist");
+            if (existingApp != null && !existingApp.getIdWebapp().equals(idWebapp)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exist");
             }
         }
 
+        // Handle existing documents
         List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
         List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
 
         if (existingDocuments != null) {
             List<String> newDocumentPaths = newDocuments.stream()
-                    .map(MultipartFile::getOriginalFilename) // Asumsi path dokumen disimpan dalam nama file asli
+                    .map(MultipartFile::getOriginalFilename)
                     .toList();
 
             Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
@@ -318,14 +315,14 @@ public class WebAppService extends BaseController {
             documentUploadEntities.add(documentUploadEntity);
         });
 
-        //Fetching from data master
+        // Fetch data from data master
         List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
-        if (picDeveloper.isEmpty()){
+        if (picDeveloper.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
         }
 
         List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
-        if (picAnalyst.isEmpty()){
+        if (picAnalyst.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
         }
 
@@ -335,27 +332,26 @@ public class WebAppService extends BaseController {
         }
 
         List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
-        if (frontEnd.isEmpty()){
+        if (frontEnd.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
         }
 
         List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
-        if (backEnd.isEmpty()){
+        if (backEnd.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
         }
 
         List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
-        if (webServer.isEmpty()){
+        if (webServer.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
         }
 
         List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-        if (!findSdaHosting.isEmpty()){
+        if (!findSdaHosting.isEmpty()) {
             findSdaHosting.forEach(findData::setSdaHostingEntity);
-        }else {
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
         }
-
 
         findData.setAddress(request.getAddress());
         findData.setApplicationName(request.getApplicationName());
@@ -376,17 +372,16 @@ public class WebAppService extends BaseController {
         findData.setApiList(apiEntities);
         findData.setDocumentUploadList(documentUploadEntities);
 
-
         return webAppRepository.save(findData);
     }
 
     //Deleting data WebApp by UUID
     @Transactional
-    public void deleteWebAppByUuid(UUID uuid){
+    public void deleteWebAppById(Long idWebapp){
         try {
-            WebAppEntity findData = webAppRepository.findByUuid(uuid);
+            WebAppEntity findData = webAppRepository.findById(idWebapp).orElse(null);
             if (findData == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with UUID : " + uuid + " not found");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with ID : " + idWebapp + " not found");
             }
             // Remove documents from MinIO and database if not referenced by other WebApp entities
             List<DocumentUploadEntity> documentUploadEntities = findData.getDocumentUploadList();

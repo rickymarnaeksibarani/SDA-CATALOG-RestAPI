@@ -45,38 +45,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
             "   OR LOWER(w.status) LIKE LOWER(CONCAT('%', :searchTerm, '%')) ")
     long countBySearchTerm(String searchTerm);
 
-    //Getting data WebApp by UUID
-    WebAppEntity findByUuid(UUID uuid);
-
-    //Updating data WebApp by UUID
-    @Modifying
-    @Transactional
-    @Query("UPDATE WebAppEntity w SET w.applicationName = :applicationName, w.assetNumber = :assetNumber, w.sapIntegration = :sapIntegration,w.appCategory = :categoryApp, " +
-            "w.description = :description, w.functionApplication = :functionApplication, w.address = :address, " +
-            "w.businessImpactPriority = :businessImpactPriority, w.status = :status, w.linkIOS = :linkIOS, " +
-            "w.linkAndroid = :linkAndroid, w.fileManifest = :fileManifest, w.fileIpa = :fileIpa, " +
-            "w.fileAndroid = :fileAndroid, w.applicationSourceFe = :applicationSourceFe, " +
-            "w.applicationSourceBe = :applicationSourceBe, w.ipDatabase = :ipDatabase " +
-            "WHERE w.uuid = :uuid")
-    int updateByUuid(UUID uuid,
-                     String applicationName,
-                     String assetNumber,
-                     SapIntegration sapIntegration,
-                     String categoryApp,
-                     String description,
-                     String functionApplication,
-                     String address,
-                     String businessImpactPriority,
-                     String status,
-                     String linkIOS,
-                     String linkAndroid,
-                     String fileManifest,
-                     String fileIpa,
-                     String fileAndroid,
-                     String applicationSourceFe,
-                     String applicationSourceBe,
-                     String ipDatabase);
-
     @Modifying
     @Transactional
     @Query("DELETE FROM WebAppEntity w WHERE w.uuid = :uuid")
@@ -101,9 +69,4 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     List<Object[]> countAllBySdaHosting();
 
     WebAppEntity findByApplicationName(String applicationName);
-
-    List<WebAppEntity> findByDocumentUploadListIn(Collection<List<DocumentUploadEntity>> documentUploadList);
-
-//    @Query("SELECT wa FROM WebAppEntity wa JOIN wa.documentUploadList du WHERE du.path IN :documentPaths")
-//    List<WebAppEntity> findByDocumentUploadListInSubquery(@Param("documentPaths") List<String> documentPaths);
 }

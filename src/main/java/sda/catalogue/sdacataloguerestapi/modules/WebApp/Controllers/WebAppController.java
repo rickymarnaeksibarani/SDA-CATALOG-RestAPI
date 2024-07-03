@@ -118,10 +118,10 @@ public class WebAppController {
         }
     }
 
-    //Update Data Web App By UUID
-    @PutMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    //Update Data Web App By Id
+    @PutMapping(value = "/{idWebApp}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateWebApp(
-            @PathVariable("uuid") UUID uuid,
+            @PathVariable("idWebApp") Long idWebApp,
             @Valid @ModelAttribute WebAppPostDTO request,
             @RequestPart("picDeveloperList") List<Long> picDeveloperList,
             @RequestPart("picAnalystList") List<Long> picAnalystList,
@@ -134,7 +134,7 @@ public class WebAppController {
             @RequestPart("apiList") List<ApiEntity> apiList
     ) {
         try {
-            WebAppEntity result = webAppService.updateWebAppByUuid(uuid, request, picDeveloperList, picAnalystList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
+            WebAppEntity result = webAppService.updateWebAppById(idWebApp , request, picDeveloperList, picAnalystList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -142,12 +142,12 @@ public class WebAppController {
         }
     }
 
-    @DeleteMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{idWebApp}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteWebAppByUuid(
-            @PathVariable("uuid") UUID uuid
+            @PathVariable("idWebApp") Long idWebApp
     ) {
         try {
-            webAppService.deleteWebAppByUuid(uuid);
+            webAppService.deleteWebAppById(idWebApp);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.OK, "Success delete data web app!", null);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
