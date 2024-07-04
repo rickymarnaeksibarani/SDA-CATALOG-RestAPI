@@ -43,19 +43,16 @@ public class WebAppController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createWebApp(
-            @Valid @ModelAttribute WebAppPostDTO request,
-            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
-            @RequestPart("picAnalystList") List<Long> picAnalystList,
-            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
-            @RequestPart("frontEndList") List<Long> frontEndList,
-            @RequestPart("backEndList") List<Long> backEndList,
-            @RequestPart("webServerList") List<Long> webServerList,
-            @RequestPart("versioningApplicationList") List<VersioningApplicationDTO> versioningApplicationList,
-            @RequestPart("databaseList") List<DatabaseDTO> databaseList,
-            @RequestPart("apiList") List<ApiDTO> apiList
+            @Valid @RequestPart WebAppPostDTO request,
+            @RequestPart("picDeveloper") List<Long> picDeveloper,
+            @RequestPart("picAnalyst") List<Long> picAnalyst,
+            @RequestPart("mappingFunction") List<Long> mappingFunction,
+            @RequestPart("frontEnd") List<Long> frontEnd,
+            @RequestPart("backEnd") List<Long> backEnd,
+            @RequestPart("webServer") List<Long> webServer
     ) {
         try {
-            WebAppEntity result = webAppService.createWebApp(request, picDeveloperList, picAnalystList,mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationList, databaseList, apiList);
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloper, picAnalyst,mappingFunction, frontEnd, backEnd, webServer);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -122,19 +119,17 @@ public class WebAppController {
     @PutMapping(value = "/{idWebApp}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateWebApp(
             @PathVariable("idWebApp") Long idWebApp,
-            @Valid @ModelAttribute WebAppPostDTO request,
-            @RequestPart("picDeveloperList") List<Long> picDeveloperList,
-            @RequestPart("picAnalystList") List<Long> picAnalystList,
-            @RequestPart("mappingFunctionList") List<Long> mappingFunctionList,
-            @RequestPart("frontEndList") List<Long> frontEndList,
-            @RequestPart("backEndList") List<Long> backEndList,
-            @RequestPart("webServerList") List<Long> webServerList,
-            @RequestPart("versioningApplicationList") List<VersioningApplicationEntity> versioningApplicationEntityList,
-            @RequestPart("databaseList") List<DatabaseEntity> databaseEntityList,
-            @RequestPart("apiList") List<ApiEntity> apiList
+            @Valid @RequestPart("request") WebAppPostDTO request,
+            @RequestParam("picDeveloper") List<Long> picDeveloper,
+            @RequestParam("picAnalyst") List<Long> picAnalyst,
+            @RequestParam("mappingFunction") List<Long> mappingFunction,
+            @RequestParam("frontEnd") List<Long> frontEnd,
+            @RequestParam("backEnd") List<Long> backEnd,
+            @RequestParam("webServer") List<Long> webServer
     ) {
+        log.info("request {}", request);
         try {
-            WebAppEntity result = webAppService.updateWebAppById(idWebApp , request, picDeveloperList, picAnalystList, mappingFunctionList, frontEndList, backEndList, webServerList, versioningApplicationEntityList, databaseEntityList, apiList);
+            WebAppEntity result = webAppService.updateWebAppById(idWebApp, request, picDeveloper, picAnalyst, mappingFunction, frontEnd, backEnd, webServer);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,7 +60,7 @@ public class WebAppEntity {
     @Column(name = "sap_integration", nullable = false)
     private SapIntegration sapIntegration;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -72,24 +74,21 @@ public class WebAppEntity {
     @Column(name = "function_application", columnDefinition = "text")
     private String functionApplication;
 
+    @Column(name = "versioning_application_list", columnDefinition = "text")
+    private String versioningApplicationList;
+
+    @Column(name = "api_application_list", columnDefinition = "text")
+    private String apiApplicationList;
+
+    @Column(name = "database_application_list", columnDefinition = "text")
+    private String databaseList;
+
     @Column(name = "address")
     private String address;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "business_impact_priority", nullable = false)
     private BusinessImpactPriority businessImpactPriority;
-
-//    @Column(name = "status")
-//    private String status;
-
-//    @Column(name = "role")
-//    private String role;
-
-    private String linkIOS;
-    private String linkAndroid;
-    private String fileManifest;
-    private String fileIpa;
-    private String fileAndroid;
 
     @Column(name = "application_source_fe")
     private String applicationSourceFe;
@@ -99,9 +98,6 @@ public class WebAppEntity {
 
     @Column(name = "ip_database")
     private String ipDatabase;
-
-    @Column(columnDefinition = "text")
-    private String documentation;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -117,7 +113,7 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_pic_developer")
     )
-    private List<PICDeveloperEntity> picDeveloperList;
+    private List<PICDeveloperEntity> picDeveloper;
 
     @ManyToMany
     @JoinTable(
@@ -125,7 +121,7 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_pic_analyst")
     )
-    private List<PICAnalystEntity> picAnalystList;
+    private List<PICAnalystEntity> picAnalyst;
 
 
     @ManyToMany
@@ -134,7 +130,7 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_mapping_function")
     )
-    private List<MappingFunctionEntity> mappingFunctionList;
+    private List<MappingFunctionEntity> mappingFunction;
 
     @ManyToMany
     @JoinTable(
@@ -142,7 +138,7 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_frontend")
     )
-    private List<FrontEndEntity> frontEndList;
+    private List<FrontEndEntity> frontEnd;
 
     @ManyToMany
     @JoinTable(
@@ -150,7 +146,7 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_backend")
     )
-    private List<BackEndEntity> backEndList;
+    private List<BackEndEntity> backEnd;
 
     @ManyToMany
     @JoinTable(
@@ -158,35 +154,15 @@ public class WebAppEntity {
             joinColumns = @JoinColumn(name = "id_webapp"),
             inverseJoinColumns = @JoinColumn(name = "id_web_server")
     )
-    private List<WebServerEntity> webServerList;
+    private List<WebServerEntity> webServer;
 
     @ManyToOne
     @JoinColumn(name = "id_sda_hosting")
     @JsonManagedReference
-    @JsonIgnoreProperties("sdaHostingEntity")
-    private SDAHostingEntity sdaHostingEntity;
-
-//    @Column(name = "sda_hosting_id", columnDefinition = "json")
-//    private String sdaHosting;
+    private SDAHostingEntity sdaHosting;
 
     @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY, cascade = jakarta.persistence.CascadeType.ALL)
     private List<DocumentUploadEntity> documentUploadList;
-
-    @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<VersioningApplicationEntity> versioningApplicationList;
-
-    @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<ApiEntity> apiList;
-
-    @Cascade(CascadeType.ALL)
-    @JsonManagedReference
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "webAppEntity", fetch = FetchType.LAZY)
-    private List<DatabaseEntity> databaseList;
 
     @Cascade(CascadeType.ALL)
     @JsonManagedReference

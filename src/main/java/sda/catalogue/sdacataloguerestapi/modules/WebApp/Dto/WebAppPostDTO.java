@@ -2,10 +2,8 @@ package sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -37,11 +35,20 @@ public class WebAppPostDTO {
     @JsonProperty("sapIntegration")
     private SapIntegration sapIntegration;
 
-//    @JsonProperty("role")
-//    private Role role;
-
     @JsonProperty("categoryApp")
     private String categoryApp;
+
+    @NotNull
+    @JsonProperty("databaseList")
+    private List<DatabaseDTO> databaseList;
+
+    @NotNull
+    @JsonProperty("apiApplication")
+    private List<ApiDTO> apiApplication;
+
+    @NotNull
+    @JsonProperty("versioningApplicationList")
+    private List<VersioningApplicationDTO> versioningApplicationList;
 
     @JsonProperty("description")
     private String description;
@@ -55,7 +62,8 @@ public class WebAppPostDTO {
     @JsonProperty("businessImpactPriority")
     private BusinessImpactPriority businessImpactPriority;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @JsonProperty("status")
     private Status status;
 
     @JsonProperty("applicationSourceFe")
@@ -70,29 +78,25 @@ public class WebAppPostDTO {
     @JsonProperty("sdaHosting")
     private List<Long> sdaHosting;
 
-    @JsonIgnore
-    private List<String> picDeveloper;
+    @JsonProperty("picDeveloper")
+    private List<Long> picDeveloper;
 
-    @JsonIgnore
-    private List<String> picAnalyst;
+    @JsonProperty("picAnalyst")
+    private List<Long> picAnalyst;
 
-    @JsonIgnore
-    private List<String> mappingFunction;
+    @JsonProperty("mappingFunction")
+    private List<Long> mappingFunction;
 
-    @JsonIgnore
-    private List<String> frontEnd;
+    @JsonProperty("frontEnd")
+    private List<Long> frontEnd;
 
-    @JsonIgnore
-    private List<String> backEnd;
+    @JsonProperty("backEnd")
+    private List<Long> backEnd;
 
-    @JsonIgnore
-    private List<String> webServer;
+    @JsonProperty("webServer")
+    private List<Long> webServer;
 
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;
-
-    @JsonIgnore
-    private List<MultipartFile> documentation;
-
-
 }
+

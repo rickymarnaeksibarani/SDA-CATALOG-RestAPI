@@ -1,6 +1,5 @@
 package sda.catalogue.sdacataloguerestapi.modules.WebApp.Services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.ObjectWriteResponse;
 import jakarta.persistence.criteria.Predicate;
@@ -89,6 +88,8 @@ public class WebAppService extends BaseController {
     private StorageService storageService;
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     private final Date date = new Date();
@@ -97,58 +98,63 @@ public class WebAppService extends BaseController {
     //Creating data WebApp
     @Transactional
     public WebAppEntity createWebApp(WebAppPostDTO request,
-                                     List<Long> picDeveloperList,
-                                     List<Long> picAnalystList,
-                                     List<Long> mappingFunctionList,
-                                     List<Long> frontEndList,
-                                     List<Long> backEndList,
-                                     List<Long> webServerList,
-                                     List<VersioningApplicationDTO> versioningApplicationList,
-                                     List<DatabaseDTO> databaseList,
-                                     List<ApiDTO> apiList) {
+                                     List<Long> picDeveloper,
+                                     List<Long> picAnalyst,
+                                     List<Long> mappingFunction,
+                                     List<Long> frontEnd,
+                                     List<Long> backEnd,
+                                     List<Long> webServer) {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
             }
 
             //PIC Developer Process
-            List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloperList, picDeveloperRepository, Function.identity(), "PIC Developer");
+            List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloper, picDeveloperRepository, Function.identity(), "PIC Developer");
 
             //PIC Analyst Process
-            List<PICAnalystEntity> picAnalystData = processLongList(picAnalystList, picAnalystRepository, Function.identity(), "PIC Analyst");
+            List<PICAnalystEntity> picAnalystData = processLongList(picAnalyst, picAnalystRepository, Function.identity(), "PIC Analyst");
 
             //Mapping Function Process
-            List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunctionList, mappingFunctionRepository, Function.identity(), "Mapping Function");
+            List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunction, mappingFunctionRepository, Function.identity(), "Mapping Function");
 
             //Front End Process
-            List<FrontEndEntity> frontEndData = processLongList(frontEndList, frontEndRepository, Function.identity(), "Front End");
+            List<FrontEndEntity> frontEndData = processLongList(frontEnd, frontEndRepository, Function.identity(), "Front End");
 
             //Back End Process
-            List<BackEndEntity> backEndData = processLongList(backEndList, backEndRepository, Function.identity(), "Back End");
+            List<BackEndEntity> backEndData = processLongList(backEnd, backEndRepository, Function.identity(), "Back End");
 
             //Web Server Process
-            List<WebServerEntity> webServerData = processLongList(webServerList, webServerRepository, Function.identity(), "Web Server");
+            List<WebServerEntity> webServerData = processLongList(webServer, webServerRepository, Function.identity(), "Web Server");
 
             //WebApp Process
             WebAppEntity data = ObjectMapperUtil.map(request, WebAppEntity.class);
-
-            data.setPicDeveloperList(picDeveloperData);
-            data.setPicAnalystList(picAnalystData);
-            data.setMappingFunctionList(mappingFunctionData);
-            data.setFrontEndList(frontEndData);
-            data.setBackEndList(backEndData);
-            data.setWebServerList(webServerData);
+            data.setApiApplicationList(objectMapper.writeValueAsString(request.getApiApplication()));
+            data.setVersioningApplicationList(objectMapper.writeValueAsString(request.getVersioningApplicationList()));
+            data.setDatabaseList(objectMapper.writeValueAsString(request.getDatabaseList()));
+            data.setPicAnalyst(picAnalystData);
+            data.setPicDeveloper(picDeveloperData);
+            data.setMappingFunction(mappingFunctionData);
+            data.setFrontEnd(frontEndData);
+            data.setBackEnd(backEndData);
+            data.setWebServer(webServerData);
+            data.setApplicationName(request.getApplicationName());
+            data.setSapIntegration(request.getSapIntegration());
+            data.setDescription(request.getDescription());
+            data.setAddress(request.getAddress());
+            data.setIpDatabase(request.getIpDatabase());
+            data.setFunctionApplication(request.getFunctionApplication());
+            data.setApplicationSourceFe(request.getApplicationSourceFe());
+            data.setApplicationSourceBe(request.getApplicationSourceBe());
             data.setAssetNumber(GenerateAssetNumber.generateAssetNumber("AW", webAppRepository.count() + 1));
 
             //SDA Hosting
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-
             if (!findSdaHosting.isEmpty()){
-                findSdaHosting.forEach(data::setSdaHostingEntity);
+                findSdaHosting.forEach(data::setSdaHosting);
             }else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
             }
-
 
             //Documentation process
             List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
@@ -161,54 +167,9 @@ public class WebAppService extends BaseController {
                 documentUploadEntities.add(documentUploadEntity);
             });
             data.setDocumentUploadList(documentUploadEntities);
+            log.info("document {} ", request.getDocumentUploadList());
             WebAppEntity result = webAppRepository.save(data);
 
-            //Versioning Application Process
-            List<VersioningApplicationEntity> versioningApplicationListData = new ArrayList<>();
-            for (VersioningApplicationDTO versioningApplicationId : versioningApplicationList) {
-                VersioningApplicationEntity versioningApplicationItem = new VersioningApplicationEntity();
-                versioningApplicationItem.setVersion(versioningApplicationId.getVersion());
-                versioningApplicationItem.setDescription(versioningApplicationId.getDescription());
-                versioningApplicationItem.setReleaseDate(versioningApplicationId.getReleaseDate());
-                versioningApplicationItem.setWebAppEntity(result);
-                versioningApplicationListData.add(versioningApplicationItem);
-
-            }
-
-            //API Process
-            List<ApiEntity> apiListData = new ArrayList<>();
-            for (ApiDTO apiId : apiList) {
-                ApiEntity apiItem = new ApiEntity();
-                apiItem.setApiName(apiId.getApiName());
-                apiItem.setIpApi(apiId.getIpApi());
-                apiItem.setUserName(apiId.getUserName());
-                apiItem.setPassword(apiId.getPassword());
-                apiItem.setWebAppEntity(result);
-                apiListData.add(apiItem);
-            }
-
-            //Database Process
-            List<DatabaseEntity> databaseListData = new ArrayList<>();
-            for (DatabaseDTO databaseId : databaseList) {
-                DatabaseEntity databaseItem = new DatabaseEntity();
-                databaseItem.setWebAppEntity(result);
-                databaseItem.setDbAddress(databaseId.getDbAddress());
-                databaseItem.setDbPassword(databaseId.getDbPassword());
-                databaseItem.setDbName(databaseId.getDbName());
-                databaseItem.setDbUserName(databaseId.getDbUserName());
-                Optional<TypeDatabaseEntity> typeDatabaseEntityOptional = typeDatabaseRepository.findById(databaseId.getIdTypeDatabase());
-                if (typeDatabaseEntityOptional.isPresent()) {
-                    TypeDatabaseEntity typeDatabaseEntity = typeDatabaseEntityOptional.get();
-                    databaseItem.setTypeDatabaseEntity(typeDatabaseEntity);
-                    databaseListData.add(databaseItem);
-                } else {
-                    throw new CustomRequestException("Database with ID : " + databaseId.getIdTypeDatabase() + " not found", HttpStatus.NOT_FOUND);
-                }
-            }
-
-            apiRepository.saveAll(apiListData);
-            databaseRepository.saveAll(databaseListData);
-            versioningApplicationRepository.saveAll(versioningApplicationListData);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -257,122 +218,127 @@ public class WebAppService extends BaseController {
     @Transactional
     public WebAppEntity updateWebAppById(Long idWebapp,
                                          WebAppPostDTO request,
-                                         List<Long> picDeveloperList,
-                                         List<Long> picAnalystList,
-                                         List<Long> mappingFunctionList,
-                                         List<Long> frontEndList,
-                                         List<Long> backEndList,
-                                         List<Long> webServerList,
-                                         List<VersioningApplicationEntity> versioningApplicationEntities,
-                                         List<DatabaseEntity> databaseEntities,
-                                         List<ApiEntity> apiEntities) {
-        WebAppEntity findData = webAppRepository.findById(idWebapp).orElse(null);
-        if (findData == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with ID : " + idWebapp + " not found");
-        }
-
-        if (!findData.getApplicationName().equals(request.getApplicationName())) {
-            WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
-            if (existingApp != null && !existingApp.getIdWebapp().equals(idWebapp)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exist");
+                                         List<Long> picDeveloper,
+                                         List<Long> picAnalyst,
+                                         List<Long> mappingFunction,
+                                         List<Long> frontEnd,
+                                         List<Long> backEnd,
+                                         List<Long> webServer
+                                         ){
+        try {
+            WebAppEntity findData = webAppRepository.findById(idWebapp).orElse(null);
+            if (findData == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with ID : " + idWebapp + " not found");
             }
-        }
 
-        // Handle existing documents
-        List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
-        List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
-
-        if (existingDocuments != null) {
-            List<String> newDocumentPaths = newDocuments.stream()
-                    .map(MultipartFile::getOriginalFilename)
-                    .toList();
-
-            Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
-            while (iterator.hasNext()) {
-                DocumentUploadEntity existingDocument = iterator.next();
-                if (!newDocumentPaths.contains(existingDocument.getPath())) {
-                    // Remove document from MinIO
-                    try {
-                        storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                        throw new RuntimeException("Failed to delete file from MinIO", e);
-                    }
-                    // Remove document from database
-                    documentUploadRepository.delete(existingDocument);
-                    // Remove document from documentUploadList
-                    iterator.remove();
+            if (!findData.getApplicationName().equals(request.getApplicationName())) {
+                WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
+                if (existingApp != null && !existingApp.getIdWebapp().equals(idWebapp)) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exist");
                 }
             }
+
+            // Handle existing documents
+            List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
+            List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
+
+            if (existingDocuments != null) {
+                List<String> newDocumentPaths = newDocuments.stream()
+                        .map(MultipartFile::getOriginalFilename)
+                        .toList();
+
+                Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
+                while (iterator.hasNext()) {
+                    DocumentUploadEntity existingDocument = iterator.next();
+                    if (!newDocumentPaths.contains(existingDocument.getPath())) {
+                        // Remove document from MinIO
+                        try {
+                            storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
+                        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+                            throw new RuntimeException("Failed to delete file from MinIO", e);
+                        }
+                        // Remove document from database
+                        documentUploadRepository.delete(existingDocument);
+                        // Remove document from documentUploadList
+                        iterator.remove();
+                    }
+                }
+            }
+
+            // Upload new documents and create document entities
+            List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
+            List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
+            uploadedDocumentPaths.forEach(path -> {
+                DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
+                documentUploadEntity.setPath(path);
+                documentUploadEntity.setWebAppEntity(findData);
+                documentUploadEntities.add(documentUploadEntity);
+            });
+
+            // Fetch data from data master
+            List<PICDeveloperEntity> developer = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloper);
+            if (developer.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
+            }
+
+            List<PICAnalystEntity> analyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalyst);
+            if (analyst.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
+            }
+
+            List<MappingFunctionEntity> mapping = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunction);
+            if (mapping.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
+            }
+
+            List<FrontEndEntity> fe = frontEndRepository.findByIdFrontEndIsIn(frontEnd);
+            if (fe.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
+            }
+
+            List<BackEndEntity> be = backEndRepository.findByIdBackEndIsIn(backEnd);
+            if (be.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
+            }
+
+            List<WebServerEntity> server = webServerRepository.findByIdWebServerIsIn(webServer);
+            if (server.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
+            }
+
+            List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
+            if (!findSdaHosting.isEmpty()) {
+                findSdaHosting.forEach(findData::setSdaHosting);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
+            }
+
+            findData.setAddress(request.getAddress());
+            findData.setApplicationName(request.getApplicationName());
+            findData.setVersioningApplicationList(objectMapper.writeValueAsString(request.getVersioningApplicationList()));
+            findData.setApiApplicationList(objectMapper.writeValueAsString(request.getApiApplication()));
+            findData.setDatabaseList(objectMapper.writeValueAsString(request.getDatabaseList()));
+            findData.setDescription(request.getDescription());
+            findData.setFunctionApplication(request.getFunctionApplication());
+            findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
+            findData.setStatus(request.getStatus());
+            findData.setSapIntegration(request.getSapIntegration());
+            findData.setIpDatabase(request.getIpDatabase());
+            findData.setPicDeveloper(developer);
+            findData.setApplicationSourceBe(request.getApplicationSourceBe());
+            findData.setApplicationSourceFe(request.getApplicationSourceFe());
+            findData.setPicAnalyst(analyst);
+            findData.setMappingFunction(mapping);
+            findData.setFrontEnd(fe);
+            findData.setBackEnd(be);
+            findData.setWebServer(server);
+            findData.setDocumentUploadList(documentUploadEntities);
+
+            WebAppEntity result =  webAppRepository.save(findData);
+            return result;
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
-
-        // Upload new documents and create document entities
-        List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
-        List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
-        uploadedDocumentPaths.forEach(path -> {
-            DocumentUploadEntity documentUploadEntity = new DocumentUploadEntity();
-            documentUploadEntity.setPath(path);
-            documentUploadEntity.setWebAppEntity(findData);
-            documentUploadEntities.add(documentUploadEntity);
-        });
-
-        // Fetch data from data master
-        List<PICDeveloperEntity> picDeveloper = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloperList);
-        if (picDeveloper.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
-        }
-
-        List<PICAnalystEntity> picAnalyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalystList);
-        if (picAnalyst.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
-        }
-
-        List<MappingFunctionEntity> mappingFunction = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunctionList);
-        if (mappingFunction.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
-        }
-
-        List<FrontEndEntity> frontEnd = frontEndRepository.findByIdFrontEndIsIn(frontEndList);
-        if (frontEnd.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
-        }
-
-        List<BackEndEntity> backEnd = backEndRepository.findByIdBackEndIsIn(backEndList);
-        if (backEnd.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
-        }
-
-        List<WebServerEntity> webServer = webServerRepository.findByIdWebServerIsIn(webServerList);
-        if (webServer.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
-        }
-
-        List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
-        if (!findSdaHosting.isEmpty()) {
-            findSdaHosting.forEach(findData::setSdaHostingEntity);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "sda hosting with IDs not found");
-        }
-
-        findData.setAddress(request.getAddress());
-        findData.setApplicationName(request.getApplicationName());
-        findData.setDescription(request.getDescription());
-        findData.setFunctionApplication(request.getFunctionApplication());
-        findData.setBusinessImpactPriority(request.getBusinessImpactPriority());
-        findData.setStatus(request.getStatus());
-        findData.setSapIntegration(request.getSapIntegration());
-        findData.setIpDatabase(request.getIpDatabase());
-        findData.setPicDeveloperList(picDeveloper);
-        findData.setPicAnalystList(picAnalyst);
-        findData.setMappingFunctionList(mappingFunction);
-        findData.setFrontEndList(frontEnd);
-        findData.setBackEndList(backEnd);
-        findData.setWebServerList(webServer);
-        findData.setVersioningApplicationList(versioningApplicationEntities);
-        findData.setDatabaseList(databaseEntities);
-        findData.setApiList(apiEntities);
-        findData.setDocumentUploadList(documentUploadEntities);
-
-        return webAppRepository.save(findData);
     }
 
     //Deleting data WebApp by UUID
