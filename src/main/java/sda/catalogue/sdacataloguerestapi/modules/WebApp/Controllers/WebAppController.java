@@ -49,10 +49,11 @@ public class WebAppController {
             @RequestPart("mappingFunction") List<Long> mappingFunction,
             @RequestPart("frontEnd") List<Long> frontEnd,
             @RequestPart("backEnd") List<Long> backEnd,
-            @RequestPart("webServer") List<Long> webServer
+            @RequestPart("webServer") List<Long> webServer,
+            @RequestPart("documentUploadList") List<MultipartFile> documentUploadList
     ) {
         try {
-            WebAppEntity result = webAppService.createWebApp(request, picDeveloper, picAnalyst,mappingFunction, frontEnd, backEnd, webServer);
+            WebAppEntity result = webAppService.createWebApp(request, picDeveloper, picAnalyst,mappingFunction, frontEnd, backEnd, webServer, documentUploadList);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.CREATED, "Successfully created data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (CustomRequestException error) {
@@ -127,7 +128,7 @@ public class WebAppController {
             @RequestParam("backEnd") List<Long> backEnd,
             @RequestParam("webServer") List<Long> webServer
     ) {
-        log.info("request {}", request);
+
         try {
             WebAppEntity result = webAppService.updateWebAppById(idWebApp, request, picDeveloper, picAnalyst, mappingFunction, frontEnd, backEnd, webServer);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
@@ -136,6 +137,7 @@ public class WebAppController {
             return error.GlobalCustomRequestException(error.getMessage(), error.getStatus());
         }
     }
+
 
     @DeleteMapping(value = "/{idWebApp}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteWebAppByUuid(

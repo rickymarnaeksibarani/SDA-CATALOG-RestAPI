@@ -75,14 +75,6 @@ public class WebAppService extends BaseController {
     @Autowired
     private WebServerRepository webServerRepository;
     @Autowired
-    private VersioningApplicationRepository versioningApplicationRepository;
-    @Autowired
-    private DatabaseRepository databaseRepository;
-    @Autowired
-    private ApiRepository apiRepository;
-    @Autowired
-    private TypeDatabaseRepository typeDatabaseRepository;
-    @Autowired
     private SDAHostingRepository sdaHostingRepository;
     @Autowired
     private StorageService storageService;
@@ -103,7 +95,8 @@ public class WebAppService extends BaseController {
                                      List<Long> mappingFunction,
                                      List<Long> frontEnd,
                                      List<Long> backEnd,
-                                     List<Long> webServer) {
+                                     List<Long> webServer,
+                                     List<MultipartFile> documentUploadList) {
         try {
             if (webAppRepository.existsByApplicationName(request.getApplicationName())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exists");
@@ -157,7 +150,7 @@ public class WebAppService extends BaseController {
             }
 
             //Documentation process
-            List<String> documentPaths = uploadDocument(request.getDocumentUploadList());
+            List<String> documentPaths = uploadDocument(documentUploadList);
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
 
             documentPaths.forEach(path -> {
@@ -231,12 +224,12 @@ public class WebAppService extends BaseController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WebApp with ID : " + idWebapp + " not found");
             }
 
-            if (!findData.getApplicationName().equals(request.getApplicationName())) {
-                WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
-                if (existingApp != null && !existingApp.getIdWebapp().equals(idWebapp)) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exist");
-                }
-            }
+//            if (!findData.getApplicationName().equals(request.getApplicationName())) {
+//                WebAppEntity existingApp = webAppRepository.findByApplicationName(request.getApplicationName());
+//                if (existingApp != null && !existingApp.getIdWebapp().equals(idWebapp)) {
+//                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Application name already exist");
+//                }
+//            }
 
             // Handle existing documents
             List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
@@ -275,36 +268,17 @@ public class WebAppService extends BaseController {
                 documentUploadEntities.add(documentUploadEntity);
             });
 
-            // Fetch data from data master
-            List<PICDeveloperEntity> developer = picDeveloperRepository.findByIdPicDeveloperIsIn(picDeveloper);
-            if (developer.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Developer not found");
-            }
+            List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloper, picDeveloperRepository, Function.identity(), "PIC Developer");
 
-            List<PICAnalystEntity> analyst = picAnalystRepository.findByIdPicAnalystIsIn(picAnalyst);
-            if (analyst.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PIC Analyst not found");
-            }
+            List<PICAnalystEntity> picAnalystData = processLongList(picAnalyst, picAnalystRepository, Function.identity(), "PIC Analyst");
 
-            List<MappingFunctionEntity> mapping = mappingFunctionRepository.findByIdMappingFunctionIsIn(mappingFunction);
-            if (mapping.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mapping Function not found");
-            }
+            List<MappingFunctionEntity> mappingFunctionData = processLongList(mappingFunction, mappingFunctionRepository, Function.identity(), "Mapping Function");
 
-            List<FrontEndEntity> fe = frontEndRepository.findByIdFrontEndIsIn(frontEnd);
-            if (fe.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Front End not found");
-            }
+            List<FrontEndEntity> frontEndData = processLongList(frontEnd, frontEndRepository, Function.identity(), "Frontend");
 
-            List<BackEndEntity> be = backEndRepository.findByIdBackEndIsIn(backEnd);
-            if (be.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Back End not found");
-            }
+            List<BackEndEntity> backEndData = processLongList(backEnd, backEndRepository, Function.identity(), "Backend");
 
-            List<WebServerEntity> server = webServerRepository.findByIdWebServerIsIn(webServer);
-            if (server.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Web Server not found");
-            }
+            List<WebServerEntity> webServerData = processLongList(webServer, webServerRepository, Function.identity(), "Web Server");
 
             List<SDAHostingEntity> findSdaHosting = sdaHostingRepository.findByIdSDAHostingIsIn(request.getSdaHosting());
             if (!findSdaHosting.isEmpty()) {
@@ -324,18 +298,17 @@ public class WebAppService extends BaseController {
             findData.setStatus(request.getStatus());
             findData.setSapIntegration(request.getSapIntegration());
             findData.setIpDatabase(request.getIpDatabase());
-            findData.setPicDeveloper(developer);
+            findData.setPicDeveloper(picDeveloperData);
             findData.setApplicationSourceBe(request.getApplicationSourceBe());
             findData.setApplicationSourceFe(request.getApplicationSourceFe());
-            findData.setPicAnalyst(analyst);
-            findData.setMappingFunction(mapping);
-            findData.setFrontEnd(fe);
-            findData.setBackEnd(be);
-            findData.setWebServer(server);
+            findData.setPicAnalyst(picAnalystData);
+            findData.setMappingFunction(mappingFunctionData);
+            findData.setFrontEnd(frontEndData);
+            findData.setBackEnd(backEndData);
+            findData.setWebServer(webServerData);
             findData.setDocumentUploadList(documentUploadEntities);
 
-            WebAppEntity result =  webAppRepository.save(findData);
-            return result;
+            return webAppRepository.save(findData);
         }catch (Exception e){
             throw new RuntimeException(e);
         }

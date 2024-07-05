@@ -6,6 +6,6 @@ spring:
     password: sd4_c4t4l0g
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false
 baseUrl: http://localhost:8080

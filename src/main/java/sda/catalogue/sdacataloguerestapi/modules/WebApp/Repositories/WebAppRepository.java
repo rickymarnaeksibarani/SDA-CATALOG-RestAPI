@@ -69,4 +69,6 @@ public interface WebAppRepository extends JpaRepository<WebAppEntity, Long>, Jpa
     List<Object[]> countAllBySdaHosting();
 
     WebAppEntity findByApplicationName(String applicationName);
+
+    boolean existsByAssetNumber(String assetNumber);
 }
