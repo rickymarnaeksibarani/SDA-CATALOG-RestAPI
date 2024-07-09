@@ -217,6 +217,7 @@ public class WebAppService extends BaseController {
                                          List<Long> frontEnd,
                                          List<Long> backEnd,
                                          List<Long> webServer
+
                                          ){
         try {
             WebAppEntity findData = webAppRepository.findById(idWebapp).orElse(null);
@@ -235,29 +236,6 @@ public class WebAppService extends BaseController {
             List<DocumentUploadEntity> existingDocuments = findData.getDocumentUploadList();
             List<MultipartFile> newDocuments = request.getDocumentUploadList() != null ? request.getDocumentUploadList() : new ArrayList<>();
 
-            if (existingDocuments != null) {
-                List<String> newDocumentPaths = newDocuments.stream()
-                        .map(MultipartFile::getOriginalFilename)
-                        .toList();
-
-                Iterator<DocumentUploadEntity> iterator = existingDocuments.iterator();
-                while (iterator.hasNext()) {
-                    DocumentUploadEntity existingDocument = iterator.next();
-                    if (!newDocumentPaths.contains(existingDocument.getPath())) {
-                        // Remove document from MinIO
-                        try {
-                            storageService.deleteAllFileS3(Collections.singletonList(existingDocument.getPath()));
-                        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-                            throw new RuntimeException("Failed to delete file from MinIO", e);
-                        }
-                        // Remove document from database
-                        documentUploadRepository.delete(existingDocument);
-                        // Remove document from documentUploadList
-                        iterator.remove();
-                    }
-                }
-            }
-
             // Upload new documents and create document entities
             List<String> uploadedDocumentPaths = uploadDocument(newDocuments);
             List<DocumentUploadEntity> documentUploadEntities = new ArrayList<>();
@@ -267,6 +245,11 @@ public class WebAppService extends BaseController {
                 documentUploadEntity.setWebAppEntity(findData);
                 documentUploadEntities.add(documentUploadEntity);
             });
+
+            // Combine existing documents with new documents
+            if (existingDocuments != null) {
+                documentUploadEntities.addAll(existingDocuments);
+            }
 
             List<PICDeveloperEntity> picDeveloperData = processLongList(picDeveloper, picDeveloperRepository, Function.identity(), "PIC Developer");
 

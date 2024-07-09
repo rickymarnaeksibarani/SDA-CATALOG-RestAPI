@@ -50,7 +50,7 @@ public class WebAppController {
             @RequestPart("frontEnd") List<Long> frontEnd,
             @RequestPart("backEnd") List<Long> backEnd,
             @RequestPart("webServer") List<Long> webServer,
-            @RequestPart("documentUploadList") List<MultipartFile> documentUploadList
+            @RequestPart(value = "documentUploadList", required = false) List<MultipartFile> documentUploadList
     ) {
         try {
             WebAppEntity result = webAppService.createWebApp(request, picDeveloper, picAnalyst,mappingFunction, frontEnd, backEnd, webServer, documentUploadList);
