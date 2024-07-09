@@ -126,10 +126,14 @@ public class WebAppController {
             @RequestParam("mappingFunction") List<Long> mappingFunction,
             @RequestParam("frontEnd") List<Long> frontEnd,
             @RequestParam("backEnd") List<Long> backEnd,
-            @RequestParam("webServer") List<Long> webServer
+            @RequestParam("webServer") List<Long> webServer,
+            @RequestPart(value = "documentUploadList", required = false) List<MultipartFile>documentUploadList
     ) {
 
         try {
+            if (Objects.nonNull(documentUploadList)) {
+                request.setDocumentUploadList(documentUploadList);
+            }
             WebAppEntity result = webAppService.updateWebAppById(idWebApp, request, picDeveloper, picAnalyst, mappingFunction, frontEnd, backEnd, webServer);
             ApiResponse<WebAppEntity> response = new ApiResponse<>(HttpStatus.ACCEPTED, "Successfully updated data webapp!", result);
             return new ResponseEntity<>(response, response.getStatus());
