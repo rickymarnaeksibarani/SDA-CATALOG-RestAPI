@@ -128,7 +128,7 @@ public class WebAppController {
             @RequestParam("backEnd") List<Long> backEnd,
             @RequestParam("webServer") List<Long> webServer,
             @RequestPart(value = "documentUploadList", required = false) List<MultipartFile>documentUploadList
-    ) {
+    ){
 
         try {
             if (Objects.nonNull(documentUploadList)) {

@@ -34,16 +34,8 @@ import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Entities.PICDevelo
 import sda.catalogue.sdacataloguerestapi.modules.PICDeveloper.Repositories.PICDeveloperRepository;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Entities.SDAHostingEntity;
 import sda.catalogue.sdacataloguerestapi.modules.SDAHosting.Repositories.SDAHostingRepository;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Entities.TypeDatabaseEntity;
-import sda.catalogue.sdacataloguerestapi.modules.TypeDatabase.Repositories.TypeDatabaseRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Dto.*;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.ApiEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.DatabaseEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.VersioningApplicationEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Entities.WebAppEntity;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.ApiRepository;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.DatabaseRepository;
-import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.VersioningApplicationRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebApp.Repositories.WebAppRepository;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Entities.WebServerEntity;
 import sda.catalogue.sdacataloguerestapi.modules.WebServer.Repositories.WebServerRepository;

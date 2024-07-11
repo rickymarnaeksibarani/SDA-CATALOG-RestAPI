@@ -14,6 +14,16 @@ spring:
   frontend: "*"
   devtools:
     add-properties: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/db_sda_catalog?stringtype=unspecified
+    username: sda_catalog
+    password: sd4_c4t4l0g
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: false
+  baseUrl: http://localhost:8080
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
@@ -37,37 +47,12 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
-      
-  security:
-    oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog
-        registration:
-          keycloak:
-            client-id: sda-catalog-web
-      resourceserver:
-        jwt:
-          jwk-set-uri: https://dev-auth.gmf-aeroasia.co.id/auth/realms/sda-catalog/protocol/openid-connect/certs
-  data:
-    redis:
-      host: 172.16.41.107
-      port: 6379
-  cache:
-    type: redis
 minio:
-  url: http://172.16.41.73
+  url: http://192.168.43.211
   port: 9000
-  access_key: NzuPCWpGUqoOPHgbCQJL
-  secret_key: YdoevporrUm3ddrytfBTXqWFT3JXVlR3DyzzwaZR
-  bucket: "sda-catalog"
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    serviceUrl:
-      defaultZone: http://172.16.41.107:8761/eureka/
+  access_key: cSbGLc9gnavEV8MDmXgy
+  secret_key: Plpd09P7RFrUuY0P7cofZE9NoO8jhyKTcsnDCUx5
+  bucket: sda-catalog
 springdoc:
   api-docs:
     enabled: true
