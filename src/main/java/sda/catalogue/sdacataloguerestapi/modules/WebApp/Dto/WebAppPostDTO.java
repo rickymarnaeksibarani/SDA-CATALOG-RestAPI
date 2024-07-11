@@ -96,6 +96,7 @@ public class WebAppPostDTO {
     @JsonProperty("webServer")
     private List<Long> webServer;
 
+    @JsonIgnore
     @JsonProperty("documentUploadList")
     private List<MultipartFile> documentUploadList;
 }
