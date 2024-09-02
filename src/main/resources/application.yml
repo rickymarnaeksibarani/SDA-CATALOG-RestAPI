@@ -7,7 +7,7 @@ logging:
         security: DEBUG
 spring:
   profiles:
-    active: dev
+    active: local
   application:
     name: td-sdacatalog-service
     version: 1.0.0
@@ -50,9 +50,9 @@ spring:
 minio:
   url: http://192.168.43.211
   port: 9000
-  access_key: cSbGLc9gnavEV8MDmXgy
-  secret_key: Plpd09P7RFrUuY0P7cofZE9NoO8jhyKTcsnDCUx5
-  bucket: sda-catalog
+  access_key: access_key
+  secret_key: secret_ket
+  bucket: bucket
 springdoc:
   api-docs:
     enabled: true
