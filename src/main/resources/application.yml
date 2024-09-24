@@ -49,7 +49,7 @@ spring:
       max-request-size: 500MB
 minio:
   url: url
-  port: 9000
+  port: port
   access_key: access_key
   secret_key: secret_ket
   bucket: bucket
